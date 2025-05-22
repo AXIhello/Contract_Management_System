@@ -14,15 +14,32 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // TODO: 替换下面这块“模拟判断逻辑”为真实后端请求
-            // 比如用 fetch("/api/login", {...})
-            // 提交 username 和 password，后端返回角色再做跳转
-            if (username === "admin" && password === "admin") {
-                window.location.href = "/admin.html"; // TODO: 也可能跳转路径需要后端返回
-            } else if (username === "user" && password === "user") {
-                window.location.href = "/operator.html";
-            } else {
-                error.textContent = "用户名或密码错误！";
+            try {
+                const res = await fetch("/api/user/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({ username: username, password }),
+                });
+
+                const result = await res.json();
+
+                if (result.code === 200) {
+                    const user = result.data;
+                    alert("登录成功，欢迎 " + user.username);
+                    // 根据用户身份跳转（示例：根据用户名判断）
+                    if (user.username === "admin") {
+                        window.location.href = "/admin.html";
+                    } else {
+                        window.location.href = "/operator.html";
+                    }
+                } else {
+                    error.textContent = result.msg;
+                }
+            } catch (err) {
+                error.textContent = "网络错误，请稍后再试";
+                console.error(err);
             }
         });
     }
@@ -44,12 +61,31 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // TODO: 这里改成发送真实注册请求给后端
-            // 比如 fetch("/api/register", { method: "POST", body: JSON.stringify({...}) })
+            try {
+                const res = await fetch("/api/user/register", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: new URLSearchParams({
+                        username: username,
+                        password,
+                        confirmPassword: confirm,
+                    }),
+                });
 
-            // 模拟注册成功提示
-            alert("注册成功！");
-            window.location.href = "/login.html"; // TODO: 注册成功后的跳转可根据后端返回结果调整
+                const result = await res.json();
+
+                if (result.code === 200) {
+                    alert("注册成功！");
+                    window.location.href = "/login.html";
+                } else {
+                    error.textContent = result.msg;
+                }
+            } catch (err) {
+                error.textContent = "网络错误，请稍后再试";
+                console.error(err);
+            }
         });
     }
 });
