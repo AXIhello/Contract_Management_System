@@ -13,4 +13,8 @@ public class User {
     public void setName(String name) {
         this.username = name;
     }
+
+    public String getName(){
+        return this.username;
+    }
 }

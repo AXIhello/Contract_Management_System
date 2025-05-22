@@ -23,11 +23,15 @@ public class LoginController {
         user.setName(username);
         user.setPassword(password);
 
+        if(!password.equals(confirmPassword)) {
+            return Result.error("两次输入的密码不一致");
+        }
+
         boolean success = userService.register(user, confirmPassword);
         if (success) {
             return Result.success("注册成功");
         } else {
-            return Result.error("注册失败！用户名重复或信息无效");
+            return Result.error("用户名已存在！");
         }
     }
 

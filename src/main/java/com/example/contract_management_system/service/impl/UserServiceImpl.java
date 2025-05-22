@@ -16,22 +16,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean register(User user, String confirmPassword) {
-//        if (user.getName() == null || user.getPassword() == null || confirmPassword == null) return false;
-//        if (!user.getPassword().equals(confirmPassword)) return false;
-//
-//        QueryWrapper<User> query = new QueryWrapper<>();
-//        query.eq("name", user.getName());
-//        if (userMapper.selectOne(query) != null) return false;
+        if (user.getName() == null || user.getPassword() == null || confirmPassword == null) return false;
+        if (!user.getPassword().equals(confirmPassword)) return false;
+
+        QueryWrapper<User> query = new QueryWrapper<>();
+        query.eq("username", user.getName());
+        if (userMapper.selectOne(query) != null) return false;
 
         return userMapper.insert(user) > 0;
     }
 
     @Override
-    public User login(String name, String password) {
-        if (name == null || password == null) return null;
+    public User login(String username, String password) {
+        if (username == null || password == null) return null;
 
         QueryWrapper<User> query = new QueryWrapper<>();
-        query.eq("name", name).eq("password", password);
+        query.eq("username", username).eq("password", password);
         return userMapper.selectOne(query);
     }
 }
