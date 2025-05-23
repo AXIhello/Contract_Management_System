@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>添加客户</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        form {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            width: 750px; /* 两倍宽 */
+            box-sizing: border-box;
+        }
+
+
+        h2 {
+            text-align: left;  /* 改成左对齐 */
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: normal; /* 标签字体正常，不粗 */
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea {
+            width: 100%;
+            padding: 0.7rem;
+            margin-top: 4px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.7rem;
+            background-color: #007bff;
+            border: none;
+            color: #fff;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #resultMessage {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+<form id="addCustomerForm" enctype="multipart/form-data">
+    <h2>添加客户</h2>
+
+    <label for="customerName">客户名称（必填）：</label>
+    <input type="text" id="customerName" name="customerName" required />
+
+    <label for="phone">电话（必填）：</label>
+    <input type="text" id="phone" name="phone" required />
+
+    <label for="address">地址（必填）：</label>
+    <input type="text" id="address" name="address" required />
+
+    <label for="fax">传真：</label>
+    <input type="text" id="fax" name="fax" />
+
+    <label for="email">邮箱：</label>
+    <input type="email" id="email" name="email" />
+
+    <label for="bankName">银行名称：</label>
+    <input type="text" id="bankName" name="bankName" />
+
+    <label for="bankAccount">银行账号：</label>
+    <input type="text" id="bankAccount" name="bankAccount" />
+
+    <label for="notes">备注：</label>
+    <textarea id="notes" name="notes" rows="3"></textarea>
+
+    <div id="resultMessage"></div>
+
+    <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <button type="submit">提交</button>
+        <button type="reset">重置</button>
+    </div>
+
+</form>
+
+<script src="addCustomer.js"></script>
+</body>
+</html>
