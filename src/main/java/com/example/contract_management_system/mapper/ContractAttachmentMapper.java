@@ -1,0 +1,18 @@
+package com.example.contract_management_system.mapper;
+
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.example.contract_management_system.pojo.ContractAttachment;
+import org.apache.ibatis.annotations.Mapper;
+
+import java.util.List;
+
+@Mapper
+public interface ContractAttachmentMapper extends BaseMapper<ContractAttachment> {
+
+    /**
+     * 根据合同编号查询附件列表
+     * @param conNum 合同编号
+     * @return 附件列表
+     */
+    List<ContractAttachment> selectByConNum(Integer conNum);
+}

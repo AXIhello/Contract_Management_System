@@ -51,45 +51,86 @@ document.getElementById("draftContractForm").addEventListener("submit", function
         return;
     }
 
-    // 5. 如果上传附件，校验格式（附件可选）
+    // 5. 客户名称格式校验（客户名（编号））
+    const clientNamePattern = /^.+（\d+）$/;
+    if (!clientNamePattern.test(clientName)) {
+        error.textContent = "客户名称格式不正确，应为：客户名（编号）格式！";
+        return;
+    }
+
+    // 6. 如果上传附件，校验格式（附件可选）
     if (contractFile) {
-        const allowedExtensions = ["doc", "jpg", "jpeg", "png", "bmp", "gif"];
+        const allowedExtensions = ["doc", "docx", "jpg", "jpeg", "png", "bmp", "gif", "pdf"];
         const fileExt = contractFile.name.split('.').pop().toLowerCase();
         if (!allowedExtensions.includes(fileExt)) {
-            error.textContent = "附件格式不正确，只允许doc、jpg、jpeg、png、bmp、gif！";
+            error.textContent = "附件格式不正确，只允许doc、docx、pdf、jpg、jpeg、png、bmp、gif！";
+            return;
+        }
+
+        // 文件大小限制（例如10MB）
+        const maxSize = 30 * 1024 * 1024; // 30MB
+        if (contractFile.size > maxSize) {
+            error.textContent = "附件大小不能超过30MB！";
             return;
         }
     }
 
-    // TODO: 改成合同起草接口地址，POST 或其他方法
-    // TODO: 根据后端API，组装表单数据，可以用FormData传文件
-    // const formData = new FormData();
-    // formData.append("contractName", contractName);
-    // formData.append("startDate", startDate);
-    // formData.append("endDate", endDate);
-    // formData.append("contractContent", contractContent);
-    // formData.append("clientName", clientName);
-    // if (contractFile) formData.append("contractFile", contractFile);
+    // 组装表单数据
+    const formData = new FormData();
+    formData.append("contractName", contractName);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
+    formData.append("contractContent", contractContent);
+    formData.append("clientName", clientName);
 
-    // TODO: 用 fetch 或 XMLHttpRequest 发给后端
-    // fetch('/api/contract/draft', {
-    //     method: 'POST',
-    //     body: formData
-    // }).then(res => res.json())
-    //   .then(data => {
-    //       if(data.success){
-    //           alert("起草成功！");
-    //           this.reset();
-    //       } else {
-    //           error.textContent = data.message || "起草失败，请重试！";
-    //       }
-    //   }).catch(() => {
-    //       error.textContent = "网络错误，提交失败！";
-    //   });
+    // 获取当前用户姓名
+    const userName = getCurrentUserName();
+    if (!userName) {
+        error.textContent = "获取用户信息失败，请重新登录！";
+        return;
+    }
+    formData.append("userName", userName);
 
-    // 目前是直接弹成功
-    alert("起草成功！");
-    this.reset();
+    if (contractFile) {
+        formData.append("contractFile", contractFile);
+    }
+
+    // 显示加载状态
+    const submitButton = this.querySelector('button[type="submit"]');
+    const originalText = submitButton.textContent;
+    submitButton.disabled = true;
+    submitButton.textContent = "提交中...";
+
+    // 发送请求到后端
+    fetch('/api/contract/draft', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('网络响应异常');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                alert("合同起草成功！");
+                this.reset(); // 重置表单
+                // 可选：跳转到合同列表页面
+                window.location.href = '/contracts';
+            } else {
+                error.textContent = data.message || "起草失败，请重试！";
+            }
+        })
+        .catch(err => {
+            console.error('提交失败:', err);
+            error.textContent = "网络错误，请检查网络连接后重试！";
+        })
+        .finally(() => {
+            // 恢复按钮状态
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+        });
 });
 
 // 动态限制结束时间不能小于开始时间
@@ -106,3 +147,20 @@ startDateInput.addEventListener("change", () => {
         endDateInput.min = "";
     }
 });
+
+// 获取当前用户姓名的函数
+function getCurrentUserName() {
+    // 从session中获取用户信息
+    return fetch('/api/user/current')
+        .then(response => response.json())
+        .then(data => {
+            if (data.code === 200 && data.data) {
+                return data.data.name;
+            }
+            throw new Error('获取用户信息失败');
+        })
+        .catch(error => {
+            console.error('获取用户信息失败:', error);
+            return null;
+        });
+}
