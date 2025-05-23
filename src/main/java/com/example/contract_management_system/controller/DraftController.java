@@ -24,8 +24,8 @@ public class DraftController {
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
             @RequestParam("contractContent") String contractContent,
-            @RequestParam("clientName") int clientId, // 客户ID，前端传来的是 int 类型的 customer 外键
-            @RequestParam("userName") String userName
+            @RequestParam("clientName") int customer, // 客户ID，前端传来的是 int 类型的 customer 外键
+            @RequestParam("userName") int userId;
     ) {
         Map<String, Object> response = new HashMap<>();
 
