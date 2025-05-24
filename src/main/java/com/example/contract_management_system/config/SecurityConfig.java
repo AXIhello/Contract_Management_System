@@ -61,7 +61,8 @@ public class SecurityConfig {
                 )
                 .authenticationProvider(authenticationProvider())
                 .sessionManagement(session -> session.maximumSessions(1))
-// 开启记住我功能
+
+                // 开启记住我功能
                 .rememberMe(rememberMe -> rememberMe
                 .userDetailsService(myUserDetailsService)
                 .tokenValiditySeconds(7 * 24 * 60 * 60) // 一周有效期

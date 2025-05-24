@@ -23,13 +23,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<Customer> queryCustomers(String contractNo, Integer customerId, String name) {
+    public List<Customer> queryCustomers( Integer customerId, String name) {
         QueryWrapper<Customer> wrapper = new QueryWrapper<>();
-        if (contractNo != null && !contractNo.trim().isEmpty()) {
-            wrapper.like("contract_no", contractNo);
-        } //待扩展：多表？
+//        if (contractNo != null && !contractNo.trim().isEmpty()) {
+//            wrapper.like("contract_no", contractNo);
+//        } //待扩展：多表？
         if (customerId != null) {
-            wrapper.eq("id", customerId);
+            wrapper.eq("num", customerId);
         }
         if (name != null && !name.trim().isEmpty()) {
             wrapper.like("name", name);

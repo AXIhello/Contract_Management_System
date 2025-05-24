@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface CustomerService {
     boolean addCustomer(Customer customer);
-    List<Customer> queryCustomers(String contractNo, Integer customerId, String name);
+    List<Customer> queryCustomers(Integer customerId, String name);
 
 }

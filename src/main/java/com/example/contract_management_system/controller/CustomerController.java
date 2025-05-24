@@ -39,13 +39,12 @@ public class CustomerController {
     // 查询客户（模糊查询）
     @GetMapping("/query")
     public Map<String, Object> queryCustomers(
-            @RequestParam(required = false) String contractNo,
             @RequestParam(required = false) Integer customerId,
             @RequestParam(required = false) String name) {
 
         Map<String, Object> result = new HashMap<>();
         try {
-            List<Customer> customers = customerService.queryCustomers(contractNo, customerId, name);
+            List<Customer> customers = customerService.queryCustomers(customerId, name);
             result.put("success", true);
             result.put("data", customers);
         } catch (Exception e) {
