@@ -65,12 +65,13 @@ public class LoginController {
         }
     }
 
-//TODO:将token也失效
-    @PostMapping("/logout")
-    public Result<String> logout(HttpSession session) {
-        session.invalidate(); // 清除当前用户所有会话数据
-        return Result.success("登出成功");
-    }
+//TODO:改用SpringSecurity的登出机制；
+
+//    @PostMapping("/logout")
+//    public Result<String> logout(HttpSession session) {
+//        session.invalidate(); // 清除当前用户所有会话数据
+//        return Result.success("登出成功");
+//    }
 
 
 }
