@@ -27,7 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
         QueryWrapper<Customer> wrapper = new QueryWrapper<>();
         if (contractNo != null && !contractNo.trim().isEmpty()) {
             wrapper.like("contract_no", contractNo);
-        }
+        } //待扩展：多表？
         if (customerId != null) {
             wrapper.eq("id", customerId);
         }

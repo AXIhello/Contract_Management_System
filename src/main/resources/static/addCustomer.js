@@ -8,6 +8,7 @@ document.getElementById("addCustomerForm").addEventListener("submit", function (
     const code = document.getElementById("code").value.trim();
     const bank = document.getElementById("bank").value.trim();
     const account = document.getElementById("account").value.trim();
+    const note = document.getElementById("note").value.trim();
     const result = document.getElementById("resultMessage");
 
     result.style.color = "red";
@@ -24,8 +25,9 @@ document.getElementById("addCustomerForm").addEventListener("submit", function (
         tel,
         fax,
         code,
-        bank,     // ✅ 和后端一致
-        account,  // ✅ 和后端一致
+        bank,
+        account,
+        note,
     };
 
     console.log("提交数据：", customerData);  // 调试用

@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @TableName("customer")
 public class Customer {
-    @TableId(value = "num", type = IdType.AUTO) // ✅ 指定主键为自增类型
+    @TableId(value = "num", type = IdType.AUTO)
     private Integer num;
     private String name;
     private String address;
@@ -16,4 +16,5 @@ public class Customer {
     private String code;
     private String bank;
     private String account;
+    private String note;
 }
