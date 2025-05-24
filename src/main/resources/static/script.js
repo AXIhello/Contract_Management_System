@@ -20,7 +20,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
-                    body: new URLSearchParams({ username: username, password }),
+                    body: new URLSearchParams({ username: username, password, "remember-me": "true" }),
+                    credentials: "include",
                 });
 
                 const result = await res.json();
