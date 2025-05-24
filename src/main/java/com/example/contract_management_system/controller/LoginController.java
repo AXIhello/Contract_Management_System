@@ -23,9 +23,6 @@ public class LoginController {
         user.setName(username);
         user.setPassword(password);
 
-        if(!password.equals(confirmPassword)) {
-            return Result.error("两次输入的密码不一致");
-        }
 
         boolean success = userService.register(user, confirmPassword);
         if (success) {
