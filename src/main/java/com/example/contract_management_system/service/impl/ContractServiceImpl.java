@@ -27,6 +27,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     private ContractStateService contractStateService;
 
     @Override
+    @Transactional
     public boolean draftContract(Contract contract) {
         logger.info("开始验证合同信息: {}", contract);
 
@@ -53,7 +54,21 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         logger.info("合同信息验证通过，开始保存");
         int result = contractMapper.insert(contract);
         logger.info("合同保存结果: {}", result > 0);
-        return result > 0;
+        
+        if (result > 0) {
+            // 创建合同状态记录
+            ContractState contractState = new ContractState();
+            contractState.setConNum(contract.getNum());
+            contractState.setConName(contract.getName());
+            contractState.setType(1); // 1表示起草状态
+            contractState.setTime(new Date());
+            
+            boolean stateSaved = contractStateService.save(contractState);
+            logger.info("合同状态保存结果: {}", stateSaved);
+            return stateSaved;
+        }
+        
+        return false;
     }
 
     //获取起草状态的合同
