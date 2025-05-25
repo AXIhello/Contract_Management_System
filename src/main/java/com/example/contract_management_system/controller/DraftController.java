@@ -2,6 +2,7 @@ package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractService;
+import com.example.contract_management_system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,9 @@ public class DraftController {
     @Autowired
     private ContractAttachmentService contractAttachmentService;
 
+    @Autowired
+    private UserService userService;
+
     @PostMapping("/draft")
     public Map<String, Object> draftContract(
             @RequestParam("contractName") String contractName,
@@ -30,17 +34,25 @@ public class DraftController {
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
             @RequestParam("contractContent") String contractContent,
             @RequestParam("clientName") String clientName, // 客户信息：客户名（编号）格式
-            @RequestParam("userName") String userName, // 起草人姓名
             @RequestParam(value = "contractFile", required = false) MultipartFile contractFile // 添加文件上传支持
     ) {
         Map<String, Object> response = new HashMap<>();
 
         try {
+            // 获取当前登录用户的ID
+            Integer userId = userService.getCurrentUserId();
+            if (userId == null) {
+                response.put("success", false);
+                response.put("message", "用户未登录或登录已过期");
+                return response;
+            }
+
             Contract contract = new Contract();
             contract.setName(contractName);
             contract.setBeginTime(startDate);
             contract.setEndTime(endDate);
             contract.setContent(contractContent);
+            contract.setUserId(userId); // 设置用户ID而不是用户名
 
             // 解析clientName格式：张三（1） -> 提取括号内的数字1作为客户编号保存
             int customerId;
@@ -63,8 +75,6 @@ public class DraftController {
                 response.put("message", "客户信息格式错误，应为：客户名（编号）格式");
                 return response;
             }
-
-            contract.setUserName(userName);
 
             // 先保存合同信息
             boolean success = contractService.draftContract(contract);

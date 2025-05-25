@@ -20,13 +20,4 @@ public class UserUtil {
         }
         return null;
     }
-
-    /**
-     * 获取当前登录用户名
-     */
-    public static String getCurrentUsername() {
-        UserDetails userDetails = getCurrentUserDetails();
-        return userDetails != null ? userDetails.getUsername() : null;
-    }
-
 }
