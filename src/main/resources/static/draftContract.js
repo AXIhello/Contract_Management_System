@@ -1,8 +1,25 @@
 // 页面加载完成后获取客户列表
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM加载完成，开始加载客户列表');
+    // 设置输入框为加载状态
+    setInputsLoading(true);
     loadCustomers();
 });
+
+// 设置输入框加载状态
+function setInputsLoading(isLoading) {
+    const inputs = document.querySelectorAll('input, textarea');
+    inputs.forEach(input => {
+        input.disabled = isLoading;
+        if (isLoading) {
+            input.style.opacity = '0.7';
+            input.style.cursor = 'not-allowed';
+        } else {
+            input.style.opacity = '1';
+            input.style.cursor = 'auto';
+        }
+    });
+}
 
 // 加载客户列表
 function loadCustomers() {
@@ -49,12 +66,19 @@ function loadCustomers() {
         })
         .catch(error => {
             console.error('获取客户列表出错:', error);
+        })
+        .finally(() => {
+            // 无论成功失败，都解除输入框的加载状态
+            setInputsLoading(false);
         });
 }
 
 // 表单提交处理
 document.getElementById("draftContractForm").addEventListener("submit", function (e) {
     e.preventDefault();
+
+    // 设置所有输入框为禁用状态
+    setInputsLoading(true);
 
     const contractName = document.getElementById("contractName").value.trim();
     const startDate = document.getElementById("startDate").value.trim();
@@ -152,11 +176,15 @@ document.getElementById("draftContractForm").addEventListener("submit", function
                 window.location.href = '/contracts';
             } else {
                 error.textContent = data.message || "起草失败，请重试！";
+                // 失败时解除输入框禁用状态
+                setInputsLoading(false);
             }
         })
         .catch(err => {
             console.error('提交失败:', err);
             error.textContent = "网络错误，请检查网络连接后重试！";
+            // 错误时解除输入框禁用状态
+            setInputsLoading(false);
         })
         .finally(() => {
             submitButton.disabled = false;

@@ -2,6 +2,10 @@ package com.example.contract_management_system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.contract_management_system.pojo.Contract;
+import org.apache.ibatis.annotations.Select;
+import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 
 public interface ContractMapper extends BaseMapper<Contract> {
@@ -15,6 +19,6 @@ public interface ContractMapper extends BaseMapper<Contract> {
     void updateContractState(@Param("conNum") int conNum, @Param("type") int type);
 
     @Select("SELECT name FROM contract WHERE id = #{id}")
-    String findContractNameById(@Param("id") String id);
+    String findContractNameById(@Param("user_id") String id);
 }
 
