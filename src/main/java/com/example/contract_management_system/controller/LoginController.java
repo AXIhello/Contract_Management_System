@@ -65,14 +65,7 @@ public class LoginController {
             // 登录成功，将认证信息存入Security上下文和session
             SecurityContextHolder.getContext().setAuthentication(authentication);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
-
-            // 查询数据库，返回完整用户信息
-            QueryWrapper<User> query = new QueryWrapper<>();
-            query.eq("username", username);
-
-            User user = userMapper.selectOne(query);
-
-            return Result.success(user.getUsername() + user.getUserid().toString()+"登录成功");
+            return Result.success("登录成功");
         } catch (AuthenticationException e) {
             return Result.error("用户名或密码错误");
         }
@@ -85,15 +78,6 @@ public class LoginController {
 //        session.invalidate(); // 清除当前用户所有会话数据
 //        return Result.success("登出成功");
 //    }
-
-    @GetMapping("/current-id")
-    public ResponseEntity<Integer> getCurrentUserId() {
-        Integer userId = userService.getCurrentUserId();
-        if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        return ResponseEntity.ok(userId);
-    }
 }
 
 
