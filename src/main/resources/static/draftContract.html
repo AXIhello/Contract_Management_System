@@ -10,11 +10,12 @@
     <h2>起草合同</h2>
 
     <label for="contractName">合同名称（必填）：</label>
-    <input type="text" id="contractName" name="contractName" required autocomplete="off" />
+    <input type="text" id="contractName" name="contractName" required />
 
     <label for="clientName">客户名称（必填）：</label>
-    <input type="text" id="clientName" name="clientName" list="clientList" required autocomplete="off" />
+    <input list="clientList" id="clientName" name="clientName" required />
     <datalist id="clientList">
+        <!-- 客户列表将通过JavaScript动态加载 -->
     </datalist>
     <br>
 
