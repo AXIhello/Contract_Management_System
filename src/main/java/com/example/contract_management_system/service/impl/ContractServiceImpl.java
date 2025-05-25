@@ -1,5 +1,6 @@
 package com.example.contract_management_system.service.impl;
 
+import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.mapper.ContractMapper;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractService;
@@ -8,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class ContractServiceImpl implements ContractService {
@@ -52,6 +53,12 @@ public class ContractServiceImpl implements ContractService {
     public List<Contract> getDraftContracts() {
         return contractMapper.selectContractsByState(1); // 1 = 起草状态
     }
+
+    @Override
+    public String getContractNameById(String id) {
+        return contractMapper.findContractNameById(id);
+    }
+
     //分配合同
     @Override
     public boolean assignContract(AssignContractRequest request) {

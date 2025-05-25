@@ -72,7 +72,7 @@ public class LoginController {
 
             User user = userMapper.selectOne(query);
 
-            return Result.success(user.getUsername() + user.getUserid().toString()+"登录成功");
+            return Result.success(user.getUsername() + user.getUserId() +"登录成功");
         } catch (AuthenticationException e) {
             return Result.error("用户名或密码错误");
         }

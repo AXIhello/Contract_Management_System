@@ -1,6 +1,9 @@
 package com.example.contract_management_system.service;
 
+import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.pojo.Contract;
+
+import java.util.List;
 
 public interface ContractService {
     boolean draftContract(Contract contract);
@@ -9,8 +12,6 @@ public interface ContractService {
     List<Contract> getDraftContracts();
     boolean assignContract(AssignContractRequest request);
 
-    public String getContractNameById(String id) {
-        return contractMapper.findContractNameById(id);
-    }
+    public String getContractNameById(String id);
 
 }

@@ -4,12 +4,16 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
+import lombok.Getter;
 
 @Data
 @TableName("users")
 public class User {
-    @TableId(value = "userId", type = IdType.AUTO)
+    @TableId(value = "user_id", type = IdType.AUTO)
+    @Getter
     private int userId;
     private String username;
     private String password;
+
+
 }
