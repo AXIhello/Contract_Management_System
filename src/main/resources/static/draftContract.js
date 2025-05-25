@@ -1,3 +1,33 @@
+// 页面加载完成后获取客户列表
+document.addEventListener('DOMContentLoaded', function() {
+    loadCustomers();
+});
+
+// 加载客户列表
+function loadCustomers() {
+    fetch('/api/customer/query')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const clientList = document.getElementById('clientList');
+                // 清空现有选项
+                clientList.innerHTML = '';
+                
+                // 添加客户选项
+                data.data.forEach(customer => {
+                    const option = document.createElement('option');
+                    option.value = `${customer.name}（${customer.num}）`;
+                    clientList.appendChild(option);
+                });
+            } else {
+                console.error('获取客户列表失败:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('获取客户列表出错:', error);
+        });
+}
+
 document.getElementById("draftContractForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -67,7 +97,7 @@ document.getElementById("draftContractForm").addEventListener("submit", function
             return;
         }
 
-        // 文件大小限制（例如10MB）
+        // 文件大小限制为30M
         const maxSize = 30 * 1024 * 1024; // 30MB
         if (contractFile.size > maxSize) {
             error.textContent = "附件大小不能超过30MB！";
@@ -82,14 +112,6 @@ document.getElementById("draftContractForm").addEventListener("submit", function
     formData.append("endDate", endDate);
     formData.append("contractContent", contractContent);
     formData.append("clientName", clientName);
-
-    // 获取当前用户姓名
-    const userName = getCurrentUserName();
-    if (!userName) {
-        error.textContent = "获取用户信息失败，请重新登录！";
-        return;
-    }
-    formData.append("userName", userName);
 
     if (contractFile) {
         formData.append("contractFile", contractFile);
@@ -116,7 +138,7 @@ document.getElementById("draftContractForm").addEventListener("submit", function
             if (data.success) {
                 alert("合同起草成功！");
                 this.reset(); // 重置表单
-                // 可选：跳转到合同列表页面
+                // 跳转到合同列表页面
                 window.location.href = '/contracts';
             } else {
                 error.textContent = data.message || "起草失败，请重试！";
@@ -147,20 +169,3 @@ startDateInput.addEventListener("change", () => {
         endDateInput.min = "";
     }
 });
-
-// 获取当前用户姓名的函数
-function getCurrentUserName() {
-    // 从session中获取用户信息
-    return fetch('/api/user/current')
-        .then(response => response.json())
-        .then(data => {
-            if (data.code === 200 && data.data) {
-                return data.data.name;
-            }
-            throw new Error('获取用户信息失败');
-        })
-        .catch(error => {
-            console.error('获取用户信息失败:', error);
-            return null;
-        });
-}

@@ -16,7 +16,7 @@ public class ContractServiceImpl implements ContractService {
 
     @Override
     public boolean draftContract(Contract contract) {
-        if (contract == null || contract.getName() == null || contract.getCustomer() <= 0 || contract.getUserName()==null)
+        if (contract == null || contract.getName() == null || contract.getCustomer() <= 0 || contract.getUserId() <= 0)
             return false;
         return contractMapper.insert(contract) > 0;
     }

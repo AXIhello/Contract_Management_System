@@ -15,10 +15,7 @@
     <label for="clientName">客户名称（必填）：</label>
     <input list="clientList" id="clientName" name="clientName" required />
     <datalist id="clientList">
-        <option value="客户A">
-        <option value="客户B">
-        <option value="客户C">
-            <!-- 你可以加更多 -->
+        <!-- 客户列表将通过JavaScript动态加载 -->
     </datalist>
     <br>
 
@@ -32,7 +29,7 @@
     <textarea id="contractContent" name="contractContent" rows="5"></textarea><br><br>
 
     <label for="contractFile">上传合同附件</label><br>
-    <input type="file" id="contractFile" name="contractFile" accept=".doc,.jpg,.jpeg,.png,.bmp,.gif"><br><br>
+    <input type="file" id="contractFile" name="contractFile" accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif"><br><br>
 
     <div class="error" id="draftError" style="color: red; margin-bottom: 10px;"></div>
     <button type="submit">提交起草</button>
