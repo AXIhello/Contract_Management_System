@@ -8,6 +8,11 @@ import com.example.contract_management_system.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+
+
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -32,5 +37,21 @@ public class UserServiceImpl implements UserService {
         user.setPassword(encodedPassword);
 
         return userMapper.insert(user) > 0;
+    }
+    @Override
+    public Integer getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof UserDetails userDetails) {
+            String username = userDetails.getUsername();
+            QueryWrapper<User> query = new QueryWrapper<>();
+            query.eq("username", username);
+            User user = userMapper.selectOne(query);
+            return user != null ? user.getUser_id() : null;
+        }
+        return null;
     }
 }
