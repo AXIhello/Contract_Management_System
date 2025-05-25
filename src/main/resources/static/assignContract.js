@@ -1,26 +1,4 @@
-// TODO: 替换此处的模拟数据为后端返回的真实数据列表
-// 后端应该返回一个 JSON 数组，格式如下：
-// [
-//   { id: "C001", name: "合同名称", drafter: "起草人", date: "起草时间" },
-//   ...
-// ]
-const contracts = [
-    { id: "C001", name: "XX合同1", drafter: "张三", date: "2023-12-01" },
-    { id: "C002", name: "XX合同2", drafter: "李四", date: "2023-12-03" },
-    { id: "C003", name: "XX合同3", drafter: "王五", date: "2023-12-05" },
-    { id: "C004", name: "XX合同4", drafter: "赵六", date: "2023-12-07" },
-    { id: "C005", name: "XX合同5", drafter: "钱七", date: "2023-12-09" },
-    { id: "C006", name: "XX合同6", drafter: "孙八", date: "2023-12-11" },
-    { id: "C007", name: "XX合同7", drafter: "周九", date: "2023-12-13" }
-];
-
-// TODO: 如果你要从后端动态拉取数据，建议这样封装接口调用逻辑
-// fetch('/api/contracts/pending')
-//     .then(res => res.json())
-//     .then(data => {
-//         contracts = data;
-//         renderTable(contracts);
-//     });
+let contracts = [];  // 先空着
 
 let currentPage = 1;
 const itemsPerPage = 5;
@@ -39,7 +17,7 @@ function renderTable(data) {
             <td>${contract.name}</td>
             <td>${contract.drafter}</td>
             <td>${contract.date}</td>
-            <td><a href="#">分配</a></td>
+            <td><a href="/contract/assign.html?id=${contract.id}">分配</a></td>
         </tr>`;
         body.insertAdjacentHTML("beforeend", row);
     }
@@ -88,5 +66,13 @@ function goToLastPage() {
     renderTable(contracts);
 }
 
-// 初始化渲染
-renderTable(contracts);
+// 启动时请求后端接口获取数据
+fetch('/api/contract/drafts')
+    .then(res => res.json())
+    .then(data => {
+        contracts = data;
+        renderTable(contracts);
+    })
+    .catch(err => {
+        console.error('获取合同列表失败:', err);
+    });

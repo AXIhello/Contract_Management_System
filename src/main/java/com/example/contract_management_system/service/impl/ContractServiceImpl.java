@@ -29,4 +29,27 @@ public class ContractServiceImpl implements ContractService {
 //        LocalDateTime uploadTime = LocalDateTime.now();
 //        return contractMapper.insertAttachment(conNum, fileName, path, type, uploadTime) > 0;
 //    }
+    //获取起草状态的合同
+    @Override
+    public List<Contract> getDraftContracts() {
+        return contractMapper.selectContractsByState(1); // 1 = 起草状态
+    }
+    //分配合同
+    @Override
+    public boolean assignContract(AssignContractRequest request) {
+        // 校验字段不为空
+        if (request.getSigner() == null || request.getApprover() == null || request.getCosigner() == null) {
+            return false;
+        }
+
+        // 插入 contract_process 表
+        contractMapper.insertContractProcess(request.getContractNum(), 1, 0, request.getCosigner());
+        contractMapper.insertContractProcess(request.getContractNum(), 2, 0, request.getApprover());
+        contractMapper.insertContractProcess(request.getContractNum(), 3, 0, request.getSigner());
+
+        // 更新合同状态表，设为已分配（比如2 会签完成）
+        contractMapper.updateContractState(request.getContractNum(), 2);
+
+        return true;
+    }
 }

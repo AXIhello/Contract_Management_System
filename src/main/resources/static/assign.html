@@ -2,118 +2,120 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <title>流程配置：xxx合同</title>
+    <title>分配人员</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f2f5;
             padding: 20px;
-            margin: 0;
         }
+
         .container {
             background: #fff;
-            padding: 20px 30px 30px 30px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-width: 1000px;
+            max-width: 800px;
             margin: auto;
         }
+
         h2 {
             background-color: #007bff;
             color: white;
             padding: 10px 15px;
             border-radius: 4px;
-            margin-bottom: 25px;
-        }
-        .multiselect-wrapper {
-            position: relative;
-            margin-bottom: 25px;
-            max-width: 100%;
-            width: 100%;
+            margin-bottom: 20px;
         }
 
-        .multiselect-wrapper label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: bold;
-            color: #003366;
-            user-select: none;
+        .multi-select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
         }
+
         .multi-input {
             width: 100%;
-            padding: 8px 10px;
-            font-size: 16px;
+            padding: 10px;
             border: 1px solid #ccc;
-            border-radius: 6px;
-            box-sizing: border-box;
-            outline: none;
+            border-radius: 4px;
             cursor: pointer;
-            background-color: #fff;
-        }
-        .multi-input:focus {
-            border-color: #0056b3;
-            box-shadow: 0 0 5px rgba(0,86,179,0.5);
-        }
-        .options-list {
-            position: absolute;
-            top: 100%;
-            left: 0; right: 0;
-            max-height: 180px;
-            border: 1px solid #ccc;
-            border-top: none;
-            background: white;
-            overflow-y: auto;
-            border-radius: 0 0 6px 6px;
-            z-index: 999;
-            display: none;
             box-sizing: border-box;
         }
+
+        .options-list {
+            border: 1px solid #ccc;
+            max-height: 150px;
+            overflow-y: auto;
+            display: none;
+            position: absolute;
+            background: white;
+            width: 100%;
+            z-index: 1000;
+            border-radius: 4px;
+        }
+
         .options-list.show {
             display: block;
         }
+
         .option-item {
-            padding: 6px 12px;
+            padding: 8px 12px;
             cursor: pointer;
-            user-select: none;
-            display: flex;
-            align-items: center;
         }
+
         .option-item:hover {
-            background: #e6f0ff;
+            background-color: #f0f0f0;
         }
-        .option-item input[type="checkbox"] {
-            margin-right: 8px;
+
+        .button-group {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .button-group button {
+            margin-left: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .button-group button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- TODO: 这里的 “xxx合同” 是占位符，页面加载时需动态替换成真实合同名称 -->
-    <!-- 合同名称应由后端接口返回或页面传参提供 -->
-    <!-- 例如，前端调用接口拿到合同详情后，通过 DOM 操作将 <h2> 的内容替换为真实合同名 -->
-    <h2 id="contractTitle">流程配置：xxx合同</h2>
+    <h2>流程配置：分配合同</h2>
 
-    <div class="multiselect-wrapper" id="signerSelect">
-        <label for="signerInput">📄 分配会签人</label>
-        <input id="signerInput" type="text" class="multi-input" placeholder="点击下拉选择" readonly />
+    <!-- 签订人 -->
+    <div id="signerSelect" class="multi-select-wrapper">
+        <input type="text" class="multi-input" placeholder="请选择签订人" readonly />
         <div class="options-list"></div>
     </div>
 
-    <div class="multiselect-wrapper" id="approveSelect">
-        <label for="approveInput">📄 分配审批人</label>
-        <input id="approveInput" type="text" class="multi-input" placeholder="点击下拉选择" readonly />
+    <!-- 审批人 -->
+    <div id="approveSelect" class="multi-select-wrapper">
+        <input type="text" class="multi-input" placeholder="请选择审批人" readonly />
         <div class="options-list"></div>
     </div>
 
-    <div class="multiselect-wrapper" id="signListSelect">
-        <label for="signListInput">📄 分配签订人</label>
-        <input id="signListInput" type="text" class="multi-input" placeholder="点击下拉选择" readonly />
+    <!-- 会签人 -->
+    <div id="signListSelect" class="multi-select-wrapper">
+        <input type="text" class="multi-input" placeholder="请选择会签人" readonly />
         <div class="options-list"></div>
     </div>
 
-
+    <!-- 按钮 -->
+    <div class="button-group">
+        <button id="btnBack">返回</button>
+        <button id="btnConfirm">确认分配</button>
+    </div>
 </div>
 
 <script src="assign.js"></script>
 </body>
 </html>
+
