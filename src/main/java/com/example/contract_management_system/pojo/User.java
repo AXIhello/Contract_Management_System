@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 @TableName("users")
 public class User {
-    @TableId(value = "user_id", type = IdType.AUTO)
-    private Integer userid;
+    @TableId(value = "userId", type = IdType.AUTO)
+    private int userId;
     private String username;
     private String password;
 }
