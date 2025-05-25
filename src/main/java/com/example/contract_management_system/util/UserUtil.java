@@ -28,5 +28,4 @@ public class UserUtil {
         UserDetails userDetails = getCurrentUserDetails();
         return userDetails != null ? userDetails.getUsername() : null;
     }
-
 }
