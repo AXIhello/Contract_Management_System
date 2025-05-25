@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             User user = userMapper.selectOne(query);
             logger.info("查询到的用户信息: {}", user);
             
-            return user != null ? user.getUserid() : null;
+            return user != null ? user.getUserId() : null;
         }
         
         logger.error("认证主体不是UserDetails类型");

@@ -1,3 +1,17 @@
+package com.example.contract_management_system.controller;
+
+
+import com.example.contract_management_system.dto.AssignContractRequest;
+import com.example.contract_management_system.pojo.Contract;
+import com.example.contract_management_system.service.ContractService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/contract")
 public class AssignController {

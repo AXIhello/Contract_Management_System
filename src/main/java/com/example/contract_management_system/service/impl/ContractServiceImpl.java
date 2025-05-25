@@ -1,5 +1,6 @@
 package com.example.contract_management_system.service.impl;
 
+import com.example.contract_management_system.dto.AssignContractRequest;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.mapper.ContractMapper;
 import com.example.contract_management_system.pojo.Contract;
@@ -12,8 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> implements ContractService {
@@ -60,6 +61,12 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     public List<Contract> getDraftContracts() {
         return contractMapper.selectContractsByState(1); // 1 = 起草状态
     }
+
+    @Override
+    public String getContractNameById(String id) {
+        return contractMapper.findContractNameById(id);
+    }
+
     //分配合同
     @Override
     public boolean assignContract(AssignContractRequest request) {
@@ -87,14 +94,14 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         if (!saved) {
             return false;
         }
-        
+
         // 创建合同状态记录
         ContractState contractState = new ContractState();
         contractState.setConNum(contract.getNum());
         contractState.setConName(contract.getName());
         contractState.setType(1); // 1表示起草状态
         contractState.setTime(new Date());
-        
+
         return contractStateService.save(contractState);
     }
 }
