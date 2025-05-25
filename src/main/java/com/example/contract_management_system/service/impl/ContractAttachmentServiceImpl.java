@@ -3,6 +3,8 @@ package com.example.contract_management_system.service.impl;
 import com.example.contract_management_system.mapper.ContractAttachmentMapper;
 import com.example.contract_management_system.pojo.ContractAttachment;
 import com.example.contract_management_system.service.ContractAttachmentService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,12 @@ import java.util.UUID;
 
 @Service
 public class ContractAttachmentServiceImpl implements ContractAttachmentService {
+    private static final Logger logger = LoggerFactory.getLogger(ContractAttachmentServiceImpl.class);
 
     @Autowired
     private ContractAttachmentMapper contractAttachmentMapper;
 
-    // 从配置文件中读取文件上传路径，如果没有配置则使用默认值
-    @Value("${file.upload.path:./uploads/contracts/}")
+    @Value("${file.upload.path}")
     private String uploadPath;
 
     @Override
@@ -29,7 +31,7 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
         try {
             return contractAttachmentMapper.insert(attachment) > 0;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("保存附件信息到数据库失败", e);
             return false;
         }
     }
@@ -37,6 +39,7 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
     @Override
     public boolean uploadAndSaveAttachment(Integer conNum, MultipartFile file) {
         if (file == null || file.isEmpty()) {
+            logger.warn("上传的文件为空");
             return false;
         }
 
@@ -44,10 +47,15 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             // 确保上传目录存在
             File uploadDir = new File(uploadPath);
             if (!uploadDir.exists()) {
-                uploadDir.mkdirs();
+                logger.info("创建上传目录: {}", uploadPath);
+                boolean created = uploadDir.mkdirs();
+                if (!created) {
+                    logger.error("创建上传目录失败: {}", uploadPath);
+                    return false;
+                }
             }
 
-            // 生成唯一文件名，避免重名冲突
+            // 生成唯一文件名
             String originalFileName = file.getOriginalFilename();
             String fileExtension = "";
             if (originalFileName != null && originalFileName.contains(".")) {
@@ -56,10 +64,12 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
 
             String fileName = UUID.randomUUID().toString() + fileExtension;
             String filePath = uploadPath + fileName;
+            logger.info("准备保存文件到: {}", filePath);
 
             // 保存文件到磁盘
             File destFile = new File(filePath);
             file.transferTo(destFile);
+            logger.info("文件保存成功: {}", filePath);
 
             // 获取文件类型
             String fileType = getFileType(originalFileName);
@@ -72,10 +82,18 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             attachment.setType(fileType);
             attachment.setUploadTime(new Date());
 
-            return saveAttachment(attachment);
+            boolean saved = saveAttachment(attachment);
+            if (saved) {
+                logger.info("附件信息保存到数据库成功");
+            } else {
+                logger.error("附件信息保存到数据库失败");
+                // 如果数据库保存失败，删除已上传的文件
+                destFile.delete();
+            }
+            return saved;
 
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.error("文件上传失败", e);
             return false;
         }
     }
@@ -93,14 +111,17 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             if (attachment != null) {
                 File file = new File(attachment.getPath());
                 if (file.exists()) {
-                    file.delete();
+                    boolean deleted = file.delete();
+                    if (!deleted) {
+                        logger.warn("文件删除失败: {}", attachment.getPath());
+                    }
                 }
                 // 删除数据库记录
                 return contractAttachmentMapper.deleteById(id) > 0;
             }
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("删除附件失败", e);
             return false;
         }
     }
