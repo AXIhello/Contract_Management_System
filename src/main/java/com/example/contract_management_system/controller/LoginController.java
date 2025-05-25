@@ -1,11 +1,15 @@
 package com.example.contract_management_system.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.contract_management_system.mapper.UserMapper;
 import com.example.contract_management_system.pojo.User;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,6 +33,9 @@ public class LoginController {
 
     @Autowired
     private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private UserMapper userMapper;
 
     @PostMapping("/register")
     public Result<String> register(@RequestParam String username,
@@ -59,7 +66,13 @@ public class LoginController {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
-            return Result.success("登录成功");
+            // 查询数据库，返回完整用户信息
+            QueryWrapper<User> query = new QueryWrapper<>();
+            query.eq("username", username);
+
+            User user = userMapper.selectOne(query);
+
+            return Result.success(user.getUsername() + user.getUserid().toString()+"登录成功");
         } catch (AuthenticationException e) {
             return Result.error("用户名或密码错误");
         }
@@ -73,7 +86,14 @@ public class LoginController {
 //        return Result.success("登出成功");
 //    }
 
-
+    @GetMapping("/current-id")
+    public ResponseEntity<Integer> getCurrentUserId() {
+        Integer userId = userService.getCurrentUserId();
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        return ResponseEntity.ok(userId);
+    }
 }
 
 

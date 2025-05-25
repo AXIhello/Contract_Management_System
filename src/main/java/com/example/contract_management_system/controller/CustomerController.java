@@ -37,7 +37,7 @@ public class CustomerController {
     }
 
     // 查询客户（模糊查询）
-    @GetMapping("/query")
+//    @GetMapping("/query")
     public Map<String, Object> queryCustomers(
             @RequestParam(required = false) Integer customerId,
             @RequestParam(required = false) String name) {

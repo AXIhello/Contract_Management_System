@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.insert(user) > 0;
     }
+
     @Override
     public Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,10 +48,11 @@ public class UserServiceImpl implements UserService {
         Object principal = authentication.getPrincipal();
         if (principal instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
+            System.out.println("用户名：" + userDetails.getUsername());
             QueryWrapper<User> query = new QueryWrapper<>();
             query.eq("username", username);
             User user = userMapper.selectOne(query);
-            return user != null ? user.getUser_id() : null;
+            return user != null ? user.getUserid() : null;
         }
         return null;
     }
