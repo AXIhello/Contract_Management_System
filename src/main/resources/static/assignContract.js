@@ -13,11 +13,11 @@ function renderTable(data) {
 
     for (const contract of pageData) {
         const row = `<tr>
-            <td>${contract.id}</td>
+            <td>${contract.num}</td>
             <td>${contract.name}</td>
-            <td>${contract.drafter}</td>
-            <td>${contract.date}</td>
-            <td><a href="/contract/assign.html?id=${contract.id}">分配</a></td>
+            <td>${contract.userId}</td>
+            <td>${contract.beginTime}</td>
+            <td><a href="/assign.html?id=${contract.num}">分配</a></td>
         </tr>`;
         body.insertAdjacentHTML("beforeend", row);
     }
@@ -67,7 +67,7 @@ function goToLastPage() {
 }
 
 // 启动时请求后端接口获取数据
-fetch('/api/contract/drafts')
+fetch('/api/assign/drafts')
     .then(res => res.json())
     .then(data => {
         contracts = data;

@@ -1,16 +1,25 @@
 package com.example.contract_management_system.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.Setter;
+
+import java.sql.Timestamp;
 
 public class AssignContractRequest {
+    @JsonProperty("conNum")
+    @Setter
     @Getter
-    private int contractNum;
-    // 也可以改为 List<ContractProcess> 结构
+    private int conNum;    // 合同ID
+    @JsonProperty("type")
     @Getter
-    private String signer;     // 签订人
+    private int type;           // 操作类型
+    @JsonProperty("userId")
     @Getter
-    private String approver;   // 审批人
+    private int userId;         // 操作员ID
+    @JsonProperty("time")
     @Getter
-    private String cosigner;   // 会签人
+    private Timestamp time
+            = new Timestamp(System.currentTimeMillis());    // 操作时间
 
 }

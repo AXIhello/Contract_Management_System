@@ -12,6 +12,7 @@ public class User {
     @TableId(value = "user_id", type = IdType.AUTO)
     @Getter
     private int userId;
+    @Getter
     private String username;
     private String password;
 
