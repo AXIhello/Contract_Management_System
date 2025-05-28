@@ -1,4 +1,4 @@
-let contracts = [];  // 先空着
+let contracts = [];  // 存储合同数据
 
 let currentPage = 1;
 const itemsPerPage = 5;
@@ -17,7 +17,7 @@ function renderTable(data) {
             <td>${contract.name}</td>
             <td>${contract.userId}</td>
             <td>${contract.beginTime}</td>
-            <td><a href="/assign.html?id=${contract.num}">分配</a></td>
+            <td><a href="/countersign.html?id=${contract.num}">会签</a></td>
         </tr>`;
         body.insertAdjacentHTML("beforeend", row);
     }
@@ -66,13 +66,24 @@ function goToLastPage() {
     renderTable(contracts);
 }
 
-// 启动时请求后端接口获取数据
-fetch('/api/assign/drafts')
+// TODO: 后端需要实现的接口
+// GET /api/countersign/pending
+// 请求参数：无
+// 返回数据格式：
+// [
+//   {
+//     "num": "合同编号",
+//     "name": "合同名称",
+//     "userId": "起草人ID",
+//     "beginTime": "起草时间"
+//   }
+// ]
+fetch('/api/countersign/pending')
     .then(res => res.json())
     .then(data => {
         contracts = data;
         renderTable(contracts);
     })
     .catch(err => {
-        console.error('获取合同列表失败:', err);
-    });
+        console.error('获取待会签合同列表失败:', err);
+    }); 

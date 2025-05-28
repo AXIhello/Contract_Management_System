@@ -7,13 +7,13 @@ import com.example.contract_management_system.pojo.User;
 import com.example.contract_management_system.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.List;
 
 
 @Service
@@ -21,10 +21,13 @@ public class UserServiceImpl implements UserService {
 
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-    @Autowired
-    private UserMapper userMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;  // 注入密码编码器
+    private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;  // 注入密码编码器
+
+    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder) {
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+    }
 
 
     @Override
@@ -42,6 +45,7 @@ public class UserServiceImpl implements UserService {
 
         return userMapper.insert(user) > 0;
     }
+
     @Override
     public Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -69,5 +73,15 @@ public class UserServiceImpl implements UserService {
         
         logger.error("认证主体不是UserDetails类型");
         return null;
+    }
+
+    @Override
+    public List<User> getAllUsers(){
+        return userMapper.selectList(null);
+    }
+
+    @Override
+    public String getUsernameById(int userId){
+        return userMapper.selectById(userId).getUsername();
     }
 }

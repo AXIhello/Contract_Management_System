@@ -1,18 +1,15 @@
 package com.example.contract_management_system.service.impl;
 
-import com.example.contract_management_system.dto.AssignContractRequest;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.example.contract_management_system.mapper.ContractMapper;
-import com.example.contract_management_system.pojo.Contract;
-import com.example.contract_management_system.pojo.ContractState;
-import com.example.contract_management_system.service.ContractService;
-import com.example.contract_management_system.service.ContractStateService;
+import com.example.contract_management_system.mapper.*;
+import com.example.contract_management_system.pojo.*;
+import com.example.contract_management_system.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,11 +17,15 @@ import java.util.List;
 public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> implements ContractService {
     private static final Logger logger = LoggerFactory.getLogger(ContractServiceImpl.class);
 
-    @Autowired
-    private ContractMapper contractMapper;
+    private final ContractMapper contractMapper;
+    private final ContractStateMapper contractStateMapper;
+    private final ContractStateService contractStateService;
 
-    @Autowired
-    private ContractStateService contractStateService;
+    public ContractServiceImpl(ContractMapper contractMapper, ContractStateMapper contractStateMapper, ContractStateService contractStateService, ContractProcessMapper contractProcessMapper) {
+        this.contractMapper = contractMapper;
+        this.contractStateMapper = contractStateMapper;
+        this.contractStateService = contractStateService;
+    }
 
     @Override
     @Transactional
@@ -74,32 +75,20 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     //获取起草状态的合同
     @Override
     public List<Contract> getDraftContracts() {
-        return contractMapper.selectContractsByState(1); // 1 = 起草状态
+        List<Integer> list = contractStateMapper.selectContractsByState(1); // 1 = 起草状态
+        List<Contract>  contracts = new ArrayList<>(List.of());
+        for(Integer id : list){
+            contracts.add(contractMapper.findContractById(id));
+        }
+        return contracts;
     }
 
     @Override
-    public String getContractNameById(String id) {
+    public String getContractNameById(Integer id) {
         return contractMapper.findContractNameById(id);
     }
 
-    //分配合同
-    @Override
-    public boolean assignContract(AssignContractRequest request) {
-        // 校验字段不为空
-        if (request.getSigner() == null || request.getApprover() == null || request.getCosigner() == null) {
-            return false;
-        }
 
-        // 插入 contract_process 表
-        contractMapper.insertContractProcess(request.getContractNum(), 1, 0, request.getCosigner());
-        contractMapper.insertContractProcess(request.getContractNum(), 2, 0, request.getApprover());
-        contractMapper.insertContractProcess(request.getContractNum(), 3, 0, request.getSigner());
-
-        // 更新合同状态表，设为已分配（比如2 会签完成）
-        contractMapper.updateContractState(request.getContractNum(), 2);
-
-        return true;
-    }
 
     @Override
     @Transactional
@@ -118,5 +107,10 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         contractState.setTime(new Date());
 
         return contractStateService.save(contractState);
+    }
+
+    @Override
+    public boolean existsByNum(Integer contractNum) {
+        return contractMapper.findContractById(contractNum) != null;
     }
 }

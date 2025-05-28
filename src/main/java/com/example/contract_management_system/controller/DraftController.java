@@ -3,7 +3,6 @@ package com.example.contract_management_system.controller;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractService;
 import com.example.contract_management_system.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import com.example.contract_management_system.service.ContractAttachmentService;
@@ -18,14 +17,15 @@ import java.util.Map;
 @CrossOrigin(origins = "*") // 允许跨域请求
 public class DraftController {
 
-    @Autowired
-    private ContractService contractService;
+    private final ContractService contractService;
+    private final ContractAttachmentService contractAttachmentService;
+    private final UserService userService;
 
-    @Autowired
-    private ContractAttachmentService contractAttachmentService;
-
-    @Autowired
-    private UserService userService;
+    public DraftController(ContractService contractService, ContractAttachmentService contractAttachmentService, UserService userService) {
+        this.contractService = contractService;
+        this.contractAttachmentService = contractAttachmentService;
+        this.userService = userService;
+    }
 
     @PostMapping("/draft")
     public Map<String, Object> draftContract(
