@@ -20,7 +20,7 @@ async function logout() {
             if (response.ok) {
                 // 如果你之前有用 sessionStorage 储存数据，也清理一下
                 sessionStorage.clear();
-                window.location.href = '/login.html';
+                window.location.href = 'userManagement/login.html';
             } else {
                 throw new Error('退出失败');
             }

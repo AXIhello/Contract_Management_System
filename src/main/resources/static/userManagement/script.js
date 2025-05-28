@@ -80,7 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (result.code === 200) {
                     alert("注册成功！");
-                    window.location.href = "/login.html";
+                    window.location.href = "/userManagement/login.html";
                 } else {
                     error.textContent = result.msg;
                 }

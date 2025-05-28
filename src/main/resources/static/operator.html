@@ -37,9 +37,6 @@
             color: #212529;
             text-decoration: none;
         }
-        .nav-item:hover .mega-menu {
-            display: block;
-        }
         .navbar-nav .nav-link {
             position: relative;
         }
@@ -59,12 +56,12 @@
                     <div class="container">
                         <div>
                             <h6><i class="fas fa-file-signature"></i> 合同操作</h6>
-                            <a href="/draftContract.html">起草合同</a>
-                            <a href="/countersignContract.html">会签合同</a>
-                            <a href="/contract/finalize.html">定稿合同</a>
-                            <a href="/contract/approve.html">审批合同</a>
-                            <a href="/contract/sign.html">签订合同</a>
-                            <a href="/contract/query.html">查询合同</a>
+                            <a href="contractManagement/draftContract.html">起草合同</a>
+                            <a href="contractManagement/countersignContract.html">会签合同</a>
+                            <a href="contractManagement/finalize.html">定稿合同</a>
+                            <a href="contractManagement/approve.html">审批合同</a>
+                            <a href="contractManagement/sign.html">签订合同</a>
+                            <a href="contractManagement/query.html">查询合同</a>
                         </div>
                     </div>
                 </div>
@@ -77,7 +74,7 @@
                     <div class="container">
                         <div>
                             <h6><i class="fas fa-users"></i> 客户操作</h6>
-                            <a href="/customerManagement/addCustomer.html">新增客户</a>
+                            <a href="customerManagement/addCustomer.html">新增客户</a>
                             <a href="/customer/query.html">查询客户</a>
                         </div>
                     </div>
@@ -91,8 +88,8 @@
                     <div class="container">
                         <div>
                             <h6><i class="fas fa-cogs"></i> 系统设置</h6>
-                            <a href="/assignContract.html">分配合同</a>
-                            <a href="/permissionManagement/permissionManage.html">权限管理</a>
+                            <a href="contractManagement/assignContract.html">分配合同</a>
+                            <a href="permissionManagement/permissionManage.html">权限管理</a>
                             <a href="/system/logs.html">日志管理</a>
                         </div>
                     </div>
@@ -126,5 +123,36 @@
         }
     });
 </script>
+<script>
+    document.querySelectorAll('.nav-item.dropdown').forEach(item => {
+        let timeout;
+
+        const menu = item.querySelector('.mega-menu');
+
+        item.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            menu.style.display = 'block';
+        });
+
+        item.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                menu.style.display = 'none';
+            }, 200); // 可调的延迟时间，防止闪退
+        });
+
+        // 防止移到子菜单时菜单关闭
+        menu.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            menu.style.display = 'block';
+        });
+
+        menu.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                menu.style.display = 'none';
+            }, 200);
+        });
+    });
+</script>
+
 </body>
 </html>
