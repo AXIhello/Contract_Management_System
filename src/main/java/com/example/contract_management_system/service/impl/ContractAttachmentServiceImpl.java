@@ -43,6 +43,13 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             return false;
         }
 
+        // 验证文件类型
+        String originalFileName = file.getOriginalFilename();
+        if (!isValidFileType(originalFileName)) {
+            logger.warn("不支持的文件类型: {}", originalFileName);
+            return false;
+        }
+
         try {
             // 确保上传目录存在
             File uploadDir = new File(uploadPath);
@@ -56,14 +63,14 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             }
 
             // 生成唯一文件名
-            String originalFileName = file.getOriginalFilename();
             String fileExtension = "";
             if (originalFileName != null && originalFileName.contains(".")) {
                 fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
             }
 
             String fileName = UUID.randomUUID().toString() + fileExtension;
-            String filePath = uploadPath + fileName;
+            String relativePath = "contract/attachment/" + fileName;
+            String filePath = uploadPath + File.separator + fileName;
             logger.info("准备保存文件到: {}", filePath);
 
             // 保存文件到磁盘
@@ -78,7 +85,7 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             ContractAttachment attachment = new ContractAttachment();
             attachment.setConNum(conNum);
             attachment.setFileName(originalFileName);
-            attachment.setPath(filePath);
+            attachment.setPath(relativePath);
             attachment.setType(fileType);
             attachment.setUploadTime(new Date());
 
@@ -153,5 +160,24 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             default:
                 return extension;
         }
+    }
+
+    /**
+     * 验证文件类型是否合法
+     */
+    private boolean isValidFileType(String fileName) {
+        if (fileName == null || !fileName.contains(".")) {
+            return false;
+        }
+
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        String[] allowedExtensions = {"doc", "docx", "pdf", "jpg", "jpeg", "png", "bmp", "gif"};
+
+        for (String allowedExt : allowedExtensions) {
+            if (allowedExt.equals(extension)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

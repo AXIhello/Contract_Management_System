@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>会签合同</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        h2 {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .contract-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .contract-info p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-height: 150px;
+            resize: vertical;
+        }
+        .button-group {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .button-group button {
+            margin-left: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>会签合同</h2>
+
+    <div class="contract-info">
+        <p>合同名称：<span id="contractName">加载中...</span></p>
+    </div>
+
+    <div class="form-group">
+        <label for="countersignComment">会签意见：</label>
+        <textarea id="countersignComment" placeholder="请输入会签意见..."></textarea>
+        <div id="errorMessage" class="error-message">会签意见不能为空</div>
+    </div>
+
+    <div class="button-group">
+        <button onclick="resetForm()">重置</button>
+        <button onclick="submitCountersign()">提交</button>
+    </div>
+</div>
+
+<script src="countersign.js"></script>
+</body>
+</html> 
