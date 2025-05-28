@@ -11,7 +11,7 @@ import lombok.Getter;
 public class User {
     @TableId(value = "user_id", type = IdType.AUTO)
     @Getter
-    private int userId;
+    private Integer userId;
     private String username;
     private String password;
 
