@@ -69,6 +69,7 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             }
 
             String fileName = UUID.randomUUID().toString() + fileExtension;
+            String relativePath = "contract/attachment/" + fileName;
             String filePath = uploadPath + File.separator + fileName;
             logger.info("准备保存文件到: {}", filePath);
 
@@ -84,7 +85,7 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             ContractAttachment attachment = new ContractAttachment();
             attachment.setConNum(conNum);
             attachment.setFileName(originalFileName);
-            attachment.setPath(filePath);
+            attachment.setPath(relativePath);
             attachment.setType(fileType);
             attachment.setUploadTime(new Date());
 
