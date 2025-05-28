@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同管理系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .mega-menu {
+            position: absolute;
+            top: 56px;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 999;
+        }
+        .mega-menu .container {
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+        }
+        .mega-menu h6 {
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        .mega-menu a {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #212529;
+            text-decoration: none;
+        }
+        .nav-item:hover .mega-menu {
+            display: block;
+        }
+        .navbar-nav .nav-link {
+            position: relative;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">合同管理系统</a>
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <!-- 合同管理 -->
+            <li class="nav-item dropdown position-static">
+                <a class="nav-link" href="#">合同管理</a>
+                <div class="mega-menu">
+                    <div class="container">
+                        <div>
+                            <h6><i class="fas fa-file-signature"></i> 合同操作</h6>
+                            <a href="/draftContract.html">起草合同</a>
+                            <a href="/contract/countersign.html">会签合同</a>
+                            <a href="/contract/finalize.html">定稿合同</a>
+                            <a href="/contract/approve.html">审批合同</a>
+                            <a href="/contract/sign.html">签订合同</a>
+                            <a href="/contract/query.html">查询合同</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <!-- 客户管理 -->
+            <li class="nav-item dropdown position-static">
+                <a class="nav-link" href="#">客户管理</a>
+                <div class="mega-menu">
+                    <div class="container">
+                        <div>
+                            <h6><i class="fas fa-users"></i> 客户操作</h6>
+                            <a href="/addCustomer.html">新增客户</a>
+                            <a href="/customer/query.html">查询客户</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <!-- 系统管理 -->
+            <li class="nav-item dropdown position-static">
+                <a class="nav-link" href="#">系统管理</a>
+                <div class="mega-menu">
+                    <div class="container">
+                        <div>
+                            <h6><i class="fas fa-cogs"></i> 系统设置</h6>
+                            <a href="/assignContract.html">分配合同</a>
+                            <a href="/system/permissions.html">权限管理</a>
+                            <a href="/system/logs.html">日志管理</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+
+        <!-- 右侧用户栏 -->
+        <div class="d-flex align-items-center text-white">
+            <i class="fas fa-user-circle me-2"></i>
+            <span class="me-3">操作员</span>
+            <button class="btn btn-outline-light btn-sm" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- 中间留空区域 -->
+<div class="container mt-5 text-center text-muted">
+    <h4>请选择上方模块进入操作</h4>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (confirm('确定要退出登录吗？')) {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            sessionStorage.clear();
+            window.location.href = '/login.html';
+        }
+    });
+</script>
+</body>
+</html>
