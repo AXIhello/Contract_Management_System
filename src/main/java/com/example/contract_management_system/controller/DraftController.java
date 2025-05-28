@@ -7,6 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -16,6 +18,7 @@ import java.util.Map;
 @RequestMapping("/api/contract")
 @CrossOrigin(origins = "*") // 允许跨域请求
 public class DraftController {
+    private static final Logger logger = LoggerFactory.getLogger(DraftController.class);
 
     private final ContractService contractService;
     private final ContractAttachmentService contractAttachmentService;
@@ -57,24 +60,13 @@ public class DraftController {
             // 解析clientName格式：张三（1） -> 提取括号内的数字1作为客户编号保存
             int customerId;
             try {
-                // 使用正则表达式提取括号内的数字
-                java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(".*（(\\d+)）$");
-                java.util.regex.Matcher matcher = pattern.matcher(clientName);
-
-                if (matcher.find()) {
-                    // 找到括号内的数字
-                    customerId = Integer.parseInt(matcher.group(1));
-                } else {
-                    // 如果格式不匹配，尝试直接解析为数字（兼容性处理）
-                    customerId = Integer.parseInt(clientName);
-                }
-
-                contract.setCustomer(customerId); // 保存客户编号
-            } catch (NumberFormatException e) {
+                customerId = Integer.parseInt(clientName.substring(clientName.lastIndexOf("（") + 1, clientName.lastIndexOf("）")));
+            } catch (Exception e) {
                 response.put("success", false);
-                response.put("message", "客户信息格式错误，应为：客户名（编号）格式");
+                response.put("message", "客户信息格式不正确");
                 return response;
             }
+            contract.setCustomer(customerId);
 
             // 先保存合同信息
             boolean success = contractService.draftContract(contract);
@@ -101,8 +93,9 @@ public class DraftController {
                 response.put("message", "合同起草失败");
             }
         } catch (Exception e) {
+            logger.error("合同起草过程中发生错误", e);
             response.put("success", false);
-            response.put("message", "系统错误：" + e.getMessage());
+            response.put("message", "系统繁忙，请稍后重试");
         }
 
         return response;

@@ -24,7 +24,6 @@ import com.example.contract_management_system.util.Result;
 
 import java.util.UUID;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/user")
 public class LoginController {
@@ -56,7 +55,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public Result<User> login(@RequestParam String username,
+    public Result<String> login(@RequestParam String username,
                                 @RequestParam String password,
                                 HttpSession session) {
         UsernamePasswordAuthenticationToken authToken =
@@ -72,10 +71,8 @@ public class LoginController {
             query.eq("username", username);
 
             User user = userMapper.selectOne(query);
-            // 清除密码信息
-            user.setPassword(null);
 
-            return Result.success(user);
+            return Result.success(user.getUsername() + user.getUserId() +"登录成功");
         } catch (AuthenticationException e) {
             return Result.error("用户名或密码错误");
         }

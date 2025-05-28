@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     const loginForm = document.getElementById("loginForm");
     const registerForm = document.getElementById("registerForm");
+    const BASE_URL = 'http://localhost:8080'; // 添加服务器基础URL
 
     if (loginForm) {
         loginForm.addEventListener("submit", async (e) => {
@@ -15,12 +16,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
-                const res = await fetch("/api/user/login", {
+                const res = await fetch(`${BASE_URL}/api/user/login`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
-                    body: new URLSearchParams({ username: username, password }),
+                    body: new URLSearchParams({ username: username, password, "remember-me": "true" }),
                     credentials: "include",
                 });
 
@@ -29,7 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (result.code === 200) {
                     const user = result.data;
                     alert("登录成功，欢迎 " + user.username);
-                    window.location.href = "/index.html";
+                    // 根据用户身份跳转（示例：根据用户名判断）
+                    if (user.username === "admin") {
+                        window.location.href = "/admin.html";
+                    } else {
+                        window.location.href = "/operator.html";
+                    }
                 } else {
                     error.textContent = result.msg;
                 }
@@ -58,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
             try {
-                const res = await fetch("/api/user/register", {
+                const res = await fetch(`${BASE_URL}/api/user/register`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
