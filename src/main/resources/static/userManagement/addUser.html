@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>添加用户</title>
+    <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+<form id="addUserForm">
+    <h2>添加用户</h2>
+
+    <label for="username">用户名：</label>
+    <input type="text" id="username" placeholder="请输入用户名" required />
+
+    <label for="password">密码：</label>
+    <input type="password" id="password" placeholder="请输入密码" required />
+
+    <label for="confirmPassword">确认密码：</label>
+    <input type="password" id="confirmPassword" placeholder="请再次输入密码" required />
+
+    <div class="error" id="errorMsg" style="display:none;"></div>
+    <div class="success" id="successMsg" style="display:none;">添加成功！</div>
+
+    <div class="button-group" style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+        <button type="button" onclick="resetForm()">重置</button>
+        <button type="button" onclick="submitUser()">提交</button>
+    </div>
+
+</form>
+<script src="addUser.js"></script>
+</body>
+</html>
