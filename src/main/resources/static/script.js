@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
                     },
-                    body: new URLSearchParams({ username: username, password, "remember-me": "true" }),
+                    body: new URLSearchParams({ username: username, password }),
                     credentials: "include",
                 });
 
@@ -29,12 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (result.code === 200) {
                     const user = result.data;
                     alert("登录成功，欢迎 " + user.username);
-                    // 根据用户身份跳转（示例：根据用户名判断）
-                    if (user.username === "admin") {
-                        window.location.href = "/admin.html";
-                    } else {
-                        window.location.href = "/operator.html";
-                    }
+                    window.location.href = "/index.html";
                 } else {
                     error.textContent = result.msg;
                 }
