@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <title>待签订合同</title>
+    <meta charset="UTF-8" />
+    <title>待审批合同</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -13,7 +13,7 @@
             background: #fff;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             max-width: 1000px;
             margin: auto;
         }
@@ -27,10 +27,6 @@
             margin: 15px 0;
             display: flex;
             align-items: center;
-        }
-        .search-bar label {
-            margin-right: 10px;
-            font-weight: bold;
         }
         .search-bar input {
             padding: 8px;
@@ -56,7 +52,6 @@
             border: 1px solid #ccc;
             padding: 10px;
             text-align: center;
-            white-space: nowrap;
         }
         table th {
             background-color: #007bff;
@@ -84,27 +79,26 @@
 </head>
 <body>
 <div class="container">
-    <h2>待签订合同</h2>
+    <h2>待审批合同</h2>
 
     <div class="search-bar">
-        <label for="searchInput">查找待签订合同：</label>
-        <input type="text" id="searchInput" placeholder="输入合同编号/名称/客户/签订员/时间...">
-        <button onclick="searchPendingContracts()">搜索</button>
+        <label for="searchInput">查找待审批合同：</label>
+        <input type="text" id="searchInput" placeholder="输入合同编号/名称/审批人/时间..." />
+        <button onclick="searchApprovalContracts()">搜索</button>
     </div>
 
-    <table id="pendingContractTable">
+    <table id="approvalContractTable">
         <thead>
         <tr>
             <th>合同编号</th>
             <th>合同名称</th>
-            <th>客户</th>
-            <th>签订员</th>
-            <th>签订时间</th>
+            <th>审批人</th>
+            <th>申请时间</th>
             <th>操作</th>
         </tr>
         </thead>
-        <tbody id="pendingContractBody">
-        <!-- 动态插入数据行 -->
+        <tbody id="approvalContractBody">
+        <!-- 动态插入行 -->
         </tbody>
     </table>
 
@@ -113,7 +107,7 @@
             <button onclick="goToPage(1)">首页</button>
             <button onclick="prevPage()">&lt; 上一页</button>
             <button onclick="nextPage()">下一页 &gt;</button>
-            <button onclick="goToLastPage()">尾页</button>
+            <button onclick="goToLastPage()">末页</button>
         </div>
         <span id="pageInfo">共 0 页 0 条</span>
     </div>
