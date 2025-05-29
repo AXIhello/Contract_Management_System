@@ -5,12 +5,14 @@ import com.example.contract_management_system.common.exception.*;
 import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.mapper.*;
 import com.example.contract_management_system.pojo.*;
+import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.service.ContractProcessService;
 import jakarta.persistence.PersistenceException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,11 +22,13 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     private final ContractProcessMapper contractProcessMapper;
     private final ContractMapper contractMapper;
     private final UserMapper userMapper;
+    private final UserService userService;
 
-    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper) {
+    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService) {
         this.contractProcessMapper = contractProcessMapper;
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
+        this.userService=userService;
     }
 
     //分配合同
@@ -100,7 +104,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     public boolean submitCountersign(Integer contractId, String comment) {
         try {
             // 1. 获取当前用户ID
-            Integer userId = userMapper.getCurrentUserId();
+            Integer userId = userService.getCurrentUserId();
             if (userId == null) {
                 throw new BusinessException("用户未登录");
             }
@@ -118,18 +122,10 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             }
 
             // 4. 更新会签状态和意见
-            int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 1, 1, comment, new Date());
+            int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 1, 1, comment, new Timestamp(System.currentTimeMillis()));
             if (affectedRows != 1) {
                 throw new PersistenceException("更新会签状态失败");
             }
-
-            // 5. 检查是否所有会签人都已完成会签
-            boolean allCountersigned = contractProcessMapper.checkAllCountersigned(contractId);
-            if (allCountersigned) {
-                // 如果所有会签人都已完成会签，更新合同状态为待审批
-                contractMapper.updateContractState(contractId, 2); // 2表示待审批状态
-            }
-
             return true;
         } catch (BusinessException e) {
             throw e;
