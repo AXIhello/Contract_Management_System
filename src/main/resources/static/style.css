@@ -34,3 +34,23 @@ button {
     color: red;
     font-size: 0.9rem;
 }
+#resultMessage {
+    color: red;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+.form-group label {
+    display: block; margin-bottom: 6px; font-weight: bold; }
+.form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+.permission-group { margin-bottom: 18px; }
+.permission-title { font-weight: bold; margin-top: 10px; }
+.checkbox-list { margin-left: 20px; }
+.button-group { text-align: right; }
+.button-group button { margin-left: 10px; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+.button-group button:hover { background-color: #0056b3; }
+.error-message { color: red; margin-top: 10px; }
+.success { color: #28a745; font-weight: bold; margin: 10px 0; }
