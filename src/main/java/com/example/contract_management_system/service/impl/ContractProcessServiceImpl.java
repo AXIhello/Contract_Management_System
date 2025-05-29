@@ -9,6 +9,11 @@ import com.example.contract_management_system.service.ContractProcessService;
 import jakarta.persistence.PersistenceException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMapper, ContractProcess> implements ContractProcessService {
@@ -58,6 +63,78 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
         } catch (Exception e) {
             // 其他未预料异常
             throw new SystemException("合同分配期间发生未知错误：", e);
+        }
+    }
+
+    @Override
+    public List<Contract> getPendingCountersignContracts(Integer userId) {
+        try {
+            // 获取当前用户待会签的合同列表
+            List<Integer> contractIds = contractProcessMapper.getPendingCountersignContracts(userId);
+            List<Contract> contracts = new ArrayList<>();
+            
+            for (Integer contractId : contractIds) {
+                Contract contract = contractMapper.findContractById(contractId);
+                if (contract != null) {
+                    contracts.add(contract);
+                }
+            }
+            
+            return contracts;
+        } catch (Exception e) {
+            throw new SystemException("获取待会签合同列表失败：", e);
+        }
+    }
+
+    @Override
+    public Contract getContractById(Integer id) {
+        try {
+            return contractMapper.findContractById(id);
+        } catch (Exception e) {
+            throw new SystemException("获取合同信息失败：", e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public boolean submitCountersign(Integer contractId, String comment) {
+        try {
+            // 1. 获取当前用户ID
+            Integer userId = userMapper.getCurrentUserId();
+            if (userId == null) {
+                throw new BusinessException("用户未登录");
+            }
+
+            // 2. 检查合同是否存在
+            Contract contract = contractMapper.findContractById(contractId);
+            if (contract == null) {
+                throw new BusinessException("合同不存在");
+            }
+
+            // 3. 检查用户是否有权限会签该合同
+            ContractProcess process = contractProcessMapper.getContractProcess(contractId, userId, 1); // 1表示会签
+            if (process == null) {
+                throw new BusinessException("您没有权限会签该合同");
+            }
+
+            // 4. 更新会签状态和意见
+            int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 1, 1, comment, new Date());
+            if (affectedRows != 1) {
+                throw new PersistenceException("更新会签状态失败");
+            }
+
+            // 5. 检查是否所有会签人都已完成会签
+            boolean allCountersigned = contractProcessMapper.checkAllCountersigned(contractId);
+            if (allCountersigned) {
+                // 如果所有会签人都已完成会签，更新合同状态为待审批
+                contractMapper.updateContractState(contractId, 2); // 2表示待审批状态
+            }
+
+            return true;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new SystemException("提交会签失败：", e);
         }
     }
 }
