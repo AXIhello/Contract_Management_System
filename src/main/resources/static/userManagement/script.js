@@ -33,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (user.username === "admin") {
                         window.location.href = "/admin.html";
                     } else {
-                        window.location.href = "/operator.html";
+                        window.location.href = "/dashboard-user.html";
                     }
                 } else {
                     error.textContent = result.msg;
