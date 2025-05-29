@@ -68,6 +68,14 @@ public class SecurityConfig {
                 .tokenValiditySeconds(7 * 24 * 60 * 60) // 一周有效期
                 // 可选：设置加密的key，默认会生成随机key，每次重启失效
                 .key("uniqueAndSecret")
+                )
+                // ✅ 加上这一段实现登出接口
+                .logout(logout -> logout
+                        .logoutUrl("/api/user/logout") // 自定义登出 URL
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.getWriter().write("退出成功");
+                        })
                 );
         return http.build();
     }
