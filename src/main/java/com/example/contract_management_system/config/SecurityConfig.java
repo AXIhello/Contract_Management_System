@@ -51,9 +51,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         // 放行静态页面（login.html、register.html）GET请求
-                        .requestMatchers(HttpMethod.GET, "/login.html","/register.html").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/userManagement/login.html","/userManagement/register.html").permitAll()
                         // 放行静态资源，如 CSS、JS、图片等
-                        .requestMatchers(HttpMethod.GET, "/style.css","/script.js").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/style.css","/userManagement/script.js").permitAll()
                         // 放行登录注册接口的POST请求
                         .requestMatchers(HttpMethod.POST, "/api/user/login", "/api/user/register").permitAll()
                         // 其他请求必须认证

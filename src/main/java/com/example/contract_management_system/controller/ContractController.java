@@ -3,7 +3,7 @@ package com.example.contract_management_system.controller;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractService;
 import org.springframework.web.bind.annotation.*;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/contracts")
 public class ContractController {

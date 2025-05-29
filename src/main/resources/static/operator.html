@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>合同管理系统</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fa;
+        }
+        .mega-menu {
+            position: absolute;
+            top: 56px;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: none;
+            z-index: 999;
+        }
+        .mega-menu .container {
+            display: flex;
+            padding: 2rem;
+            gap: 2rem;
+        }
+        .mega-menu a {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #212529;
+            text-decoration: none;
+        }
+        .mega-menu {
+            position: absolute;
+            top: 56px;
+            left: 0;
+            width: 100%;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            /*display: none;*/
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+            z-index: 999;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .mega-menu .container {
+            display: flex;
+            gap: 3rem; /* 两列之间间距 */
+            padding: 2rem 2rem;
+            max-width: 700px;
+            margin-left: 2rem; /* 向左偏移 */
+        }
+
+        .mega-menu h6 {
+            font-weight: bold;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+        .mega-menu h6 i {
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+            color: #0d6efd;
+            vertical-align: middle;
+        }
+
+        .system-menu > div {
+            background-color: #f1f3f5;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            min-width: 180px;
+        }
+
+        .system-menu > div:hover {
+            transform: translateY(-5px);
+            background-color: #e9ecef;
+        }
+
+        .mega-menu a {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #212529;
+            text-decoration: none;
+            transition: color 0.2s ease, transform 0.2s ease;
+            font-size: 0.95rem;
+            white-space: nowrap;       /* 不换行 */
+            overflow: hidden;          /* 防止内容溢出 */
+        }
+
+        .mega-menu a:hover {
+            color: #0d6efd;
+            transform: translateX(3px);
+        }
+
+        .nav-item:hover .mega-menu {
+            display: block;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .navbar-nav .nav-link {
+            position: relative;
+        }
+
+        .navbar-nav .nav-link {
+            position: relative;
+        }
+        /* 仅针对系统管理菜单，增大列间距 */
+        .mega-menu .container.system-menu  {
+            gap: 10rem !important;
+            flex-wrap: nowrap;  /* 防止整体折行 */
+        }
+        /* 可选：列之间加分隔线 */
+        .system-menu > div + div {
+            border-left: 1px solid #dee2e6;
+            padding-left: 2rem;
+        }
+        .navbar-skyblue {
+            background-color: #5897FF !important;
+        }
+        .navbar-skyblue .navbar-nav .nav-link,
+        .navbar-skyblue .navbar-brand,
+        .navbar-skyblue .text-white,
+        .navbar-skyblue span,
+        .navbar-skyblue button {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<nav class="navbar navbar-expand-lg navbar-dark navbar-skyblue">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">合同管理系统</a>
+        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+            <!-- 合同管理 -->
+            <li class="nav-item dropdown position-static">
+                <a class="nav-link fw-bold text-white" href="#">合同管理</a>
+                <div class="mega-menu">
+                    <div class="container justify-content-between">
+                        <div>
+                            <h6><i class="fas fa-file-signature"></i> 合同操作</h6>
+                            <a href="contractManagement/draftContract.html">起草合同</a>
+                            <a href="contractManagement/countersignContract.html">会签合同</a>
+                            <a href="contractManagement/finalize.html">定稿合同</a>
+                        </div>
+                        <div>
+                            <h6 style="visibility: hidden;">占位符</h6> <!-- 保持对齐 -->
+                            <a href="contractManagement/approve.html">审批合同</a>
+                            <a href="contractManagement/sign.html">签订合同</a>
+                            <a href="contractManagement/query.html">查询合同</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- 客户管理 -->
+            <li class="nav-item dropdown position-static">
+                <a class="nav-link fw-bold text-white" href="#">客户管理</a>
+                <div class="mega-menu">
+                    <div class="container justify-content-between">
+                        <div>
+                            <h6><i class="fas fa-users"></i> 客户操作</h6>
+                            <a href="customerManagement/addCustomer.html">新增客户</a>
+                        </div>
+                        <div>
+                            <h6 style="visibility: hidden;">占位符</h6>
+                            <a href="/customer/query.html">查询客户</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+
+            <!-- 系统管理 -->
+            <li class="nav-item dropdown position-static">
+                <a class="nav-link fw-bold text-white" href="#">系统管理</a>
+                <div class="mega-menu">
+                    <div class="container system-menu">
+                        <!-- 分配合同 -->
+                        <div>
+                            <h6><i class="fas fa-file-signature"></i> 分配合同</h6>
+                            <a href="contractManagement/assignContract.html">分配合同</a>
+                        </div>
+
+                        <!-- 日志管理 -->
+                        <div>
+                            <h6><i class="fas fa-book"></i> 日志管理</h6>
+                            <a href="/system/logs.html">日志管理</a>
+                        </div>
+
+                        <!-- 权限管理 + 子页面 -->
+                        <div>
+                            <h6>
+                                <a href="permissionManagement/permissionManage.html" style="text-decoration:none; color:inherit;">
+                                    <i class="fas fa-user-cog"></i> 权限管理
+                                </a>
+                            </h6>
+                            <a href="userManagement/userManage.html">用户管理</a>
+                            <a href="queryAndStatistics/roleList.html">角色管理</a>
+                            <a href="permissionManagement/functionManagement.html">功能操作</a>
+                            <a href="queryAndStatistics/userPermissionList.html">分配权限</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+
+        <!-- 右侧用户栏 -->
+        <div class="d-flex align-items-center text-white">
+            <i class="fas fa-user-circle me-2"></i>
+            <span class="me-3">操作员</span>
+            <button class="btn btn-outline-light btn-sm" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i> 退出
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- 中间留空区域 -->
+<div class="container mt-5 text-center text-muted">
+    <h4>请选择上方模块进入操作</h4>
+</div>
+
+<script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+        if (confirm('确定要退出登录吗？')) {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            sessionStorage.clear();
+            window.location.href = '/login.html';
+        }
+    });
+</script>
+<script>
+    document.querySelectorAll('.nav-item.dropdown').forEach(item => {
+        let timeout;
+
+        const menu = item.querySelector('.mega-menu');
+
+        item.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            menu.style.display = 'block';
+        });
+
+        item.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                menu.style.display = 'none';
+            }, 200); // 可调的延迟时间，防止闪退
+        });
+
+        // 防止移到子菜单时菜单关闭
+        menu.addEventListener('mouseenter', () => {
+            clearTimeout(timeout);
+            menu.style.display = 'block';
+        });
+
+        menu.addEventListener('mouseleave', () => {
+            timeout = setTimeout(() => {
+                menu.style.display = 'none';
+            }, 200);
+        });
+    });
+</script>
+
+</body>
+</html>

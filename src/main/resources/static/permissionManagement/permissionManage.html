@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>权限管理</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 20px; }
+        .container { background: #fff; padding: 40px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 500px; margin: 60px auto; text-align: center; }
+        h2 { background-color: #007bff; color: white; padding: 10px 15px; border-radius: 4px; margin-bottom: 30px; }
+        .btn-group { display: flex; flex-direction: column; gap: 24px; align-items: center; }
+        .main-btn {
+            width: 220px;
+            padding: 16px 0;
+            font-size: 18px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .main-btn:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>权限管理</h2>
+    <div class="btn-group">
+        <button class="main-btn" onclick="location.href='userManage.html'">用户管理</button>
+        <button class="main-btn" onclick="location.href='roleList.html'">角色管理</button>
+        <button class="main-btn" onclick="location.href='assignPermission.html'">分配权限</button>
+    </div>
+</div>
+</body>
+</html> 
