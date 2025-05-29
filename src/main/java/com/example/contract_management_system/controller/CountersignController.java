@@ -48,7 +48,7 @@ public class CountersignController {
 
     @PostMapping("/submit")
     public ResponseEntity<Map<String, Object>> submitCountersign(@RequestBody Map<String, Object> request) {
-        Integer contractId = (Integer) request.get("contractId");
+        Integer contractId = Integer.parseInt((String) request.get("contractId"));
         String comment = (String) request.get("comment");
         
         boolean success = contractProcessService.submitCountersign(contractId, comment);

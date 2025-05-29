@@ -25,24 +25,19 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
     List<Integer> getPendingCountersignContracts(@Param("userId") Integer userId);
 
     @Select("SELECT * FROM contract_process " +
-            "WHERE conNum = #{contractId} AND user_id = #{userId} AND type = #{type}")
-    ContractProcess getContractProcess(@Param("contNum") Integer conNum,
-                                     @Param("userId") Integer userId,
-                                     @Param("type") Integer type);
+            "WHERE conNum = #{conNum} AND user_id = #{userId} AND type = #{type}")
+    ContractProcess getContractProcess(@Param("conNum") Integer conNum,
+                                       @Param("userId") Integer userId,
+                                       @Param("type") Integer type);
 
     @Update("UPDATE contract_process " +
             "SET state = #{state}, content = #{content}, time = #{time} " +
-            "WHERE conNum = #{contractId} AND user_id  = #{userId} AND type = #{type}")
-    int updateContractProcess(@Param("contNum") Integer contractId,
-                            @Param("userId") Integer userId,
-                            @Param("type") Integer type,
-                            @Param("state") Integer state,
-                            @Param("content") String content,
-                            @Param("time") Date time);
+            "WHERE conNum = #{conNum} AND user_id = #{userId} AND type = #{type}")
+    int updateContractProcess(@Param("conNum") Integer conNum,
+                              @Param("userId") Integer userId,
+                              @Param("type") Integer type,
+                              @Param("state") Integer state,
+                              @Param("content") String content,
+                              @Param("time") Date time);
 
-    @Select("SELECT COUNT(*) = (SELECT COUNT(*) FROM contract_process " +
-            "WHERE conNum = #{contractId} AND type = 1) " +
-            "FROM contract_process " +
-            "WHERE conNum = #{contractId} AND type = 1 AND state = 1")
-    boolean checkAllCountersigned(@Param("contNum") Integer contractId);
 }

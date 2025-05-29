@@ -10,10 +10,4 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper extends BaseMapper<User> {
     @Select("SELECT * FROM users WHERE user_id = #{id}")
     User selectById(@Param("user_id") int id);
-
-    @Select("SELECT id FROM user WHERE username = #{username}")
-    Integer getUserIdByUsername(String username);
-    
-    @Select("SELECT id FROM user WHERE id = (SELECT user_id FROM user_session WHERE session_id = #{sessionId})")
-    Integer getCurrentUserId();
 }
