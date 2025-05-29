@@ -25,7 +25,7 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
     List<Integer> getPendingCountersignContracts(@Param("userId") Integer userId);
 
     @Select("SELECT * FROM contract_process " +
-            "WHERE conNum = #{contractId} AND user_id = #{userId} AND type = #{type}")
+            "WHERE conNum = #{contNum} AND user_id = #{userId} AND type = #{type}")
     ContractProcess getContractProcess(@Param("contNum") Integer conNum,
                                      @Param("userId") Integer userId,
                                      @Param("type") Integer type);
