@@ -2,7 +2,9 @@ package com.example.contract_management_system.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.contract_management_system.mapper.RoleMapper;
 import com.example.contract_management_system.mapper.UserMapper;
+import com.example.contract_management_system.pojo.Role;
 import com.example.contract_management_system.pojo.User;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
@@ -22,6 +24,8 @@ import jakarta.servlet.http.HttpSession;
 
 import com.example.contract_management_system.util.Result;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -36,6 +40,9 @@ public class LoginController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RoleMapper roleMapper;
 
     @PostMapping("/register")
     public Result<String> register(@RequestParam String username,
@@ -93,6 +100,32 @@ public class LoginController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
         }
         return ResponseEntity.ok(userId);
+    }
+
+    //获取完整用户信息
+    @GetMapping("/current")
+    public ResponseEntity<?> getCurrentUserInfo() {
+        Integer userId = userService.getCurrentUserId();
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("未登录");
+        }
+
+        // 获取 user
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户不存在");
+        }
+
+        // 单独查 role name，不加在 User 类里
+        //String roleName = roleMapper.selectById(Role.getRole_id()).getName();
+
+        // 返回需要的信息
+        Map<String, Object> result = new HashMap<>();
+        result.put("userId", user.getUserId());
+        result.put("username", user.getUsername());
+        //result.put("roleName", roleName);
+
+        return ResponseEntity.ok(result);
     }
 }
 
