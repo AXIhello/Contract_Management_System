@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>签订合同</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            padding: 20px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-width: 700px;
+            margin: auto;
+        }
+        h2 {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+        }
+        input[readonly] {
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 8px 10px;
+            width: 100%;
+            border-radius: 4px;
+            box-sizing: border-box;
+            color: #495057;
+        }
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            box-sizing: border-box;
+            resize: vertical;
+            font-size: 14px;
+            font-family: inherit;
+        }
+        .btn-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 12px;
+        }
+        button {
+            cursor: pointer;
+            padding: 10px 18px;
+            border-radius: 4px;
+            border: none;
+            font-weight: bold;
+            font-size: 14px;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        button.submit-btn {
+            background-color: #007bff;
+        }
+        button.submit-btn:hover {
+            background-color: #0056b3;
+        }
+        button.reset-btn {
+            background-color: #6c757d;
+        }
+        button.reset-btn:hover {
+            background-color: #495057;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>签订合同</h2>
+
+    <form id="signContractForm">
+        <label for="contractName">合同名称</label>
+        <input type="text" id="contractName" name="contractName" readonly />
+
+        <label for="clientName">客户</label>
+        <input type="text" id="clientName" name="clientName" readonly />
+
+        <label for="signerName">签订员</label>
+        <input type="text" id="signerName" name="signerName" readonly />
+
+        <label for="signInfo">签订信息</label>
+        <textarea id="signInfo" name="signInfo" placeholder="请输入签订信息..."></textarea>
+
+        <div class="btn-group">
+            <button type="submit" class="submit-btn">提交</button>
+            <button type="button" class="reset-btn" onclick="resetForm()">重置</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // 模拟后台数据获取
+    function loadContractData() {
+        // 这里模拟后台取来的数据
+        return {
+            contractName: "技术服务合同B",
+            clientName: "科技公司B",
+            signerName: "张三"
+        };
+    }
+
+    function populateForm() {
+        const data = loadContractData();
+        document.getElementById("contractName").value = data.contractName;
+        document.getElementById("clientName").value = data.clientName;
+        document.getElementById("signerName").value = data.signerName;
+    }
+
+    function resetForm() {
+        // 签订信息清空，前三个只读字段保持不变
+        document.getElementById("signInfo").value = "";
+    }
+
+    document.getElementById("signContractForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        const signInfo = document.getElementById("signInfo").value.trim();
+        if (!signInfo) {
+            alert("请填写签订信息");
+            return;
+        }
+
+        // 提交数据逻辑，示例用 alert 显示
+        alert(
+            `提交成功！\n合同名称: ${document.getElementById("contractName").value}\n` +
+            `客户: ${document.getElementById("clientName").value}\n` +
+            `签订员: ${document.getElementById("signerName").value}\n` +
+            `签订信息: ${signInfo}`
+        );
+
+        // 提交后清空签订信息（可按需调整）
+        resetForm();
+    });
+
+    // 页面加载时填充数据
+    window.onload = populateForm;
+</script>
+</body>
+</html>

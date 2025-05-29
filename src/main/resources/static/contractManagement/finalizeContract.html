@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <title>定稿合同</title>
+    <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+<form id="finalizeContractForm" enctype="multipart/form-data">
+    <h2>定稿合同</h2>
+
+    <label for="contractName">合同名称：</label>
+    <input type="text" id="contractName" name="contractName" readonly />
+
+    <label for="finalizer">定稿人：</label>
+    <input type="text" id="finalizer" name="finalizer" readonly />
+
+    <label for="clientName">客户名称：</label>
+    <input type="text" id="clientName" name="clientName" readonly />
+
+    <br>
+
+    <label for="startDate">开始时间（可修改）：</label>
+    <input type="date" id="startDate" name="startDate" required />
+
+    <label for="endDate">结束时间（可修改）：</label>
+    <input type="date" id="endDate" name="endDate" required />
+
+    <label for="contractContent">合同内容</label><br>
+    <textarea id="contractContent" name="contractContent" rows="5"></textarea><br><br>
+
+    <label for="contractFile">上传最终合同附件</label><br>
+    <input type="file" id="contractFile" name="contractFile" accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif"><br><br>
+
+    <div class="error" id="finalError" style="color: red; margin-bottom: 10px;"></div>
+    <button type="submit">提交定稿</button>
+</form>
+
+<script src="finalizeContract.js"></script>
+</body>
+</html>
