@@ -55,7 +55,7 @@ public class SecurityConfig {
                         // 放行静态资源，如 CSS、JS、图片等
                         .requestMatchers(HttpMethod.GET, "/style.css","/userManagement/script.js").permitAll()
                         // 放行登录注册接口的POST请求
-                        .requestMatchers(HttpMethod.POST, "/api/user/login", "/api/user/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user/login", "/api/user/register", "/api/user/logout").permitAll()
                         // 其他请求必须认证
                         .anyRequest().authenticated()
                 )
