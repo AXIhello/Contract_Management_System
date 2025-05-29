@@ -1,7 +1,6 @@
 const userId = new URLSearchParams(window.location.search).get('id');
 
 window.addEventListener('DOMContentLoaded', () => {
-    // TODO: 后端需要实现 GET /api/user/detail/{id}
     fetch(`/api/user/detail/${userId}`)
         .then(res => res.json())
         .then(data => {
@@ -19,7 +18,6 @@ function resetForm() {
     window.location.reload();
 }
 
-// TODO: 后端需要实现 POST /api/user/update
 function submitEdit() {
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value;
@@ -38,7 +36,7 @@ function submitEdit() {
         }
     }
 
-    const data = { id: userId, username };
+    const data = { userId: userId, username };
     if (password) data.password = password;
 
     fetch('/api/user/update', {
@@ -46,20 +44,21 @@ function submitEdit() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-    .then(res => res.json())
-    .then(result => {
-        if (result.success) {
-            document.getElementById('successMsg').style.display = 'block';
-            document.getElementById('errorMsg').style.display = 'none';
-        } else {
-            document.getElementById('errorMsg').textContent = result.message || '修改失败！';
+        .then(res => res.json())
+        .then(result => {
+            if (result.code === 200) {
+                document.getElementById('successMsg').style.display = 'block';
+                document.getElementById('errorMsg').style.display = 'none';
+            } else {
+                document.getElementById('errorMsg').textContent = result.msg || '修改失败！';
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('successMsg').style.display = 'none';
+            }
+        })
+        .catch(() => {
+            document.getElementById('errorMsg').textContent = '系统异常，修改失败！';
             document.getElementById('errorMsg').style.display = 'block';
             document.getElementById('successMsg').style.display = 'none';
-        }
-    })
-    .catch(() => {
-        document.getElementById('errorMsg').textContent = '系统异常，修改失败！';
-        document.getElementById('errorMsg').style.display = 'block';
-        document.getElementById('successMsg').style.display = 'none';
-    });
+        });
+
 } 

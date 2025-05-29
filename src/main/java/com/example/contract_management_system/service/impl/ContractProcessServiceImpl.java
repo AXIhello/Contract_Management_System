@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -41,7 +40,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
 
         try {
             // 1. 校验合同是否存在
-            Contract contract = contractMapper.findContractById(request.getConNum());
+            Contract contract = contractMapper.selectById(request.getConNum());
             if (contract == null) {
                 throw new BusinessException("合同 " + request.getConNum() + " 未找到！");
             }
@@ -78,7 +77,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             List<Contract> contracts = new ArrayList<>();
             
             for (Integer contractId : contractIds) {
-                Contract contract = contractMapper.findContractById(contractId);
+                Contract contract = contractMapper.selectById(contractId);
                 if (contract != null) {
                     contracts.add(contract);
                 }
@@ -93,7 +92,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     @Override
     public Contract getContractById(Integer id) {
         try {
-            return contractMapper.findContractById(id);
+            return contractMapper.selectById(id);
         } catch (Exception e) {
             throw new SystemException("获取合同信息失败：", e);
         }
@@ -110,7 +109,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             }
 
             // 2. 检查合同是否存在
-            Contract contract = contractMapper.findContractById(contractId);
+            Contract contract = contractMapper.selectById(contractId);
             if (contract == null) {
                 throw new BusinessException("合同不存在");
             }
