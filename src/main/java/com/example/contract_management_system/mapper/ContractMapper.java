@@ -16,7 +16,7 @@ public interface ContractMapper extends BaseMapper<Contract> {
     @Update("UPDATE contract SET state = #{state} WHERE num = #{contractId}")
     int updateContractState(@Param("contractId") Integer contractId, @Param("state") Integer state);
 
-    @Select("SELECT name FROM contract WHERE num = #{id}")
-    String findContractNameById(@Param("num") int id);
+    @Select("SELECT name FROM contract WHERE num = #{num}")
+    String findContractNameById(@Param("id") int id);
 }
 

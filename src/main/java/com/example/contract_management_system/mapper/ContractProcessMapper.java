@@ -33,7 +33,7 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
     @Update("UPDATE contract_process " +
             "SET state = #{state}, content = #{content}, time = #{time} " +
             "WHERE conNum = #{contractId} AND user_id  = #{userId} AND type = #{type}")
-    int updateContractProcess(@Param("contNum") Integer contractId,
+    int updateContractProcess(@Param("contractId") Integer contractId,
                             @Param("userId") Integer userId,
                             @Param("type") Integer type,
                             @Param("state") Integer state,
@@ -44,5 +44,5 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "WHERE conNum = #{contractId} AND type = 1) " +
             "FROM contract_process " +
             "WHERE conNum = #{contractId} AND type = 1 AND state = 1")
-    boolean checkAllCountersigned(@Param("contNum") Integer contractId);
+    boolean checkAllCountersigned(@Param("contractId") Integer contractId);
 }
