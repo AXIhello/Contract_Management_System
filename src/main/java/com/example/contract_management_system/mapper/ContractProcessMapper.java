@@ -38,7 +38,7 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
                             @Param("type") Integer type,
                             @Param("state") Integer state,
                             @Param("content") String content,
-                            @Param("time") Date time);
+                            @Param("time") Timestamp time);
 
     @Select("SELECT COUNT(*) = (SELECT COUNT(*) FROM contract_process " +
             "WHERE conNum = #{contractId} AND type = 1) " +

@@ -11,6 +11,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -118,7 +119,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             }
 
             // 4. 更新会签状态和意见
-            int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 1, 1, comment, new Date());
+            int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 1, 1, comment, new Timestamp(System.currentTimeMillis()));
             if (affectedRows != 1) {
                 throw new PersistenceException("更新会签状态失败");
             }
