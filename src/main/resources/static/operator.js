@@ -1,6 +1,6 @@
 // 页面加载完成后统一初始化
-document.addEventListener('DOMContentLoaded', () => {
-    getCurrentUser();           // 获取当前用户信息
+document.addEventListener('DOMContentLoaded',async  () => {
+    await getCurrentUser();           // 获取当前用户信息
     initializeUserDropdown();   // 初始化右上角用户菜单
     initializeNavMenu();        // 初始化导航栏菜单
     initLogoutButton();         // 绑定退出按钮事件
@@ -16,13 +16,13 @@ function initLogoutButton() {
 
 async function getCurrentUser() {
     try {
-        const response = await fetch('/api/user/current-id');
-        if (!response.ok) throw new Error('Failed to fetch user id');
-        const userId = await response.json();
+        const response = await fetch('/api/user/current'); // ⬅️ 注意：改接口地址
+        if (!response.ok) throw new Error('Failed to fetch user info');
+        const user = await response.json();
 
-        document.getElementById('currentUsername').textContent = `用户${userId}`;
-        document.getElementById('userFullName').textContent = `用户${userId}`;
-        document.getElementById('userRole').textContent = '普通用户';
+        document.getElementById('currentUsername').textContent = user.username ?? '未知用户';
+        document.getElementById('userFullName').textContent = user.username ?? '未知用户';
+        document.getElementById('userRole').textContent = user.role ?? '未知角色';
     } catch (error) {
         console.error('Error fetching user info:', error);
         document.getElementById('currentUsername').textContent = '未登录';
