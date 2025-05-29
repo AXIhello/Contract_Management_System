@@ -55,7 +55,7 @@ public class SecurityConfig {
                         // 放行静态资源，如 CSS、JS、图片等
                         .requestMatchers(HttpMethod.GET, "/style.css","/userManagement/script.js").permitAll()
                         // 放行登录注册接口的POST请求
-                        .requestMatchers(HttpMethod.POST, "/api/user/login", "/api/user/register").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/user/login", "/api/user/register", "/api/user/logout").permitAll()
                         // 其他请求必须认证
                         .anyRequest().authenticated()
                 )
@@ -68,6 +68,14 @@ public class SecurityConfig {
                 .tokenValiditySeconds(7 * 24 * 60 * 60) // 一周有效期
                 // 可选：设置加密的key，默认会生成随机key，每次重启失效
                 .key("uniqueAndSecret")
+                )
+                // ✅ 加上这一段实现登出接口
+                .logout(logout -> logout
+                        .logoutUrl("/api/user/logout") // 自定义登出 URL
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(200);
+                            response.getWriter().write("退出成功");
+                        })
                 );
         return http.build();
     }

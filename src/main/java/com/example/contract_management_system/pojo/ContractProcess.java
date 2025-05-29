@@ -9,6 +9,8 @@ import java.util.Date;
 @Data
 @TableName("contract_process")
 public class ContractProcess {
+
+    @TableField("conNum")
     private Integer conNum;      // 合同编号，外键关联 contract(num)
     private Integer type;        // 操作类型：1 会签，2 审批，3 签订
     private Integer state;       // 操作状态：0 未完成，1 已完成，2 否决
