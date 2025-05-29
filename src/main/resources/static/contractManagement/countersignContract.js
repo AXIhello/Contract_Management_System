@@ -17,7 +17,7 @@ function renderTable(data) {
             <td>${contract.name}</td>
             <td>${contract.userId}</td>
             <td>${contract.beginTime}</td>
-            <td><a href="/countersign.html?id=${contract.num}">会签</a></td>
+            <td><a href="/contractManagement/countersign.html?id=${contract.num}">会签</a></td>
         </tr>`;
         body.insertAdjacentHTML("beforeend", row);
     }
