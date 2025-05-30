@@ -143,7 +143,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         }
 
         // （3）查询原始合同
-        Contract existingContract = contractMapper.findContractById(contractNum);
+        Contract existingContract = contractMapper.selectById(contractNum);
         if (existingContract == null) {
             logger.error("未找到编号为 {} 的合同", contractNum);
             return false;
@@ -195,7 +195,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
         // 再逐个查合同并转换
         return contractIds.stream()
-                .map(contractMapper::findContractById)
+                .map(contractMapper::selectById)
                 .filter(Objects::nonNull)
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

@@ -9,7 +9,7 @@ window.onload = function () {
 
 // 模拟从后端获取待定稿合同数据
 function loadDraftContracts() {
-    fetch("http://localhost:8080/api/contracts/getToBeFinishedContracts")
+    fetch("/api/contract/getToBeFinishedContracts")
         .then(response => {
             if (!response.ok) {
                 throw new Error("网络响应失败");
