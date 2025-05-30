@@ -10,9 +10,6 @@ import org.apache.ibatis.annotations.Update;
 @Mapper
 public interface ContractMapper extends BaseMapper<Contract> {
 
-    @Select("SELECT * FROM contract WHERE num = #{id}")
-    Contract findContractById(@Param("id") Integer id);
-
     @Update("UPDATE contract SET state = #{state} WHERE num = #{contractId}")
     int updateContractState(@Param("contractId") Integer contractId, @Param("state") Integer state);
 

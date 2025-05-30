@@ -84,4 +84,25 @@ public class UserServiceImpl implements UserService {
     public String getUsernameById(int userId){
         return userMapper.selectById(userId).getUsername();
     }
+
+    @Override
+    public boolean deleteUserById(int userId){
+        return userMapper.deleteById(userId) > 0;
+    }
+
+    @Override
+    public User getById(int userId) {
+        return userMapper.selectById(userId);
+    }
+
+    @Override
+    public boolean updateById(User user){
+        return userMapper.updateById(user) > 0;
+    }
+
+    @Override
+    public int count(QueryWrapper<User> query) {
+        return Math.toIntExact(userMapper.selectCount(query));
+    }
+
 }

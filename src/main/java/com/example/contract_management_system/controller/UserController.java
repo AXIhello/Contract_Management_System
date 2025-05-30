@@ -2,14 +2,11 @@ package com.example.contract_management_system.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.example.contract_management_system.mapper.RoleMapper;
 import com.example.contract_management_system.mapper.UserMapper;
-import com.example.contract_management_system.pojo.Role;
 import com.example.contract_management_system.pojo.User;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
 import jakarta.servlet.http.HttpSession;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,31 +15,31 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpSession;
-
-import com.example.contract_management_system.util.Result;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user")
-public class LoginController {
+public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
-    @Autowired
-    private UserMapper userMapper;
+    private final UserMapper userMapper;
 
-    @Autowired
-    private RoleMapper roleMapper;
+    public UserController(UserService userService, AuthenticationManager authenticationManager, UserMapper userMapper) {
+        this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.userMapper = userMapper;
+    }
+
+    @GetMapping("/list")
+    public List<User> getAllUsers() {
+        return userService.getAllUsers();
+    }
 
     @PostMapping("/register")
     public Result<String> register(@RequestParam String username,
@@ -127,6 +124,59 @@ public class LoginController {
 
         return ResponseEntity.ok(result);
     }
+
+    @DeleteMapping("/delete/{id}")
+    public Result<String> deleteUserById(@PathVariable("id") int userId) {
+        boolean success = userService.deleteUserById(userId);
+        if (success) {
+            return Result.success("删除成功！");
+        } else {
+            return Result.error("删除失败，用户不存在！");
+        }
+    }
+
+    @GetMapping("/detail/{id}")
+    public Result<User> getUserDetail(@PathVariable("id") int id) {
+        User user = userService.getById(id);
+        if (user != null) {
+            return Result.success(user);
+        } else {
+            return Result.error("用户不存在");
+        }
+    }
+
+    @PostMapping("/update")
+    public Result<?> updateUser(@RequestBody User user) {
+        // 查找原始用户
+        User original = userService.getById(user.getUserId());
+        if (original == null) {
+            return Result.error("用户不存在");
+        }
+
+//        // 检查用户名是否已被其他用户占用（排除当前用户）
+//        QueryWrapper<User> query = new QueryWrapper<>();
+//        query.eq("username", user.getUsername())
+//                .ne("user_id", user.getUserId());  // user_id字段根据数据库字段名调整
+//
+//        int count = userService.count(query);
+//        if (count > 0) {
+//            return Result.error("用户名已存在，请更换其他用户名");
+//        }
+
+        // 更新用户名
+        original.setUsername(user.getUsername());
+
+        // 更新密码（如果有）
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            original.setPassword(user.getPassword()); // 建议加密处理
+        }
+
+        boolean success = userService.updateById(original);
+        return success ? Result.success(null) : Result.error("更新失败");
+    }
+
+
+
 }
 
 

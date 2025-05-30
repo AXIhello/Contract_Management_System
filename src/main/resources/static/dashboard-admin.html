@@ -102,6 +102,10 @@
             color: #0d6efd;
             transform: translateX(3px);
         }
+        .custom-nav-position {
+            margin-left: 15rem; /* 或 20px，根据需要微调 */
+            margin-right: auto;
+        }
 
         .nav-item:hover .mega-menu {
             display: block;
@@ -205,10 +209,10 @@
 <!-- 顶部导航 -->
 <nav class="navbar navbar-expand-lg navbar-dark navbar-skyblue">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">合同管理系统</a>
-        <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
+        <a class="navbar-brand" href="#">合同管理系统 （你好，管理员！）</a>
+        <ul class="navbar-nav custom-nav-position mb-2 mb-lg-0">
             <!-- 合同管理 -->
-            <li class="nav-item dropdown position-static">
+            <li class="nav-item dropdown position-static mx-4">
                 <a class="nav-link fw-bold text-white" href="#">合同管理</a>
                 <div class="mega-menu">
                     <div class="container justify-content-between">
@@ -216,12 +220,12 @@
                             <h6><i class="fas fa-file-signature"></i> 合同操作</h6>
                             <a href="contractManagement/draftContract.html">起草合同</a>
                             <a href="contractManagement/countersignContract.html">会签合同</a>
-                            <a href="contractManagement/pendingContractList.html">定稿合同</a>
+                            <a href="contractManagement/toBeFinalizedContractList.html">定稿合同</a>
                         </div>
                         <div>
                             <h6 style="visibility: hidden;">占位符</h6> <!-- 保持对齐 -->
-                            <a href="contractManagement/approve.html">审批合同</a>
-                            <a href="contractManagement/sign.html">签订合同</a>
+                            <a href="contractManagement/toBeExaminedContractList.html">审批合同</a>
+                            <a href="contractManagement/toBeConcludedContractList.html">签订合同</a>
                             <a href="contractManagement/query.html">查询合同</a>
                         </div>
                     </div>
@@ -230,7 +234,7 @@
 
 
             <!-- 客户管理 -->
-            <li class="nav-item dropdown position-static">
+            <li class="nav-item dropdown position-static mx-4">
                 <a class="nav-link fw-bold text-white" href="#">客户管理</a>
                 <div class="mega-menu">
                     <div class="container justify-content-between">
@@ -248,7 +252,7 @@
 
 
             <!-- 系统管理 -->
-            <li class="nav-item dropdown position-static">
+            <li class="nav-item dropdown position-static mx-4">
                 <a class="nav-link fw-bold text-white" href="#">系统管理</a>
                 <div class="mega-menu">
                     <div class="container system-menu">
@@ -320,6 +324,6 @@
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-<script src="operator.js"></script>
+<script src="dashboard-admin.js"></script>
 </body>
 </html>

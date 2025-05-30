@@ -2,7 +2,7 @@ window.onload = function () {
     // 模拟从URL或接口获取合同信息
     const contract = {
         contractName: "示例合同 ABC123",
-        drafter: "张三",
+        finalizer: "张三",
         clientName: "北京客户有限公司",
         startDate: "2025-06-01",
         endDate: "2025-12-01",
@@ -11,7 +11,7 @@ window.onload = function () {
 
     // 填充到表单
     document.getElementById("contractName").value = contract.contractName;
-    document.getElementById("drafter").value = contract.drafter;
+    document.getElementById("finalizer").value = contract.finalizer;
     document.getElementById("clientName").value = contract.clientName;
     document.getElementById("startDate").value = contract.startDate;
     document.getElementById("endDate").value = contract.endDate;

@@ -99,9 +99,9 @@ let signerSelect, approveSelect, signListSelect;
 
 // 动态拉人员列表，初始化 MultiSelect
 function initMultiSelects(userList) {
-    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList);
+    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);;
     approveSelect = new MultiSelect(document.getElementById('approveSelect'), userList);
-    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);
+    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList)
 }
 
 // 提交分配
@@ -167,7 +167,7 @@ async function submitAssign() {
 }
 
 async function assignToBackend(request) {
-    const response = await fetch('/api/assign/process', {
+    const response = await fetch('/api/contract/assign', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -208,7 +208,7 @@ document.getElementById('btnBack').addEventListener('click', cancelAssign);
 // 页面启动时，调用接口获取人员列表和合同名
 window.addEventListener('DOMContentLoaded', () => {
     // 返回User对象数组
-    fetch('/api/assign/user')
+    fetch('/api/user/list')
         .then(res => res.json())
         .then(data => {
             initMultiSelects(data);
@@ -224,7 +224,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 
     const conId = new URLSearchParams(window.location.search).get('id') || 'C001';
-    fetch(`/api/assign/name?id=${conId}`)
+    fetch(`/api/contract/name?id=${conId}`)
         .then(res => res.json())
         .then(data => {
             updateContractTitle(data.name || '未知合同');

@@ -9,9 +9,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/contract-state")
 public class ContractStateController {
     
-    @Autowired
-    private ContractStateService contractStateService;
-    
+    private final ContractStateService contractStateService;
+
+    public ContractStateController(ContractStateService contractStateService) {
+        this.contractStateService = contractStateService;
+    }
+
     @PutMapping("/{conNum}")
     public boolean updateContractState(@PathVariable Integer conNum, @RequestParam Integer type) {
         return contractStateService.updateContractState(conNum, type);

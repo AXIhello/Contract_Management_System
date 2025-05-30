@@ -81,7 +81,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         List<Integer> list = contractStateMapper.selectContractsByState(1); // 1 = 起草状态
         List<Contract>  contracts = new ArrayList<>(List.of());
         for(Integer id : list){
-            contracts.add(contractMapper.findContractById(id));
+            contracts.add(contractMapper.selectById(id));
         }
         return contracts;
     }
@@ -114,7 +114,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
     @Override
     public boolean existsByNum(Integer contractNum) {
-        return contractMapper.findContractById(contractNum) != null;
+        return contractMapper.selectById(contractNum) != null;
     }
 
 
