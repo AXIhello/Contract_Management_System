@@ -1,13 +1,12 @@
 window.onload = function () {
     // 模拟从URL或接口获取合同信息
-    const contract = {
-        contractName: "示例合同 ABC123",
-        finalizer: "张三",
-        clientName: "北京客户有限公司",
-        startDate: "2025-06-01",
-        endDate: "2025-12-01",
-        content: "这是该合同的初步内容，可进行编辑定稿。"
-    };
+    const urlParams = new URLSearchParams(window.location.search);
+    const contractId = urlParams.get("id");
+
+    if (!contractId) {
+       // document.getElementById("finalError").innerText = "未提供合同 ID。";
+        return;
+    }
 
     // 填充到表单
     document.getElementById("contractName").value = contract.contractName;
