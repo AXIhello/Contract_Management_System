@@ -99,9 +99,9 @@ let signerSelect, approveSelect, signListSelect;
 
 // 动态拉人员列表，初始化 MultiSelect
 function initMultiSelects(userList) {
-    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList);
+    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);;
     approveSelect = new MultiSelect(document.getElementById('approveSelect'), userList);
-    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);
+    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList)
 }
 
 // 提交分配
