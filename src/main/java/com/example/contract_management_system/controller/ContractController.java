@@ -125,6 +125,15 @@ public class ContractController {
         return result;
     }
 
+    @GetMapping("/approvalPending")
+    public List<Map<String,Object>> getPendingExamineContracts() {
+        Integer currentUserId = userService.getCurrentUserId();
+        if (currentUserId == null) {
+            throw new RuntimeException("用户未登录");
+        }
+        return contractProcessService.getPendingExamineContracts(currentUserId);
+    }
+
     @GetMapping("/draft")
     public List<Contract> getDraftContracts() {
         return contractService.getDraftContracts();

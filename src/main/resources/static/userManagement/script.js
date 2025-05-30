@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if (result.code === 200) {
                     const user = result.data;
-                    alert("登录成功，欢迎 " + user.username);
+                    alert("登录成功，欢迎 " + username);
                     // 根据用户身份跳转（示例：根据用户名判断）
                     if (user.username === "admin") {
                         window.location.href = "/admin.html";

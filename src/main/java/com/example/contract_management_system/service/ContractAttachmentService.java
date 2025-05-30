@@ -1,6 +1,7 @@
 package com.example.contract_management_system.service;
 
 import com.example.contract_management_system.pojo.ContractAttachment;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -35,4 +36,11 @@ public interface ContractAttachmentService {
      * @return 是否删除成功
      */
     boolean deleteAttachment(Integer id);
+
+    /**
+     * 下载附件
+     * @param id 附件ID
+     * @return 文件字节数组和响应头
+     */
+    ResponseEntity<byte[]> downloadAttachment(Integer id);
 }

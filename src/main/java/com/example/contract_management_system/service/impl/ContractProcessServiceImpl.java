@@ -14,20 +14,25 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMapper, ContractProcess> implements ContractProcessService {
     private final ContractProcessMapper contractProcessMapper;
     private final ContractMapper contractMapper;
+    private final ContractStateMapper contractStateMapper;
     private final UserMapper userMapper;
     private final UserService userService;
 
-    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService) {
+    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService,
+                                      ContractStateMapper contractStateMapper) {
         this.contractProcessMapper = contractProcessMapper;
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
         this.userService=userService;
+        this.contractStateMapper=contractStateMapper;
     }
 
     //分配合同
@@ -125,11 +130,38 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             if (affectedRows != 1) {
                 throw new PersistenceException("更新会签状态失败");
             }
+            boolean allCountersign = contractProcessMapper.checkAllCountersigned(contractId);
+            if(allCountersign){
+                contractStateMapper.updateContractState(contractId,2,1,new Timestamp(System.currentTimeMillis()));
+            }
             return true;
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
             throw new SystemException("提交会签失败：", e);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getPendingExamineContracts(Integer userId) {
+        try {
+            // 获取当前用户待审批的合同列表
+            List<Integer> contractIds = contractProcessMapper.getPendingExamineContracts(userId);
+            List<Map<String, Object>> contracts = new ArrayList<>();
+            
+            for (Integer contractId : contractIds) {
+                Contract contract = contractMapper.selectById(contractId);
+                if (contract != null) {
+                    Map<String, Object> contractInfo = new HashMap<>();
+                    contractInfo.put("id", contract.getNum());
+                    contractInfo.put("name", contract.getName());
+                    contracts.add(contractInfo);
+                }
+            }
+            
+            return contracts;
+        } catch (Exception e) {
+            throw new SystemException("获取待审批合同列表失败：", e);
         }
     }
 }
