@@ -6,6 +6,7 @@ import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.pojo.ContractProcess;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ContractProcessService extends IService<ContractProcess> {
     boolean assignContract(AssignContractRequest request);
@@ -18,4 +19,7 @@ public interface ContractProcessService extends IService<ContractProcess> {
     
     // 提交会签意见
     boolean submitCountersign(Integer contractId, String comment);
+    
+    // 获取待审批的合同列表（简化信息）
+    List<Map<String, Object>> getPendingExamineContracts(Integer userId);
 }

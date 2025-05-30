@@ -7,11 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -179,5 +185,36 @@ public class ContractAttachmentServiceImpl implements ContractAttachmentService 
             }
         }
         return false;
+    }
+
+    @Override
+    public ResponseEntity<byte[]> downloadAttachment(Integer id) {
+        try {
+            ContractAttachment attachment = contractAttachmentMapper.selectById(id);
+            if (attachment == null) {
+                logger.error("附件不存在: {}", id);
+                return ResponseEntity.notFound().build();
+            }
+
+            File file = new File(uploadPath + File.separator + attachment.getPath());
+            if (!file.exists()) {
+                logger.error("附件文件不存在: {}", file.getAbsolutePath());
+                return ResponseEntity.notFound().build();
+            }
+
+            byte[] fileContent = Files.readAllBytes(file.toPath());
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+            headers.setContentDispositionFormData("attachment", 
+                new String(attachment.getFileName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
+            
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(fileContent);
+        } catch (Exception e) {
+            logger.error("下载附件失败", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

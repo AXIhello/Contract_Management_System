@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMapper, ContractProcess> implements ContractProcessService {
@@ -137,6 +139,29 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             throw e;
         } catch (Exception e) {
             throw new SystemException("提交会签失败：", e);
+        }
+    }
+
+    @Override
+    public List<Map<String, Object>> getPendingExamineContracts(Integer userId) {
+        try {
+            // 获取当前用户待审批的合同列表
+            List<Integer> contractIds = contractProcessMapper.getPendingExamineContracts(userId);
+            List<Map<String, Object>> contracts = new ArrayList<>();
+            
+            for (Integer contractId : contractIds) {
+                Contract contract = contractMapper.selectById(contractId);
+                if (contract != null) {
+                    Map<String, Object> contractInfo = new HashMap<>();
+                    contractInfo.put("id", contract.getNum());
+                    contractInfo.put("name", contract.getName());
+                    contracts.add(contractInfo);
+                }
+            }
+            
+            return contracts;
+        } catch (Exception e) {
+            throw new SystemException("获取待审批合同列表失败：", e);
         }
     }
 }
