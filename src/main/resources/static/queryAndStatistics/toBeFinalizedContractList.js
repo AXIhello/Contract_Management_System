@@ -9,16 +9,35 @@ window.onload = function () {
 
 // 模拟从后端获取待定稿合同数据
 function loadDraftContracts() {
-    // TODO: 替换为你的后端接口获取逻辑
-    draftContracts = generateMockDraftContracts(53); // 模拟53条数据
-    renderDraftContractsTable();
-    updatePageInfo();
+    fetch("/api/contract/getToBeFinishedContracts")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("网络响应失败");
+            }
+            return response.json();
+        })
+        .then(data => {
+            draftContracts = data;
+            renderDraftContractsTable(); // 根据你已有逻辑渲染
+            updatePageInfo();            // 更新页码信息
+        })
+        .catch(error => {
+            console.error("获取合同数据失败：", error)
+        });
 }
 
 // 渲染表格
 function renderDraftContractsTable() {
     const tbody = document.getElementById("draftContractBody");
     tbody.innerHTML = "";
+
+    if (draftContracts.length === 0) {
+        // 表格中显示一行提示“无待定稿合同”
+        const row = document.createElement("tr");
+        row.innerHTML = `<td colspan="5" style="text-align:center;">无待定稿合同</td>`;
+        tbody.appendChild(row);
+        return; // 结束，不渲染其他行
+    }
 
     const start = (currentPage - 1) * pageSize;
     const end = Math.min(start + pageSize, draftContracts.length);
@@ -97,7 +116,7 @@ function goToLastPage() {
 
 // 查看按钮事件（可跳转或弹窗）
 function viewContract(id) {
-    alert("查看合同：" + id);
+    window.location.href = "/finalizeContract.html?id=" + id;
     // 你可以跳转到详情页，或弹出合同信息等
 }
 

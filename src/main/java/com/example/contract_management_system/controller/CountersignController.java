@@ -1,8 +1,10 @@
 package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.pojo.Contract;
+import com.example.contract_management_system.pojo.ContractAttachment;
 import com.example.contract_management_system.service.ContractProcessService;
 import com.example.contract_management_system.service.UserService;
+import com.example.contract_management_system.service.ContractAttachmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,10 +19,14 @@ public class CountersignController {
 
     private final ContractProcessService contractProcessService;
     private final UserService userService;
+    private final ContractAttachmentService contractAttachmentService;
 
-    public CountersignController(ContractProcessService contractProcessService, UserService userService) {
+    public CountersignController(ContractProcessService contractProcessService, 
+                               UserService userService,
+                               ContractAttachmentService contractAttachmentService) {
         this.contractProcessService = contractProcessService;
         this.userService = userService;
+        this.contractAttachmentService = contractAttachmentService;
     }
 
     @GetMapping("/pending")
@@ -37,13 +43,24 @@ public class CountersignController {
     @GetMapping("/contract/{id}")
     public Map<String, Object> getContractInfo(@PathVariable Integer id) {
         Contract contract = contractProcessService.getContractById(id);
+        List<ContractAttachment> attachments = contractAttachmentService.getAttachmentsByConNum(id);
+        
         Map<String, Object> result = new HashMap<>();
         if (contract != null) {
             result.put("name", contract.getName());
+            result.put("content", contract.getContent());
+            result.put("attachments", attachments);
         } else {
             result.put("name", "未知合同");
+            result.put("content", "");
+            result.put("attachments", List.of());
         }
         return result;
+    }
+
+    @GetMapping("/attachment/{id}")
+    public ResponseEntity<byte[]> downloadAttachment(@PathVariable Integer id) {
+        return contractAttachmentService.downloadAttachment(id);
     }
 
     @PostMapping("/submit")

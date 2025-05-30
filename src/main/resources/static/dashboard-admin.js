@@ -97,7 +97,7 @@ async function logout(e) {
     if (e) e.preventDefault();
     if (confirm('确定要退出登录吗？')) {
         try {
-            const response = await fetch('/api/user/logout', { method: 'POST' });
+            const response = await fetch('/logout', { method: 'POST', credentials: 'include' });
             if (response.ok) {
                 sessionStorage.clear();
                 window.location.href = '/userManagement/login.html';
@@ -110,3 +110,4 @@ async function logout(e) {
         }
     }
 }
+
