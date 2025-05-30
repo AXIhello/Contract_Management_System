@@ -20,14 +20,17 @@ import java.util.List;
 public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMapper, ContractProcess> implements ContractProcessService {
     private final ContractProcessMapper contractProcessMapper;
     private final ContractMapper contractMapper;
+    private final ContractStateMapper contractStateMapper;
     private final UserMapper userMapper;
     private final UserService userService;
 
-    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService) {
+    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService,
+                                      ContractStateMapper contractStateMapper) {
         this.contractProcessMapper = contractProcessMapper;
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
         this.userService=userService;
+        this.contractStateMapper=contractStateMapper;
     }
 
     //分配合同
@@ -124,6 +127,10 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 1, 1, comment, new Timestamp(System.currentTimeMillis()));
             if (affectedRows != 1) {
                 throw new PersistenceException("更新会签状态失败");
+            }
+            boolean allCountersign = contractProcessMapper.checkAllCountersigned(contractId);
+            if(allCountersign){
+                contractStateMapper.updateContractState(contractId,2,1,new Timestamp(System.currentTimeMillis()));
             }
             return true;
         } catch (BusinessException e) {
