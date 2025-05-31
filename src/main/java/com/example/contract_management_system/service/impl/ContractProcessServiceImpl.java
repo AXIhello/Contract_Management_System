@@ -155,6 +155,8 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
                     Map<String, Object> contractInfo = new HashMap<>();
                     contractInfo.put("id", contract.getNum());
                     contractInfo.put("name", contract.getName());
+                    contractInfo.put("user_id", contract.getUserId());
+                    contractInfo.put("customer", contract.getCustomer());
                     contracts.add(contractInfo);
                 }
             }
