@@ -1,27 +1,7 @@
+let contracts = [];  // 存储合同数据
+
 const pageSize = 5;
 let currentPage = 1;
-let approvalContracts = []; // 原始数据
-let filteredContracts = []; // 当前筛选后的数据
-
-// 加载待审批合同数据
-async function loadApprovalContractsFromServer() {
-    try {
-        const response = await fetch('/api/contracts/approvalPending'); // 替换为你的接口
-        if (!response.ok) throw new Error(`HTTP错误: ${response.status}`);
-
-        const result = await response.json();
-        if (result.success) {
-            approvalContracts = result.data || [];
-            filteredContracts = approvalContracts;  // 初始化时默认不过滤
-            currentPage = 1;
-            renderTable(filteredContracts);
-        } else {
-            alert('加载数据失败：' + (result.message || '未知错误'));
-        }
-    } catch (error) {
-        alert('获取待审批合同异常：' + error.message);
-    }
-}
 
 // 渲染表格
 function renderTable(data) {
@@ -42,7 +22,7 @@ function renderTable(data) {
                 <td>${c.user_id}</td>
                 <td>${c.customer}</td>
                 <td>
-                    <a href="/contractManagement/approval.html?id=${c.id}">审批</a>
+                    <a href="/contractManagement/examineContract.html?id=${c.id}">审批</a>
                 </td>
             </tr>`;
             tbody.insertAdjacentHTML("beforeend", row);
@@ -60,28 +40,22 @@ function updatePageInfo(total) {
 
 // 搜索
 function searchApprovalContracts() {
-    const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-
-    if (!keyword) {
-        filteredContracts = approvalContracts;
-    } else {
-        filteredContracts = approvalContracts.filter(c =>
-            c.id.toLowerCase().includes(keyword) ||
-            c.name.toLowerCase().includes(keyword) ||
-            c.user_id.toLowerCase().includes(keyword) ||
-            c.customer.includes(keyword)
-        );
-    }
-
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = contracts.filter(c =>
+        c.id.toLowerCase().includes(query) ||
+        c.name.toLowerCase().includes(query) ||
+        c.drafter.toLowerCase().includes(query) ||
+        c.date.includes(query)
+    );
     currentPage = 1;
-    renderTable(filteredContracts);
+    renderTable(filtered);
 }
 
 // 分页相关函数
 function goToPage(page) {
-    const pageCount = Math.ceil(filteredContracts.length / pageSize) || 1;
+    const pageCount = Math.ceil(contracts.length / pageSize) || 1;
     currentPage = Math.max(1, Math.min(page, pageCount));
-    renderTable(filteredContracts);
+    renderTable(contracts);
 }
 
 function prevPage() {
@@ -93,11 +67,17 @@ function nextPage() {
 }
 
 function goToLastPage() {
-    const pageCount = Math.ceil(filteredContracts.length / pageSize) || 1;
+    const pageCount = Math.ceil(contracts.length / pageSize) || 1;
     goToPage(pageCount);
 }
 
-// 初始化加载
-window.onload = function () {
-    loadApprovalContractsFromServer();
-};
+
+fetch('/api/contract/approvalPending')
+    .then(res => res.json())
+    .then(data => {
+        contracts = data;
+        renderTable(contracts);
+    })
+    .catch(err => {
+        console.error('获取待审批合同列表失败:', err);
+    });
