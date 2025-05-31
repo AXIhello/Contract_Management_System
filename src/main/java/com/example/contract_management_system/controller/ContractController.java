@@ -1,5 +1,6 @@
 package com.example.contract_management_system.controller;
 
+import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractAttachmentService;
@@ -9,6 +10,9 @@ import com.example.contract_management_system.service.UserService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
@@ -24,7 +28,7 @@ import org.slf4j.LoggerFactory;
 @RequestMapping("/api/contract")
 public class ContractController {
     private static final Logger logger = LoggerFactory.getLogger(ContractController.class);
-    
+
     private final ContractService contractService;
     private final ContractProcessService contractProcessService;
     private final UserService userService;
@@ -121,6 +125,15 @@ public class ContractController {
         return result;
     }
 
+    @GetMapping("/approvalPending")
+    public List<Map<String,Object>> getPendingExamineContracts() {
+        Integer currentUserId = userService.getCurrentUserId();
+        if (currentUserId == null) {
+            throw new RuntimeException("用户未登录");
+        }
+        return contractProcessService.getPendingExamineContracts(currentUserId);
+    }
+
     @GetMapping("/draft")
     public List<Contract> getDraftContracts() {
         return contractService.getDraftContracts();
@@ -138,4 +151,10 @@ public class ContractController {
         }
     }
 
-} 
+    @GetMapping("/getToBeFinishedContracts")
+    public List<ContractPendingDTO> getToBeFinishedContracts() {
+        System.out.println("✔ 已进入 getToBeFinishedContracts 控制器");
+        return contractService.getToBeFinishedContracts();
+    }
+
+}

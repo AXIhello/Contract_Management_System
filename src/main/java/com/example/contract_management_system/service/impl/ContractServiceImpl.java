@@ -1,6 +1,7 @@
 package com.example.contract_management_system.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.mapper.*;
 import com.example.contract_management_system.pojo.*;
 import com.example.contract_management_system.service.*;
@@ -12,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> implements ContractService {
@@ -113,4 +116,103 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     public boolean existsByNum(Integer contractNum) {
         return contractMapper.selectById(contractNum) != null;
     }
+
+
+    @Override
+    public String getContractContentById(Integer id) {
+        Contract contract = this.getById(id);
+        return contract != null ? contract.getContent() : null;
+    }
+
+    @Override
+    @Transactional
+    public boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract) {
+        logger.info("开始更新合同内容, 合同编号: {}, 用户ID: {}", contractNum, userId);
+
+        // （1）数据验证
+        if (updatedContract == null || updatedContract.getName() == null || updatedContract.getName().trim().isEmpty()) {
+            logger.error("更新的合同内容为空或缺少合同名称");
+            return false;
+        }
+
+        // （2）查询合同状态，判断是否为“待定稿”状态（例如状态类型为 3）
+        ContractState state = contractStateService.getContractState(contractNum);
+        if (state == null || state.getType() != 3) {
+            logger.error("合同不处于待定稿状态，无法更新。当前状态: {}", state != null ? state.getType() : "null");
+            return false;
+        }
+
+        // （3）查询原始合同
+        Contract existingContract = contractMapper.selectById(contractNum);
+        if (existingContract == null) {
+            logger.error("未找到编号为 {} 的合同", contractNum);
+            return false;
+        }
+
+        // （4）更新合同基本信息
+        updatedContract.setNum(contractNum); // 确保是同一合同编号
+        updatedContract.setUserId(userId);   // 更新者ID（？）
+
+        int rows = contractMapper.updateById(updatedContract);
+        logger.info("合同更新结果: {}", rows > 0);
+
+        if (rows > 0) {
+            // （5）保存合同定稿状态（状态类型为 4，表示“定稿完成”）
+            ContractState finalState = new ContractState();
+            finalState.setConNum(contractNum);
+            finalState.setConName(updatedContract.getName());
+            finalState.setType(4); // 4 = 定稿完成
+            finalState.setTime(new Date());
+
+            boolean stateSaved = contractStateService.save(finalState);
+            logger.info("合同定稿状态保存结果: {}", stateSaved);
+
+            return stateSaved;
+        }
+
+        return false;
+    }
+
+//    @Override
+//    public List<Contract> getToBeFinishedContracts() {
+//        // 获取 type 为 3（待定稿）的合同编号列表
+//        List<Integer> contractIds = contractStateMapper.selectContractsByState(3);
+//
+//        List<Contract> contracts = new ArrayList<>();
+//        for (Integer id : contractIds) {
+//            Contract contract = contractMapper.findContractById(id);
+//            if (contract != null) {
+//                contracts.add(contract);
+//            }
+//        }
+//
+//        return contracts;
+//    }
+    @Override
+    public List<ContractPendingDTO> getToBeFinishedContracts() {
+        // 先通过状态查合同ID列表
+        List<Integer> contractIds = contractStateMapper.selectContractsByState(2);
+
+        // 再逐个查合同并转换
+        return contractIds.stream()
+                .map(contractMapper::selectById)
+                .filter(Objects::nonNull)
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    private ContractPendingDTO convertToDTO(Contract contract) {
+        ContractPendingDTO dto = new ContractPendingDTO();
+        dto.setId(contract.getNum());
+        dto.setName(contract.getName());
+        dto.setDrafter(contract.getUserId().toString());//目前只获取用户ID
+        dto.setDraftDate(contract.getBeginTime().toString());
+        // 其他字段映射
+        return dto;
+    }
+
 }
+
+
+

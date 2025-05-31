@@ -71,11 +71,11 @@ public class SecurityConfig {
                 )
                 // ✅ 加上这一段实现登出接口
                 .logout(logout -> logout
-                        .logoutUrl("/api/user/logout") // 自定义登出 URL
-                        .logoutSuccessHandler((request, response, authentication) -> {
-                            response.setStatus(200);
-                            response.getWriter().write("退出成功");
-                        })
+                        // 默认登出路径是 /logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/userManagement/login.html")  // 登出成功后跳转登录页
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
                 );
         return http.build();
     }

@@ -77,8 +77,7 @@ function nextPage() {
 }
 
 function goToLastPage() {
-    const totalPages = Math.ceil(filteredContracts.length / pageSize);
-    currentPage = totalPages;
+    currentPage = Math.ceil(filteredContracts.length / pageSize);
     renderTable();
 }
 

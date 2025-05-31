@@ -60,6 +60,7 @@
         .option-item {
             padding: 8px 12px;
             cursor: pointer;
+            width: 100%; /* 保证整块区域可点击 */
         }
 
         .option-item:hover {
@@ -90,11 +91,12 @@
 <div class="container">
     <h2>流程配置：分配合同</h2>
 
-    <!-- 签订人 -->
-    <div id="signerSelect" class="multi-select-wrapper">
-        <input type="text" class="multi-input" placeholder="请选择签订人" readonly />
+    <!-- 会签人 -->
+    <div id="signListSelect" class="multi-select-wrapper">
+        <input type="text" class="multi-input" placeholder="请选择会签人" readonly />
         <div class="options-list"></div>
     </div>
+
 
     <!-- 审批人 -->
     <div id="approveSelect" class="multi-select-wrapper">
@@ -102,11 +104,13 @@
         <div class="options-list"></div>
     </div>
 
-    <!-- 会签人 -->
-    <div id="signListSelect" class="multi-select-wrapper">
-        <input type="text" class="multi-input" placeholder="请选择会签人" readonly />
+
+    <!-- 签订人 -->
+    <div id="signerSelect" class="multi-select-wrapper">
+        <input type="text" class="multi-input" placeholder="请选择签订人" readonly />
         <div class="options-list"></div>
     </div>
+
 
     <!-- 按钮 -->
     <div class="button-group">

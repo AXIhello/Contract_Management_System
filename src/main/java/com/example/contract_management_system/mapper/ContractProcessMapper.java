@@ -40,4 +40,17 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
                             @Param("content") String content,
                             @Param("time") Timestamp time);
 
+    @Select("SELECT COUNT(*) = 0 " +
+            "FROM contract_process " +
+            "WHERE conNum = #{conNum} AND type = 1 AND state = 0")
+    boolean checkAllCountersigned(@Param("conNum") Integer conNum);
+
+    @Select("SELECT cp.conNum " +
+            "FROM contract_process cp " +
+            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
+            "WHERE cp.user_id = #{userId} " +
+            "AND cp.type = 2 " +
+            "AND cp.state = 0 " +
+            "AND cs.type = 3")
+    List<Integer> getPendingExamineContracts(@Param("userId") Integer userId);
 }

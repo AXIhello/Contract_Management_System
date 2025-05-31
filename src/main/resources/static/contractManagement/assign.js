@@ -47,23 +47,29 @@ class MultiSelect {
             const div = document.createElement('div');
             div.className = 'option-item';
 
+            const label = document.createElement('label');
+            label.className = 'option-label';
+            label.style.display = 'flex';
+            label.style.alignItems = 'center';
+            label.style.width = '100%';
+            label.style.cursor = 'pointer';
+
             const checkbox = document.createElement('input');
             checkbox.type = 'checkbox';
             checkbox.checked = this.selected.has(user);
-            checkbox.id = `${this.wrapper.id}_opt_${user.userId}`;
             checkbox.dataset.userId = user.userId;
+            checkbox.style.marginRight = '8px';
 
-            const label = document.createElement('label');
-            label.htmlFor = checkbox.id;
-            label.textContent = `${user.username} (${user.userId})`;
-            label.style.flex = '1';
-            label.style.cursor = 'pointer';
+            const text = document.createElement('span');
+            text.textContent = `${user.username} (${user.userId})`;
 
-            div.appendChild(checkbox);
+            label.appendChild(checkbox);
+            label.appendChild(text);
             div.appendChild(label);
             this.list.appendChild(div);
         });
     }
+
 
     showList() {
         this.list.classList.add('show');
@@ -99,9 +105,9 @@ let signerSelect, approveSelect, signListSelect;
 
 // 动态拉人员列表，初始化 MultiSelect
 function initMultiSelects(userList) {
-    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList);
+    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);;
     approveSelect = new MultiSelect(document.getElementById('approveSelect'), userList);
-    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);
+    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList)
 }
 
 // 提交分配
@@ -252,24 +258,27 @@ document.addEventListener('DOMContentLoaded', function () {
             optionsList.classList.add('show');
         });
 
-        // 点击选项区域，切换勾选状态
         optionsList.addEventListener('click', function (e) {
             e.stopPropagation();
 
-            // 如果点到的是 option-item 或其内部
+            // 查找最近的 .option-item（包括点击在子元素上）
             let item = e.target.closest('.option-item');
-            if (item) {
-                let checkbox = item.querySelector('.option-checkbox');
+            if (!item || !optionsList.contains(item)) return;
+
+            // 切换 checkbox 状态（不管点击到哪个区域，只要在 option-item 内）
+            let checkbox = item.querySelector('.option-checkbox');
+            if (checkbox) {
                 checkbox.checked = !checkbox.checked;
 
-                // 获取所有选中项文本，放入 input 显示
+                // 获取所有选中项的文本
                 const selected = Array.from(optionsList.querySelectorAll('.option-checkbox'))
                     .filter(cb => cb.checked)
-                    .map(cb => cb.parentElement.querySelector('.option-text').textContent);
+                    .map(cb => cb.closest('.option-item').querySelector('.option-text').textContent);
 
                 input.value = selected.join(', ');
             }
         });
+
     });
 
     // 点击其他地方关闭所有下拉框

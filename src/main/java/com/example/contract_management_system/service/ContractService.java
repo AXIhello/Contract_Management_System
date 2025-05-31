@@ -1,7 +1,9 @@
 package com.example.contract_management_system.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.pojo.Contract;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,4 +20,15 @@ public interface ContractService extends IService<Contract> {
     boolean createContract(Contract contract);
 
     boolean existsByNum(Integer contractNum);
+
+    //修改定稿合同
+    boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract);
+
+    //获取合同内容(用于前端显示）
+    String getContractContentById(Integer contractId);
+
+    //获取待定稿合同
+    //List<Contract> getToBeFinishedContracts();
+
+    List<ContractPendingDTO> getToBeFinishedContracts();
 }
