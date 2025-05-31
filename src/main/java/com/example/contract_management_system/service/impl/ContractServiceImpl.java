@@ -129,7 +129,6 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
     @Override
     @Transactional
-    //TODO:将数据库中的原记录覆盖而非增加
     public boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract) {
         logger.info("开始更新合同内容, 合同编号: {}, 用户ID: {}", contractNum, userId);
 
