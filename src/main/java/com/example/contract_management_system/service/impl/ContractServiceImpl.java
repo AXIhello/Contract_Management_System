@@ -1,5 +1,7 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.mapper.*;
@@ -7,13 +9,11 @@ import com.example.contract_management_system.pojo.*;
 import com.example.contract_management_system.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +23,9 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     private final ContractMapper contractMapper;
     private final ContractStateMapper contractStateMapper;
     private final ContractStateService contractStateService;
+
+    @Autowired
+    private UserService userService;
 
     public ContractServiceImpl(ContractMapper contractMapper, ContractStateMapper contractStateMapper, ContractStateService contractStateService, ContractProcessMapper contractProcessMapper) {
         this.contractMapper = contractMapper;
@@ -126,6 +129,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
     @Override
     @Transactional
+    //TODO:将数据库中的原记录覆盖而非增加
     public boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract) {
         logger.info("开始更新合同内容, 合同编号: {}, 用户ID: {}", contractNum, userId);
 
@@ -135,9 +139,9 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
             return false;
         }
 
-        // （2）查询合同状态，判断是否为“待定稿”状态（例如状态类型为 3）
+        // （2）查询合同状态，判断是否为“待定稿”状态
         ContractState state = contractStateService.getContractState(contractNum);
-        if (state == null || state.getType() != 3) {
+        if (state == null || state.getType() != 2) {
             logger.error("合同不处于待定稿状态，无法更新。当前状态: {}", state != null ? state.getType() : "null");
             return false;
         }
@@ -153,18 +157,20 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         updatedContract.setNum(contractNum); // 确保是同一合同编号
         updatedContract.setUserId(userId);   // 更新者ID（？）
 
-        int rows = contractMapper.updateById(updatedContract);
+        UpdateWrapper<Contract> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.eq("num", contractNum);
+        int rows = contractMapper.update(updatedContract, updateWrapper);
         logger.info("合同更新结果: {}", rows > 0);
 
         if (rows > 0) {
-            // （5）保存合同定稿状态（状态类型为 4，表示“定稿完成”）
+            // （5）保存合同定稿状态（状态类型为 3，表示“定稿完成”）
             ContractState finalState = new ContractState();
             finalState.setConNum(contractNum);
             finalState.setConName(updatedContract.getName());
-            finalState.setType(4); // 4 = 定稿完成
+            finalState.setType(3); // 3 = 定稿完成
             finalState.setTime(new Date());
 
-            boolean stateSaved = contractStateService.save(finalState);
+            boolean stateSaved = contractStateService.updateById(finalState);
             logger.info("合同定稿状态保存结果: {}", stateSaved);
 
             return stateSaved;
@@ -173,33 +179,39 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         return false;
     }
 
-//    @Override
-//    public List<Contract> getToBeFinishedContracts() {
-//        // 获取 type 为 3（待定稿）的合同编号列表
-//        List<Integer> contractIds = contractStateMapper.selectContractsByState(3);
-//
-//        List<Contract> contracts = new ArrayList<>();
-//        for (Integer id : contractIds) {
-//            Contract contract = contractMapper.findContractById(id);
-//            if (contract != null) {
-//                contracts.add(contract);
-//            }
-//        }
-//
-//        return contracts;
-//    }
+
     @Override
     public List<ContractPendingDTO> getToBeFinishedContracts() {
-        // 先通过状态查合同ID列表
-        List<Integer> contractIds = contractStateMapper.selectContractsByState(2);
+        // 先查状态为2的合同编号列表
+        QueryWrapper<ContractState> stateQuery = new QueryWrapper<>();
+        stateQuery.eq("type", 2);
+        List<ContractState> stateList = contractStateMapper.selectList(stateQuery);
 
-        // 再逐个查合同并转换
-        return contractIds.stream()
-                .map(contractMapper::selectById)
-                .filter(Objects::nonNull)
+        // 从状态列表中提取合同编号
+        List<Integer> contractNums = stateList.stream()
+                .map(ContractState::getConNum)
+                .collect(Collectors.toList());
+
+        if (contractNums.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 当前用户id
+        Integer userId = userService.getCurrentUserId();
+
+        // 再从合同表查：合同编号在contractNums内，且user_id = 当前用户id
+        QueryWrapper<Contract> contractQuery = new QueryWrapper<>();
+        contractQuery.in("num", contractNums)
+                .eq("user_id", userId);
+
+        List<Contract> contracts = contractMapper.selectList(contractQuery);
+
+        // 转换为DTO返回
+        return contracts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
+
 
 
     private ContractPendingDTO convertToDTO(Contract contract) {
