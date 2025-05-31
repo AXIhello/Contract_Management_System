@@ -46,7 +46,7 @@ function submitEdit() {
     })
         .then(res => res.json())
         .then(result => {
-            if (result.code === 200) {
+            if (result.success()) {
                 document.getElementById('successMsg').style.display = 'block';
                 document.getElementById('errorMsg').style.display = 'none';
             } else {

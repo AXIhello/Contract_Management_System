@@ -1,4 +1,4 @@
-const roleId = new URLSearchParams(window.location.search).get('id');
+const roleName = new URLSearchParams(window.location.search).get('name');
 
 const allPerms = [
     { group: '合同管理', perms: [
@@ -68,11 +68,10 @@ function renderPerms(selectedPerms) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-    // TODO: 后端需要实现 GET /api/role/detail/{id}
-    fetch(`/api/role/detail/${roleId}`)
+
+    fetch(`/api/role/detail/${name}`)
         .then(res => res.json())
         .then(data => {
-            document.getElementById('roleId').value = data.id || '';
             document.getElementById('roleName').value = data.name || '';
             document.getElementById('roleDesc').value = data.desc || '';
             renderPerms(data.perms || []);
@@ -97,7 +96,7 @@ function submitEdit() {
         document.getElementById('errorMsg').style.display = 'block';
         return;
     }
-    const data = { id: roleId, name, desc, perms };
+    const data = { name, desc, perms };
     fetch('/api/role/update', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
