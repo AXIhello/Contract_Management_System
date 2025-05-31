@@ -41,7 +41,7 @@ function submitUser() {
                 throw new Error('响应格式错误，服务器可能未返回 JSON');
             }
 
-            if (res.ok && result.success()) {
+            if (res.ok && result.success) {
                 alert(result.msg || '添加成功！');
                 resetForm();
             } else {

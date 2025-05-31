@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const result = await res.json();
 
-                if (result.success()) {
+                if (result.success) {
                     alert("注册成功！");
                     window.location.href = "/userManagement/login.html";
                 } else {
