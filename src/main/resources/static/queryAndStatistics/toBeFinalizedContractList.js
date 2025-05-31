@@ -116,7 +116,7 @@ function goToLastPage() {
 
 // 查看按钮事件（可跳转或弹窗）
 function viewContract(id) {
-    window.location.href = "/finalizeContract.html?id=" + id;
+    window.location.href = "/contractManagement/finalizeContract.html?id=" + id;
     // 你可以跳转到详情页，或弹出合同信息等
 }
 
