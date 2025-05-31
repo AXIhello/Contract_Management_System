@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 const result = await res.json();
 
-                if (result.success()) {
+                if (result.success) {
                     alert("登录成功，欢迎 " + username);
                     // 根据用户身份跳转（示例：根据用户名判断）
                     if (username === "admin") {
