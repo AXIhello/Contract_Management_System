@@ -166,4 +166,78 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             throw new SystemException("获取待审批合同列表失败：", e);
         }
     }
+
+    @Override
+    @Transactional
+    public boolean submitExamine(Integer contractId, String comment, Integer state) {
+        try {
+            // 1. 获取当前用户ID
+            Integer userId = userService.getCurrentUserId();
+            if (userId == null) {
+                throw new BusinessException("用户未登录");
+            }
+
+            // 2. 检查合同是否存在
+            Contract contract = contractMapper.selectById(contractId);
+            if (contract == null) {
+                throw new BusinessException("合同不存在");
+            }
+
+            // 3. 检查用户是否有权限审批该合同
+            ContractProcess process = contractProcessMapper.getContractProcess(contractId, userId, 2); // 2表示审批
+            if (process == null) {
+                throw new BusinessException("您没有权限审批该合同");
+            }
+
+            // 4. 更新审批状态和意见
+            int affectedRows = contractProcessMapper.updateContractProcess(contractId, userId, 2, state, comment, new Timestamp(System.currentTimeMillis()));
+            if (affectedRows != 1) {
+                throw new PersistenceException("更新审批状态失败");
+            }
+
+            // 5. 检查是否所有审批人都已通过
+            if (state == 1 && checkAllExamined(contractId)) {
+                // 更新合同状态为审批完成（type=4）
+                contractStateMapper.updateContractState(contractId, 4, 3, new Timestamp(System.currentTimeMillis()));
+            }
+
+            return true;
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new SystemException("提交审批失败：", e);
+        }
+    }
+
+    @Override
+    public boolean checkAllExamined(Integer contractId) {
+        try {
+            // 检查是否所有审批人都已通过（state=1）
+            return contractProcessMapper.checkAllExamined(contractId);
+        } catch (Exception e) {
+            throw new SystemException("检查审批状态失败：", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getContractApprovalInfo(Integer contractId) {
+        try {
+            Contract contract = contractMapper.selectById(contractId);
+            if (contract == null) {
+                throw new BusinessException("合同不存在");
+            }
+
+            Map<String, Object> info = new HashMap<>();
+            info.put("contractName", contract.getName());
+            info.put("approverId", userService.getCurrentUserId());
+            return info;
+        } catch (Exception e) {
+            throw new SystemException("获取合同审批信息失败：", e);
+        }
+    }
+
+    @Override
+    public Integer getCurrentUserId() {
+        return userService.getCurrentUserId();
+    }
 }

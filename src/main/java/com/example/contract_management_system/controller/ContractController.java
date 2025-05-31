@@ -177,6 +177,21 @@ public class ContractController {
         }
         return Result.success(contract);
     }
+
+    @GetMapping("/approvalInfo/{id}")
+    public Map<String, Object> getApprovalInfo(@RequestParam Integer id) {
+        // 获取合同审批相关信息
+        return contractProcessService.getContractApprovalInfo(id);
+    }
+
+    @PostMapping("/submitApproval")
+    public boolean submitApproval(@RequestBody Map<String, Object> request) {
+        Integer contractId = (Integer) request.get("contractId");
+        String approvalOpinion = (String) request.get("approvalOpinion");
+        Integer approvalResult = (Integer) request.get("approvalResult");
+        
+        return contractProcessService.submitExamine(contractId, approvalOpinion, approvalResult);
+    }
 }
 
 

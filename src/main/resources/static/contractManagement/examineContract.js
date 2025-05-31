@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const contractId = urlParams.get("id") || "defaultId"; // 从URL获取合同ID
 
     // 获取合同审批信息
-    fetch(`/api/contract/approvalInfo?id=${contractId}`)
+    fetch(`/api/contract/approvalInfo/${contractId}`)
         .then((res) => {
             if (!res.ok) throw new Error("网络响应失败");
             return res.json();
