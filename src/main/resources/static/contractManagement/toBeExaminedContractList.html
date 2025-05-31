@@ -82,8 +82,8 @@
     <h2>待审批合同</h2>
 
     <div class="search-bar">
-        <label for="searchInput">查找待审批合同：</label>
-        <input type="text" id="searchInput" placeholder="输入合同编号/名称/审批人/时间..." />
+        <label for="approvalSearchInput">查找待审批合同：</label>
+        <input type="text" id="approvalSearchInput" oninput="searchApprovalContracts()" placeholder="搜索合同..." />
         <button onclick="searchApprovalContracts()">搜索</button>
     </div>
 
@@ -109,7 +109,7 @@
             <button onclick="nextPage()">下一页 &gt;</button>
             <button onclick="goToLastPage()">末页</button>
         </div>
-        <span id="pageInfo">共 0 页 0 条</span>
+        <span id="approvalPageInfo">共 0 页 0 条</span>
     </div>
 </div>
 

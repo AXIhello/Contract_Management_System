@@ -102,10 +102,6 @@
             color: #0d6efd;
             transform: translateX(3px);
         }
-        .custom-nav-position {
-            margin-left: 15rem; /* 或 20px，根据需要微调 */
-            margin-right: auto;
-        }
 
         .nav-item:hover .mega-menu {
             display: block;
@@ -207,19 +203,18 @@
 <body>
 
 <!-- 顶部导航 -->
-<nav class="navbar navbar-expand-lg navbar-dark navbar-skyblue">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-skyblue d-flex align-items-center" style="height: 80px;">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">合同管理系统 （你好，管理员！）</a>
-        <ul class="navbar-nav custom-nav-position mb-2 mb-lg-0">
-            <!-- 合同管理 -->
-            <li class="nav-item dropdown position-static mx-4">
+        <a class="navbar-brand d-flex align-items-center" href="#">合同管理系统 （你好，管理员！）</a>
+        <ul class="navbar-nav mx-auto d-flex align-items-center" style="height: 100%;">
+            <li class="nav-item dropdown position-static mx-4 d-flex align-items-center">
                 <a class="nav-link fw-bold text-white" href="#">合同管理</a>
                 <div class="mega-menu">
                     <div class="container justify-content-between">
                         <div>
                             <h6><i class="fas fa-file-signature"></i> 合同操作</h6>
                             <a href="contractManagement/draftContract.html">起草合同</a>
-                            <a href="contractManagement/countersignContract.html">会签合同</a>
+                            <a href="contractManagement/toBeCountersignedContractList.html">会签合同</a>
                             <a href="contractManagement/toBeFinalizedContractList.html">定稿合同</a>
                         </div>
                         <div>
@@ -249,7 +244,6 @@
                     </div>
                 </div>
             </li>
-
 
             <!-- 系统管理 -->
             <li class="nav-item dropdown position-static mx-4">
@@ -283,7 +277,6 @@
                     </div>
                 </div>
             </li>
-
         </ul>
 
         <!-- 右侧用户栏 -->
@@ -318,9 +311,44 @@
     </div>
 </nav>
 
-<!-- 中间留空区域 -->
-<div class="container mt-5 text-center text-muted">
-    <h4>请选择上方模块进入操作</h4>
+
+
+<!-- 中部展示区域开始 -->
+<div class="container-fluid p-0">
+    <!-- 顶部大图 -->
+    <div style="height: 60vh; background: url('/pic.png') center/cover no-repeat;"></div>
+
+    <!-- 两个卡片区域 -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <!-- 系统简介卡片 -->
+            <div class="col-md-6 mb-4">
+                <div class="card bg-light text-dark shadow rounded-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">系统简介</h5>
+                        <p class="card-text">
+                            本系统为企业合同全流程管理平台，支持合同起草、审批、签署、归档、变更与统计等功能。
+                            帮助企业实现合同生命周期的全程数字化与智能化管理。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 最新动态卡片 -->
+            <div class="col-md-6 mb-4">
+                <div class="card bg-light text-dark shadow rounded-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold">最新系统动态</h5>
+                        <ul class="list-unstyled mb-0">
+                            <li>✅ 2025-05-25：上线合同模版管理功能</li>
+                            <li>🔧 2025-05-18：优化客户查询速度</li>
+                            <li>🚀 2025-05-10：支持合同自动提醒</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>

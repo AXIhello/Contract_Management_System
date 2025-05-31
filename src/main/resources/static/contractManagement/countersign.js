@@ -74,7 +74,7 @@ function submitCountersign() {
         if (data.success) {
             alert('会签提交成功！');
             // 提交成功后返回列表页
-            window.location.href = '/countersignContract.html';
+            window.location.href = '/toBeCountersignedContractList.html';
         } else {
             alert('会签提交失败：' + (data.message || '未知错误'));
         }

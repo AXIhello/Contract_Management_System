@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("登录成功，欢迎 " + user.username);
                     // 根据用户身份跳转（示例：根据用户名判断）
                     if (user.username === "admin") {
-                        window.location.href = "/admin.html";
+                        window.location.href = "/dashboard-admin.html";
                     } else {
                         window.location.href = "/dashboard-user.html";
                     }

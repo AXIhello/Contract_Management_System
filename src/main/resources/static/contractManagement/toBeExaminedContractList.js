@@ -1,17 +1,20 @@
 const pageSize = 5;
 let currentPage = 1;
-let filteredContracts = [];
+let approvalContracts = []; // 原始数据
+let filteredContracts = []; // 当前筛选后的数据
 
+// 加载待审批合同数据
 async function loadApprovalContractsFromServer() {
     try {
-        const response = await fetch('/api/contracts/approvalPending'); // 替换成你后台接口
+        const response = await fetch('/api/contracts/approvalPending'); // 替换为你的接口
         if (!response.ok) throw new Error(`HTTP错误: ${response.status}`);
 
         const result = await response.json();
         if (result.success) {
-            filteredContracts = result.data || [];
+            approvalContracts = result.data || [];
+            filteredContracts = approvalContracts;  // 初始化时默认不过滤
             currentPage = 1;
-            renderTable();
+            renderTable(filteredContracts);
         } else {
             alert('加载数据失败：' + (result.message || '未知错误'));
         }
@@ -20,63 +23,65 @@ async function loadApprovalContractsFromServer() {
     }
 }
 
-function renderTable() {
+// 渲染表格
+function renderTable(data) {
     const tbody = document.getElementById('approvalContractBody');
     tbody.innerHTML = '';
 
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
-    const pageData = filteredContracts.slice(start, end);
+    const pageData = data.slice(start, end);
 
     if (pageData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="5">暂无数据</td></tr>`;
     } else {
         for (const c of pageData) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-        <td>${c.id}</td>
-        <td>${c.name}</td>
-        <td>${c.approver}</td>
-        <td>${c.applyDate}</td>
-        <td>
-          <button onclick="viewContract('${c.id}')">查看</button>
-          <button onclick="approveContract('${c.id}')">审批</button>
-        </td>
-      `;
-            tbody.appendChild(tr);
+            const row = `<tr>
+                <td>${c.id}</td>
+                <td>${c.name}</td>
+                <td>${c.user_id}</td>
+                <td>${c.customer}</td>
+                <td>
+                    <a href="/contractManagement/approval.html?id=${c.id}">审批</a>
+                </td>
+            </tr>`;
+            tbody.insertAdjacentHTML("beforeend", row);
         }
     }
-    updatePageInfo();
+
+    updatePageInfo(data.length);
 }
 
-function updatePageInfo() {
-    const pageCount = Math.ceil(filteredContracts.length / pageSize) || 1;
-    const info = document.getElementById('pageInfo');
-    info.textContent = `共 ${pageCount} 页 ${filteredContracts.length} 条`;
+// 更新页码显示
+function updatePageInfo(total) {
+    const pageCount = Math.ceil(total / pageSize) || 1;
+    document.getElementById('pageInfo').textContent = `共 ${pageCount} 页 ${total} 条`;
 }
 
+// 搜索
 function searchApprovalContracts() {
     const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
     if (!keyword) {
-        loadApprovalContractsFromServer();
+        filteredContracts = approvalContracts;
     } else {
-        filteredContracts = filteredContracts.filter(c =>
+        filteredContracts = approvalContracts.filter(c =>
             c.id.toLowerCase().includes(keyword) ||
             c.name.toLowerCase().includes(keyword) ||
-            c.approver.toLowerCase().includes(keyword) ||
-            c.applyDate.includes(keyword)
+            c.user_id.toLowerCase().includes(keyword) ||
+            c.customer.includes(keyword)
         );
-        currentPage = 1;
-        renderTable();
     }
+
+    currentPage = 1;
+    renderTable(filteredContracts);
 }
 
+// 分页相关函数
 function goToPage(page) {
     const pageCount = Math.ceil(filteredContracts.length / pageSize) || 1;
-    if (page < 1) page = 1;
-    if (page > pageCount) page = pageCount;
-    currentPage = page;
-    renderTable();
+    currentPage = Math.max(1, Math.min(page, pageCount));
+    renderTable(filteredContracts);
 }
 
 function prevPage() {
@@ -92,14 +97,7 @@ function goToLastPage() {
     goToPage(pageCount);
 }
 
-function viewContract(id) {
-    alert('查看合同：' + id);
-}
-
-function approveContract(id) {
-    alert('审批合同：' + id);
-}
-
+// 初始化加载
 window.onload = function () {
     loadApprovalContractsFromServer();
 };
