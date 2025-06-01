@@ -179,7 +179,7 @@ public class ContractController {
     }
 
     @GetMapping("/approvalInfo/{id}")
-    public Map<String, Object> getApprovalInfo(@RequestParam Integer id) {
+    public Map<String, Object> getApprovalInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息
         return contractProcessService.getContractApprovalInfo(id);
     }

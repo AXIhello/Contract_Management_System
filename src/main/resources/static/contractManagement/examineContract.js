@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .then((data) => {
             document.getElementById("contractName").value = data.contractName || "";
-            document.getElementById("approverName").value = data.approverName || "";
+            document.getElementById("approverId").value = data.approverId || "";
         })
         .catch((error) => {
             console.error("获取审批信息失败:", error);
