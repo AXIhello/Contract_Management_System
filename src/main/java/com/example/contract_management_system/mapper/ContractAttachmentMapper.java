@@ -3,6 +3,8 @@ package com.example.contract_management_system.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.contract_management_system.pojo.ContractAttachment;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+import org.springframework.data.util.Pair;
 
 import java.util.List;
 
@@ -14,5 +16,7 @@ public interface ContractAttachmentMapper extends BaseMapper<ContractAttachment>
      * @param conNum 合同编号
      * @return 附件列表
      */
-    List<ContractAttachment> selectByConNum(Integer conNum);
+    @Select("SELECT fileName,path FROM contract_attachment " +
+            "WHERE conNum  = #{conNum}")
+    List<Pair<String,String>> selectByConNum(Integer conNum);
 }

@@ -1,6 +1,7 @@
 package com.example.contract_management_system.service;
 
 import com.example.contract_management_system.pojo.ContractAttachment;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,7 +29,7 @@ public interface ContractAttachmentService {
      * @param conNum 合同编号
      * @return 附件列表
      */
-    List<ContractAttachment> getAttachmentsByConNum(Integer conNum);
+    List<Pair<String,String>> getAttachmentsByConNum(Integer conNum);
 
     /**
      * 删除附件
