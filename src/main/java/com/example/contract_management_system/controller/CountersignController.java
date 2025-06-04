@@ -54,14 +54,26 @@ public class CountersignController {
             String filePath = pair.getSecond(); // 获取文件路径
 
             try {
-                // 读取文件内容（这里假设是读取文件的base64编码或者文件字节）
+                // 读取文件内容
                 byte[] fileContent = Files.readAllBytes(Paths.get(filePath));
+
+                // 获取文件扩展名，用于确定MIME类型
+                String fileExtension = "";
+                int lastDotIndex = fileName.lastIndexOf('.');
+                if (lastDotIndex > 0) {
+                    fileExtension = fileName.substring(lastDotIndex + 1).toLowerCase();
+                }
+
+                // 根据文件类型设置MIME类型
+                String mimeType = getMimeType(fileExtension);
 
                 Map<String, Object> attachment = new HashMap<>();
                 attachment.put("fileName", fileName);
+                attachment.put("fileSize", fileContent.length);
+                attachment.put("mimeType", mimeType);
+                // 方式1: Base64编码 - 适合所有文件类型，前端使用 data URL
                 attachment.put("content", Base64.getEncoder().encodeToString(fileContent));
-                // 或者如果你想直接传输文件字节：
-                // attachment.put("content", fileContent);
+                // 前端可以使用: data:${mimeType};base64,${content} 创建下载链接
 
                 processedAttachments.add(attachment);
             } catch (IOException e) {
@@ -85,6 +97,37 @@ public class CountersignController {
             result.put("attachments", List.of());
         }
         return result;
+    }
+
+
+    private String getMimeType(String fileExtension) {
+        switch (fileExtension) {
+            case "pdf":
+                return "application/pdf";
+            case "doc":
+                return "application/msword";
+            case "docx":
+                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+            case "xls":
+                return "application/vnd.ms-excel";
+            case "xlsx":
+                return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+            case "png":
+                return "image/png";
+            case "jpg":
+            case "jpeg":
+                return "image/jpeg";
+            case "gif":
+                return "image/gif";
+            case "txt":
+                return "text/plain";
+            case "zip":
+                return "application/zip";
+            case "rar":
+                return "application/x-rar-compressed";
+            default:
+                return "application/octet-stream";
+        }
     }
 
     @PostMapping("/submit")
