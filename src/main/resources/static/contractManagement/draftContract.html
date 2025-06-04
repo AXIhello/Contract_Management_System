@@ -59,14 +59,44 @@
         .button-group button:hover {
             background-color: #0056b3;
         }
-        .error-message {
-            color: red;
-            margin-top: 10px;
-            display: none;
-        }
+
         .error {
             color: red;
             margin: 10px 0;
+        }
+        .attachments-container {
+            margin-top: 10px;
+        }
+
+        .attachment-item span {
+            flex: 1;
+            margin-right: 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .attachment-item button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .attachment-item button:hover {
+            background-color: #c82333;
+        }
+        .add-attachment-btn {
+            margin-top: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .add-attachment-btn:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -104,8 +134,9 @@
         </div>
 
         <div class="form-group">
-            <label for="contractFile">上传合同附件</label>
-            <input type="file" id="contractFile" name="contractFile" accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif">
+            <label>上传合同附件</label>
+            <div class="attachments-container" id="attachmentsContainer"></div>
+            <button type="button" id="addAttachmentBtn" class="add-attachment-btn">添加附件</button>
         </div>
 
         <div class="error" id="draftError"></div>
