@@ -1,3 +1,4 @@
+/* 基础全局样式 */
 body {
     font-family: sans-serif;
     background-color: #f5f5f5;
@@ -5,21 +6,34 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    margin: 0;
 }
+
 form {
     background: #fff;
     padding: 2rem;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    min-width: 300px;
+    min-width: 320px;
+    max-width: 600px;
+    box-sizing: border-box;
 }
-input {
+
+input, textarea {
     width: 100%;
     margin: 10px 0;
     padding: 0.7rem;
     border-radius: 5px;
     border: 1px solid #ccc;
+    box-sizing: border-box;
+    font-size: 14px;
+    resize: vertical;
 }
+
+textarea {
+    min-height: 70px;
+}
+
 button {
     width: 100%;
     padding: 0.7rem;
@@ -29,28 +43,211 @@ button {
     font-weight: bold;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
-.error {
-    color: red;
-    font-size: 0.9rem;
+
+button:hover {
+    background-color: #0056b3;
 }
-#resultMessage {
+
+.error, #resultMessage, .error-message {
     color: red;
     font-size: 0.9rem;
     margin-top: 5px;
 }
 
+.success {
+    color: #28a745;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
 .form-group {
     margin-bottom: 18px;
 }
+
 .form-group label {
-    display: block; margin-bottom: 6px; font-weight: bold; }
-.form-group input, .form-group textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
-.permission-group { margin-bottom: 18px; }
-.permission-title { font-weight: bold; margin-top: 10px; }
-.checkbox-list { margin-left: 20px; }
-.button-group { text-align: right; }
-.button-group button { margin-left: 10px; padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-.button-group button:hover { background-color: #0056b3; }
-.error-message { color: red; margin-top: 10px; }
-.success { color: #28a745; font-weight: bold; margin: 10px 0; }
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+}
+
+.permission-group {
+    margin-bottom: 18px;
+}
+
+.permission-title {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.checkbox-list {
+    margin-left: 20px;
+}
+
+.button-group {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.button-group button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.button-group button:hover {
+    background-color: #0056b3;
+}
+
+/* 附件列表样式 */
+#existingAttachments,
+#filePreview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 6px 0 15px 0;
+    min-height: 48px;
+}
+
+/* 单个附件项 */
+.attachment-item {
+    position: relative;
+    width: 100px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+    background: #f9f9f9;
+    box-sizing: border-box;
+    user-select: none;
+    transition: box-shadow 0.2s ease;
+}
+
+.attachment-item:hover {
+    box-shadow: 0 0 6px #0078d7;
+}
+
+/* 附件图标，默认文件图标或者缩略图 */
+.attachment-icon {
+    font-size: 32px;
+    margin-bottom: 5px;
+    color: #0078d7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 40px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+/* 如果是图片预览，可通过JS插入 <img>，这里img样式 */
+.attachment-icon img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* 附件名称，限制一行显示，多出部分显示省略号 */
+.attachment-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+/* 删除按钮 */
+.attachment-item .delete-btn {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 18px;
+    height: 18px;
+    background: #ff4d4f;
+    color: white;
+    font-weight: bold;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 18px;
+    font-size: 14px;
+    cursor: pointer;
+    display: none;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.attachment-item:hover .delete-btn {
+    display: block;
+}
+
+.attachment-item .delete-btn:hover {
+    background-color: #c0392b;
+}
+
+/* 只读输入框样式 */
+input[readonly] {
+    background-color: #eee;
+    border-color: #ddd;
+    color: #666;
+    cursor: default;
+}
+
+/* 响应式 */
+@media (max-width: 480px) {
+    form {
+        padding: 1.5rem;
+        min-width: 90vw;
+    }
+    .attachment-item {
+        width: 80px;
+        font-size: 11px;
+    }
+    .attachment-icon {
+        font-size: 24px;
+        height: 30px;
+    }
+}
+.contract-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+.contract-info div {
+    margin-right: 20px;
+}
+.file-item {
+    display: flex;
+    align-items: center;
+    margin-top: 8px;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+    max-width: 400px;
+}
+.file-icon {
+    width: 60px;
+    height: 60px;
+    margin-right: 10px;
+    text-align: center;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f2f2f2;
+}
+.file-name {
+    flex-grow: 1;
+}
+.file-remove {
+    color: red;
+    cursor: pointer;
+    margin-left: 10px;
+}

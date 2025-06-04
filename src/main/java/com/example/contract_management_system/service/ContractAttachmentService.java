@@ -1,12 +1,13 @@
 package com.example.contract_management_system.service;
 
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.contract_management_system.pojo.ContractAttachment;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface ContractAttachmentService {
+public interface ContractAttachmentService extends IService<ContractAttachment> {
 
     /**
      * 保存合同附件

@@ -2,7 +2,9 @@ package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.pojo.ContractAttachment;
+import com.example.contract_management_system.pojo.Customer;
 import com.example.contract_management_system.service.ContractProcessService;
+import com.example.contract_management_system.service.CustomerService;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import org.springframework.http.ResponseEntity;
@@ -20,13 +22,15 @@ public class CountersignController {
     private final ContractProcessService contractProcessService;
     private final UserService userService;
     private final ContractAttachmentService contractAttachmentService;
+    private final CustomerService customerService;
 
-    public CountersignController(ContractProcessService contractProcessService, 
-                               UserService userService,
-                               ContractAttachmentService contractAttachmentService) {
+    public CountersignController(ContractProcessService contractProcessService,
+                                 UserService userService,
+                                 ContractAttachmentService contractAttachmentService, CustomerService customerService) {
         this.contractProcessService = contractProcessService;
         this.userService = userService;
         this.contractAttachmentService = contractAttachmentService;
+        this.customerService = customerService;
     }
 
     @GetMapping("/pending")
@@ -44,16 +48,20 @@ public class CountersignController {
     public Map<String, Object> getContractInfo(@PathVariable Integer id) {
         Contract contract = contractProcessService.getContractById(id);
         List<ContractAttachment> attachments = contractAttachmentService.getAttachmentsByConNum(id);
+        int customerId = contract.getCustomer();
+        Customer customer = customerService.getById(customerId);
         
         Map<String, Object> result = new HashMap<>();
         if (contract != null) {
             result.put("name", contract.getName());
             result.put("content", contract.getContent());
             result.put("attachments", attachments);
+            result.put("clientName",customer.getName());
         } else {
             result.put("name", "未知合同");
             result.put("content", "");
             result.put("attachments", List.of());
+            result.put("clientName", "未知客户");
         }
         return result;
     }

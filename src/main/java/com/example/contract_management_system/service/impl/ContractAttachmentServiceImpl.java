@@ -1,5 +1,6 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.mapper.ContractAttachmentMapper;
 import com.example.contract_management_system.pojo.ContractAttachment;
 import com.example.contract_management_system.service.ContractAttachmentService;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class ContractAttachmentServiceImpl implements ContractAttachmentService {
+public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmentMapper, ContractAttachment> implements ContractAttachmentService {
     private static final Logger logger = LoggerFactory.getLogger(ContractAttachmentServiceImpl.class);
 
     @Autowired
