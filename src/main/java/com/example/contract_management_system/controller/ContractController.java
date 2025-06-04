@@ -20,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -54,14 +53,18 @@ public class ContractController {
             @RequestParam("contractName") String contractName,
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date startDate,
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") Date endDate,
+            @RequestParam("clientName") String clientName,
             @RequestParam("contractContent") String contractContent,
-            @RequestParam("clientName") String clientName, // 客户信息：客户名（编号）格式
-            @RequestParam(value = "contractFile", required = false) MultipartFile contractFile // 添加文件上传支持
+            @RequestParam(value = "contractFiles", required = false) List<MultipartFile> contractFiles
     ) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // 获取当前登录用户的ID
+            logger.info("✅ draftContract 接口已调用");
+            logger.info("contractName: {}", contractName);
+            logger.info("clientName: {}", clientName);
+            logger.info("contractFiles count: {}", contractFiles != null ? contractFiles.size() : 0);
+
             Integer userId = userService.getCurrentUserId();
             if (userId == null) {
                 response.put("success", false);
@@ -74,37 +77,47 @@ public class ContractController {
             contract.setBeginTime(startDate);
             contract.setEndTime(endDate);
             contract.setContent(contractContent);
-            contract.setUserId(userId); // 设置用户ID而不是用户名
+            contract.setUserId(userId);
 
-            // 解析clientName格式：张三（1） -> 提取括号内的数字1作为客户编号保存
-            int customerId;
+            // 解析客户 ID
             try {
-                customerId = Integer.parseInt(clientName.substring(clientName.lastIndexOf("（") + 1, clientName.lastIndexOf("）")));
+                int customerId = Integer.parseInt(
+                        clientName.substring(clientName.lastIndexOf("（") + 1, clientName.lastIndexOf("）"))
+                );
+                contract.setCustomer(customerId);
             } catch (Exception e) {
+                logger.error("客户信息解析失败: {}", clientName, e);
                 response.put("success", false);
                 response.put("message", "客户信息格式不正确");
                 return response;
             }
-            contract.setCustomer(customerId);
 
-            // 先保存合同信息
             boolean success = contractService.draftContract(contract);
             if (success) {
-                // 合同保存成功后，处理文件上传
                 boolean attachmentSuccess = true;
-                if (contractFile != null && !contractFile.isEmpty()) {
-                    attachmentSuccess = contractAttachmentService.uploadAndSaveAttachment(
-                            contract.getNum(), contractFile);
+
+                if (contractFiles != null && !contractFiles.isEmpty()) {
+                    logger.info("开始处理 {} 个附件", contractFiles.size());
+                    for (MultipartFile file : contractFiles) {
+                        if (!file.isEmpty()) {
+                            logger.info("上传附件: {}", file.getOriginalFilename());
+                            boolean result = contractAttachmentService.uploadAndSaveAttachment(contract.getNum(), file);
+                            if (!result) {
+                                attachmentSuccess = false;
+                                break;
+                            }
+                        }
+                    }
                 }
 
                 if (attachmentSuccess) {
                     response.put("success", true);
                     response.put("message", "合同起草成功" +
-                            (contractFile != null && !contractFile.isEmpty() ? "，附件已上传" : ""));
+                            (contractFiles != null && !contractFiles.isEmpty() ? "，附件已上传" : ""));
                     response.put("contractId", contract.getNum());
                 } else {
                     response.put("success", true);
-                    response.put("message", "合同起草成功，但附件上传失败");
+                    response.put("message", "合同起草成功，但部分或全部附件上传失败");
                     response.put("contractId", contract.getNum());
                 }
             } else {
@@ -119,6 +132,8 @@ public class ContractController {
 
         return response;
     }
+
+
 
     @GetMapping("/name")
     public Map<String, Object> getContractName(@RequestParam Integer id) {
@@ -137,7 +152,7 @@ public class ContractController {
         return contractProcessService.getPendingExamineContracts(currentUserId);
     }
 
-    @GetMapping("/draft")
+    @GetMapping("/getDraft")
     public List<Contract> getDraftContracts() {
         return contractService.getDraftContracts();
     }

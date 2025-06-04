@@ -1,3 +1,4 @@
+let allAttachments=[];
 // 页面加载完成后获取客户列表
 document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM加载完成，开始加载客户列表');
@@ -165,7 +166,12 @@ document.getElementById("draftContractForm").addEventListener("submit", function
     }
 
     // 确保所有附件被添加到表单数据
-    const formData = new FormData(this);
+    const formData = new FormData();
+    formData.append("contractName", contractName);
+    formData.append("startDate", startDate);
+    formData.append("endDate", endDate);
+    formData.append("contractContent", contractContent);
+    formData.append("clientName", clientName);
 
     // 移除旧的附件
     for (let key of formData.keys()) {
@@ -183,6 +189,11 @@ document.getElementById("draftContractForm").addEventListener("submit", function
     const originalText = submitButton.textContent;
     submitButton.disabled = true;
     submitButton.textContent = "提交中...";
+
+    console.log('[2] 添加附件后内容:');
+    for (let [key, value] of formData.entries()) {
+        console.log(`${key}:`, value);
+    }
 
     fetch('/api/contract/draft', {
         method: 'POST',
