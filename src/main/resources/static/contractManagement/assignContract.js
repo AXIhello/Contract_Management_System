@@ -67,7 +67,7 @@ function goToLastPage() {
 }
 
 // 启动时请求后端接口获取数据
-fetch('/api/contract/draft')
+fetch('/api/contract/getDraft')
     .then(res => res.json())
     .then(data => {
         contracts = data;

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -113,7 +114,7 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
     }
 
     @Override
-    public List<ContractAttachment> getAttachmentsByConNum(Integer conNum) {
+    public List<Pair<String, String>> getAttachmentsByConNum(Integer conNum) {
         return contractAttachmentMapper.selectByConNum(conNum);
     }
 
