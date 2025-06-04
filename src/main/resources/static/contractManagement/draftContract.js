@@ -38,7 +38,7 @@ function loadCustomers() {
                 const clientList = document.getElementById('clientList');
                 console.log('找到clientList元素:', clientList);
                 clientList.innerHTML = '';
-                
+
                 if (data.data && data.data.length > 0) {
                     console.log('开始处理客户数据，数量:', data.data.length);
                     data.data.forEach((customer, index) => {
@@ -50,7 +50,7 @@ function loadCustomers() {
                         clientList.appendChild(option);
                     });
                     console.log('客户列表加载完成，共加载', data.data.length, '个客户');
-                    
+
                     // 验证选项是否已添加
                     const options = clientList.getElementsByTagName('option');
                     console.log('当前datalist中的选项数量:', options.length);
@@ -91,43 +91,52 @@ document.getElementById("draftContractForm").addEventListener("submit", function
 
     if (!contractName) {
         error.textContent = "合同名称不能为空！";
+        setInputsLoading(false);
         return;
     }
     if (!startDate) {
         error.textContent = "开始时间不能为空！";
+        setInputsLoading(false);
         return;
     }
     if (!endDate) {
         error.textContent = "结束时间不能为空！";
+        setInputsLoading(false);
         return;
     }
     if (!clientName) {
         error.textContent = "客户不能为空！";
+        setInputsLoading(false);
         return;
     }
     if (!contractContent) {
         error.textContent = "合同内容不能为空！";
+        setInputsLoading(false);
         return;
     }
 
     const datePattern = /^\d{4}-\d{2}-\d{2}$/;
     if (!datePattern.test(startDate)) {
         error.textContent = "开始时间格式不正确，应为YYYY-MM-DD！";
+        setInputsLoading(false);
         return;
     }
     if (!datePattern.test(endDate)) {
         error.textContent = "结束时间格式不正确，应为YYYY-MM-DD！";
+        setInputsLoading(false);
         return;
     }
 
     if (endDate < startDate) {
         error.textContent = "结束时间不能早于开始时间！";
+        setInputsLoading(false);
         return;
     }
 
     const clientNamePattern = /^.+[（(]\d+[）)]$/;
     if (!clientNamePattern.test(clientName)) {
         error.textContent = "客户名称格式不正确，应为：客户名（编号）格式！";
+        setInputsLoading(false);
         return;
     }
 
@@ -136,12 +145,14 @@ document.getElementById("draftContractForm").addEventListener("submit", function
         const fileExt = contractFile.name.split('.').pop().toLowerCase();
         if (!allowedExtensions.includes(fileExt)) {
             error.textContent = "附件格式不正确，只允许doc、docx、pdf、jpg、jpeg、png、bmp、gif！";
+            setInputsLoading(false);
             return;
         }
 
         const maxSize = 30 * 1024 * 1024;
         if (contractFile.size > maxSize) {
             error.textContent = "附件大小不能超过30MB！";
+            setInputsLoading(false);
             return;
         }
     }
@@ -206,3 +217,9 @@ startDateInput.addEventListener("change", () => {
         endDateInput.min = "";
     }
 });
+
+// 重置表单
+function resetForm() {
+    document.getElementById('draftContractForm').reset();
+    document.getElementById('draftError').textContent = '';
+}

@@ -14,7 +14,7 @@
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
+            max-width: 1200px;
             margin: auto;
         }
         h2 {
@@ -31,7 +31,7 @@
             border-radius: 4px;
         }
         .contract-info p {
-            margin: 5px 0;
+            margin: 8px 0;
             font-size: 16px;
         }
         .form-group {
@@ -71,6 +71,42 @@
             margin-top: 10px;
             display: none;
         }
+        .attachment-list {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+        }
+        .attachment-item span {
+            flex: 1;
+            margin-right: 15px;
+        }
+        .attachment-item a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .attachment-item a:hover {
+            text-decoration: underline;
+        }
+        .contract-content {
+            margin: 20px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            min-height: 300px;
+            padding: 15px;
+            background-color: #fff;
+            overflow: auto;
+        }
+        .loading-indicator {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -79,6 +115,21 @@
 
     <div class="contract-info">
         <p>合同名称：<span id="contractName">加载中...</span></p>
+        <p>合同编号：<span id="contractNum">加载中...</span></p>
+        <p>开始日期：<span id="beginTime">加载中...</span></p>
+        <p>结束日期：<span id="endTime">加载中...</span></p>
+        <p>创建用户ID：<span id="userId">加载中...</span></p>
+        <p>客户ID：<span id="customer">加载中...</span></p>
+    </div>
+
+    <div class="attachment-list">
+        <h3>合同附件</h3>
+        <div id="attachments" class="loading-indicator">加载中...</div>
+    </div>
+
+    <div class="contract-content">
+        <h3>合同内容</h3>
+        <div id="contractContent" class="loading-indicator">加载中...</div>
     </div>
 
     <div class="form-group">
@@ -95,4 +146,4 @@
 
 <script src="countersign.js"></script>
 </body>
-</html> 
+</html>

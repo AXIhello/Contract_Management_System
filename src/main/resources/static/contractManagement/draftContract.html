@@ -1,39 +1,121 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8">
     <title>起草合同</title>
-    <link rel="stylesheet" href="/style.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            padding: 20px;
+        }
+        .container {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        h2 {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        .button-group {
+            margin-top: 20px;
+            text-align: right;
+        }
+        .button-group button {
+            margin-left: 10px;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button-group button:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+    </style>
 </head>
 <body>
-<form id="draftContractForm" enctype="multipart/form-data">
+<div class="container">
     <h2>起草合同</h2>
 
-    <label for="contractName">合同名称（必填）：</label>
-    <input type="text" id="contractName" name="contractName" required />
+    <form id="draftContractForm" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="contractName">合同名称（必填）：</label>
+            <input type="text" id="contractName" name="contractName" required>
+        </div>
 
-    <label for="clientName">客户名称（必填）：</label>
-    <input list="clientList" id="clientName" name="clientName" required />
-    <datalist id="clientList">
-        <!-- 客户列表将通过JavaScript动态加载 -->
-    </datalist>
-    <br>
+        <div class="form-group">
+            <label for="clientName">客户名称（必填）：</label>
+            <input list="clientList" id="clientName" name="clientName" required>
+            <datalist id="clientList">
+                <!-- 客户列表将通过JavaScript动态加载 -->
+            </datalist>
+        </div>
 
-    <label for="startDate">开始时间（必填）：</label>
-    <input type="date" id="startDate" name="startDate" required />
+        <div class="form-group">
+            <label for="startDate">开始时间（必填）：</label>
+            <input type="date" id="startDate" name="startDate" required>
+        </div>
 
-    <label for="endDate">结束时间（必填）：</label>
-    <input type="date" id="endDate" name="endDate" required />
+        <div class="form-group">
+            <label for="endDate">结束时间（必填）：</label>
+            <input type="date" id="endDate" name="endDate" required>
+        </div>
 
-    <label for="contractContent">合同内容</label><br>
-    <textarea id="contractContent" name="contractContent" rows="5"></textarea><br><br>
+        <div class="form-group">
+            <label for="contractContent">合同内容</label>
+            <textarea id="contractContent" name="contractContent" rows="5"></textarea>
+        </div>
 
-    <label for="contractFile">上传合同附件</label><br>
-    <input type="file" id="contractFile" name="contractFile" accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif"><br><br>
+        <div class="form-group">
+            <label for="contractFile">上传合同附件</label>
+            <input type="file" id="contractFile" name="contractFile" accept=".doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif">
+        </div>
 
-    <div class="error" id="draftError" style="color: red; margin-bottom: 10px;"></div>
-    <button type="submit">提交起草</button>
-</form>
+        <div class="error" id="draftError"></div>
+
+        <div class="button-group">
+            <button type="button" onclick="resetForm()">重置</button>
+            <button type="submit">提交起草</button>
+        </div>
+    </form>
+</div>
 
 <script src="draftContract.js"></script>
 </body>
