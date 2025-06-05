@@ -103,52 +103,6 @@
     </form>
 </div>
 
-<script>
-    // 模拟后台数据获取
-    function loadContractData() {
-        // 这里模拟后台取来的数据
-        return {
-            contractName: "技术服务合同B",
-            clientName: "科技公司B",
-            signerName: "张三"
-        };
-    }
-
-    function populateForm() {
-        const data = loadContractData();
-        document.getElementById("contractName").value = data.contractName;
-        document.getElementById("clientName").value = data.clientName;
-        document.getElementById("signerName").value = data.signerName;
-    }
-
-    function resetForm() {
-        // 签订信息清空，前三个只读字段保持不变
-        document.getElementById("signInfo").value = "";
-    }
-
-    document.getElementById("signContractForm").addEventListener("submit", function(event) {
-        event.preventDefault();
-
-        const signInfo = document.getElementById("signInfo").value.trim();
-        if (!signInfo) {
-            alert("请填写签订信息");
-            return;
-        }
-
-        // 提交数据逻辑，示例用 alert 显示
-        alert(
-            `提交成功！\n合同名称: ${document.getElementById("contractName").value}\n` +
-            `客户: ${document.getElementById("clientName").value}\n` +
-            `签订员: ${document.getElementById("signerName").value}\n` +
-            `签订信息: ${signInfo}`
-        );
-
-        // 提交后清空签订信息（可按需调整）
-        resetForm();
-    });
-
-    // 页面加载时填充数据
-    window.onload = populateForm;
-</script>
+<script src="concludeContract.js"></script>
 </body>
 </html>
