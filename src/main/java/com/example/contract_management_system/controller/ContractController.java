@@ -60,7 +60,6 @@ public class ContractController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            logger.info("✅ draftContract 接口已调用");
             logger.info("contractName: {}", contractName);
             logger.info("clientName: {}", clientName);
             logger.info("contractFiles count: {}", contractFiles != null ? contractFiles.size() : 0);
@@ -134,7 +133,6 @@ public class ContractController {
     }
 
 
-
     @GetMapping("/name")
     public Map<String, Object> getContractName(@RequestParam Integer id) {
         String name = contractService.getContractNameById(id);
@@ -150,6 +148,15 @@ public class ContractController {
             throw new RuntimeException("用户未登录");
         }
         return contractProcessService.getPendingExamineContracts(currentUserId);
+    }
+
+    @GetMapping("/approvalConclude")
+    public List<Map<String,Object>> getPendingConcludeContracts() {
+        Integer currentUserId = userService.getCurrentUserId();
+        if (currentUserId == null) {
+            throw new RuntimeException("用户未登录");
+        }
+        return contractProcessService.getPendingConcludeContracts(currentUserId);
     }
 
     @GetMapping("/getDraft")

@@ -58,4 +58,13 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "AND cp.state = 0 " +
             "AND cs.type = 3")
     List<Integer> getPendingExamineContracts(@Param("userId") Integer userId);
+
+    @Select("SELECT cp.conNum " +
+            "FROM contract_process cp " +
+            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
+            "WHERE cp.user_id = #{userId} " +
+            "AND cp.type = 3 " +
+            "AND cp.state = 0 " +
+            "AND cs.type = 4")
+    List<Integer> getPendingConcludeContracts(@Param("userId") Integer userId);
 }

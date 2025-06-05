@@ -22,7 +22,9 @@ public interface ContractProcessService extends IService<ContractProcess> {
     
     // 获取待审批的合同列表（简化信息）
     List<Map<String, Object>> getPendingExamineContracts(Integer userId);
-    
+
+    List<Map<String, Object>> getPendingConcludeContracts(Integer userId);
+
     // 提交审批意见
     boolean submitExamine(Integer contractId, String comment, Integer state);
     
