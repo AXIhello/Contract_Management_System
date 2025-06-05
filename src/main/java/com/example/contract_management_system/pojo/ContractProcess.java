@@ -16,7 +16,9 @@ public class ContractProcess {
     private Integer state;       // 操作状态：0 未完成，1 已完成，2 否决
     @TableField("user_id")
     private Integer userId;     // 操作用户号
+
     private String content;      // 操作内容
+
     private Date time;           // 操作时间
 
     public void setContractNum(int contractNum) {

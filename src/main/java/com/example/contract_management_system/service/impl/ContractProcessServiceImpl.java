@@ -1,8 +1,10 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.common.exception.*;
 import com.example.contract_management_system.dto.AssignContractRequest;
+import com.example.contract_management_system.dto.CountersignDTO;
 import com.example.contract_management_system.mapper.*;
 import com.example.contract_management_system.pojo.*;
 import com.example.contract_management_system.service.UserService;
@@ -13,10 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMapper, ContractProcess> implements ContractProcessService {
@@ -94,6 +93,8 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
         }
     }
 
+
+
     @Override
     public Contract getContractById(Integer id) {
         try {
@@ -141,6 +142,31 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             throw new SystemException("提交会签失败：", e);
         }
     }
+
+    //获取会签意见及会签人
+    @Override
+    public List<CountersignDTO> getCountersignContent(Integer contractNum) {
+        // 1. 先查contract_process表，type=1表示会签
+        QueryWrapper<ContractProcess> processQuery = new QueryWrapper<>();
+        processQuery.eq("conNum", contractNum)
+                .eq("type", 1);
+        List<ContractProcess> processList = contractProcessMapper.selectList(processQuery);
+
+        if (processList.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+
+        List<CountersignDTO> result = new ArrayList<>();
+        for (ContractProcess process : processList) {
+            User user = userMapper.selectById(process.getUserId());
+            String username = user != null ? user.getUsername() : "未知用户";
+            result.add(new CountersignDTO(username, process.getContent()));
+        }
+        return result;
+    }
+
+
 
     @Override
     public List<Map<String, Object>> getPendingExamineContracts(Integer userId) {

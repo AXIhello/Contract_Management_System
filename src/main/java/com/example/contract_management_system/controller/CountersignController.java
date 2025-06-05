@@ -1,5 +1,6 @@
 package com.example.contract_management_system.controller;
 
+import com.example.contract_management_system.dto.CountersignDTO;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.pojo.ContractAttachment;
 import com.example.contract_management_system.service.ContractProcessService;
@@ -29,6 +30,12 @@ public class CountersignController {
         this.contractProcessService = contractProcessService;
         this.userService = userService;
         this.contractAttachmentService = contractAttachmentService;
+    }
+
+    //获取会签意见
+    @GetMapping("/contents/{contractNum}")
+    public List<CountersignDTO> getCountersign(@PathVariable Integer contractNum) {
+        return contractProcessService.getCountersignContent(contractNum);
     }
 
     @GetMapping("/pending")
@@ -143,4 +150,6 @@ public class CountersignController {
                     .body(Map.of("success", false, "message", "会签提交失败"));
         }
     }
+
+
 } 

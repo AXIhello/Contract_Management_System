@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>定稿合同</title>
     <style>
+        /* 你的CSS样式，保持不变，直接复制粘贴即可 */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f2f5;
@@ -16,6 +17,30 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             max-width: 800px;
             margin: auto;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab-buttons button {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background-color: #e9ecef;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-buttons button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         h2 {
             background-color: #007bff;
@@ -59,13 +84,17 @@
         .button-group button:hover {
             background-color: #0056b3;
         }
-
         .error {
             color: red;
             margin: 10px 0;
         }
         .attachments-container {
             margin-top: 10px;
+        }
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
         }
         .attachment-item span {
             flex: 1;
@@ -103,47 +132,63 @@
 <div class="container">
     <h2>定稿合同</h2>
 
-    <form id="finalizeContractForm" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="contractName">合同名称：</label>
-            <input type="text" id="contractName" name="contractName" readonly>
-        </div>
+    <div class="tab-buttons">
+        <button class="active" onclick="switchTab('editTab', this)">修改定稿</button>
+        <button onclick="switchTab('commentTab', this)">会签意见</button>
+    </div>
 
-        <div class="form-group">
-            <label for="clientName">客户名称：</label>
-            <input type="text" id="clientName" name="clientName" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="startDate">开始时间（可修改）：</label>
-            <input type="date" id="startDate" name="startDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="endDate">结束时间（可修改）：</label>
-            <input type="date" id="endDate" name="endDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="contractContent">合同内容</label>
-            <textarea id="contractContent" name="contractContent" rows="5"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>上传最终合同附件</label>
-            <div class="attachments-container" id="attachmentsContainer">
-                <p>未选择附件</p>
+    <div id="editTab" class="tab-content active">
+        <form id="finalizeContractForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="contractName">合同名称：</label>
+                <input type="text" id="contractName" name="contractName" readonly />
             </div>
-            <button type="button" id="addAttachmentBtn" class="add-attachment-btn">添加附件</button>
-        </div>
 
-        <div class="error" id="finalError"></div>
+            <div class="form-group">
+                <label for="clientName">客户名称：</label>
+                <input type="text" id="clientName" name="clientName" readonly />
+            </div>
 
-        <div class="button-group">
-            <button type="button" onclick="resetForm()">重置</button>
-            <button type="submit">提交定稿</button>
+            <div class="form-group">
+                <label for="startDate">开始时间（可修改）：</label>
+                <input type="date" id="startDate" name="startDate" required />
+            </div>
+
+            <div class="form-group">
+                <label for="endDate">结束时间（可修改）：</label>
+                <input type="date" id="endDate" name="endDate" required />
+            </div>
+
+            <div class="form-group">
+                <label for="contractContent">合同内容</label>
+                <textarea id="contractContent" name="contractContent" rows="5"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>上传最终合同附件</label>
+                <div class="attachments-container" id="attachmentsContainer">
+                    <p>未选择附件</p>
+                </div>
+                <button type="button" id="addAttachmentBtn" class="add-attachment-btn">添加附件</button>
+            </div>
+
+            <div class="error" id="finalError"></div>
+
+            <div class="button-group">
+                <button type="button" onclick="resetForm()">重置</button>
+                <button type="submit">提交定稿</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="commentTab" class="tab-content">
+        <div class="form-group">
+            <label>会签意见：</label>
+            <div id="countersignContent">
+                <p>正在加载会签意见...</p>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 
 <script src="finalizeContract.js"></script>

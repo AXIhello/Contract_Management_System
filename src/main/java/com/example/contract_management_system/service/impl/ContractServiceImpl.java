@@ -178,6 +178,8 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         return false;
     }
 
+    //TODO:附件的增删
+
 
     @Override
     public List<ContractPendingDTO> getToBeFinishedContracts() {
@@ -209,6 +211,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         return contracts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
+        //TODO:显示附件列表，提供下载功能
     }
 
 
@@ -224,6 +227,8 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     }
 
 }
+
+
 
 
 
