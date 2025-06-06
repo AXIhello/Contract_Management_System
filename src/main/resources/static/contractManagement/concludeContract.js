@@ -1,71 +1,75 @@
+document.addEventListener("DOMContentLoaded", () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const contractId = urlParams.get("id") || "defaultId";
 
-// 模拟从后台获取合同相关信息（改为真实接口）
-// TODO: 替换为真实接口，例如：fetch(`/api/contract/info?id=xxx`)
-//function loadContractData() {
-  //  return {
-    //    contractName: "技术服务合同B",
-      //  clientName: "科技公司B",
-        //signerName: "张三"
-    //};
-//}
+    // 获取合同签订信息（包括审批意见）
+    fetch(`/api/contract/concludeInfo/${contractId}`)
+        .then((res) => {
+            if (!res.ok) throw new Error("网络响应失败");
+            return res.json();
+        })
+        .then((data) => {
+            document.getElementById("contractName").value = data.contractName || "";
+            document.getElementById("clientName").value = data.customer || "";
+            document.getElementById("signerName").value = data.concludeId || "";
+            document.getElementById("contractInfo").value = data.contractContent || "";
 
-// 页面加载时填充合同信息
-function populateForm() {
-    const data = loadContractData();
-    document.getElementById("contractName").value = data.contractName;
-    document.getElementById("clientName").value = data.clientName;
-    document.getElementById("signerName").value = data.signerName;
-}
+            const comments = data.examineComments || [];
+            const commentList = document.getElementById("examineCommentsList");
+            commentList.innerHTML = "";
+            if (comments.length === 0) {
+                commentList.innerHTML = "<li>无</li>";
+            } else {
+                comments.forEach(comment => {
+                    const li = document.createElement("li");
+                    li.textContent = comment;
+                    commentList.appendChild(li);
+                });
+            }
+        })
+        .catch((error) => {
+            console.error("获取合同签订信息失败:", error);
+            alert("获取信息失败，请稍后重试。");
+        });
 
-// 重置签订信息输入框（不影响只读字段）
-function resetForm() {
-    document.getElementById("signInfo").value = "";
-}
+    // 表单提交逻辑
+    document.getElementById("signContractForm").addEventListener("submit", (event) => {
+        event.preventDefault();
 
-// 处理表单提交事件
-function handleSubmit(event) {
-    event.preventDefault();
+        const signInfo = document.getElementById("signInfo").value.trim();
+        if (!signInfo) {
+            alert("请填写签订信息");
+            return;
+        }
 
-    const signInfo = document.getElementById("signInfo").value.trim();
-    if (!signInfo) {
-        alert("请填写签订信息");
-        return;
-    }
+        const payload = {
+            contractId,
+            signInfo: signInfo
+        };
 
-    const payload = {
-        contractName: document.getElementById("contractName").value,
-        clientName: document.getElementById("clientName").value,
-        signerName: document.getElementById("signerName").value,
-        signInfo: signInfo
-    };
+        fetch("/api/contract/submitSignInfo", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("提交失败");
+                return res.json();
+            })
+            .then(() => {
+                alert("签订信息提交成功！");
+                document.getElementById("signInfo").value = "";
+            })
+            .catch((error) => {
+                console.error("提交失败:", error);
+                alert("提交失败，请稍后重试。");
+            });
+    });
 
-    // TODO: 调用后端提交签订信息的接口，如：
-    // fetch('/api/contract/submitSignInfo', {
-    //     method: 'POST',
-    //     headers: { 'Content-Type': 'application/json' },
-    //     body: JSON.stringify(payload)
-    // }).then(res => res.json()).then(result => {
-    //     alert("提交成功！");
-    //     resetForm();
-    // }).catch(err => {
-    //     alert("提交失败！");
-    // });
-
-    // 示例：临时替代逻辑
-    alert(
-        `提交成功！\n合同名称: ${payload.contractName}\n` +
-        `客户: ${payload.clientName}\n` +
-        `签订员: ${payload.signerName}\n` +
-        `签订信息: ${payload.signInfo}`
-    );
-
-    resetForm();
-}
-
-// 初始化函数
-function init() {
-    populateForm();
-    document.getElementById("signContractForm").addEventListener("submit", handleSubmit);
-}
-
-window.onload = init;
+    // 重置按钮逻辑
+    document.getElementById("resetBtn").addEventListener("click", () => {
+        document.getElementById("signInfo").value = "";
+    });
+});
