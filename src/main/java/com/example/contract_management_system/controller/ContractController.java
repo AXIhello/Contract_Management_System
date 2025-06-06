@@ -206,6 +206,12 @@ public class ContractController {
         return contractProcessService.getContractApprovalInfo(id);
     }
 
+    @GetMapping("/concludeInfo/{id}")
+    public Map<String, Object> getConcludeInfoInfo(@PathVariable Integer id) {
+        // 获取合同审批相关信息
+        return contractProcessService.getContractConcludeInfo(id);
+    }
+
     @PostMapping("/submitApproval")
     public boolean submitApproval(@RequestBody Map<String, Object> request) {
         Integer contractId = (Integer) request.get("contractId");

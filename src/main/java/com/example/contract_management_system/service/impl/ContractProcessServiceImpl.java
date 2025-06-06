@@ -261,10 +261,33 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
 
             Map<String, Object> info = new HashMap<>();
             info.put("contractName", contract.getName());
+            info.put("contractContent", contract.getContent());
+            Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
+            info.put("customer", customer.getName());
             info.put("approverId", userService.getCurrentUserId());
             return info;
         } catch (Exception e) {
             throw new SystemException("获取合同审批信息失败：", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getContractConcludeInfo(Integer contractId) {
+        try {
+            Contract contract = contractMapper.selectById(contractId);
+            if (contract == null) {
+                throw new BusinessException("合同不存在");
+            }
+
+            Map<String, Object> info = new HashMap<>();
+            info.put("contractName", contract.getName());
+            info.put("contractContent", contract.getContent());
+            Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
+            info.put("customer", customer.getName());
+            info.put("concludeId", userService.getCurrentUserId());
+            return info;
+        } catch (Exception e) {
+            throw new SystemException("获取合同签订信息失败：", e);
         }
     }
 

@@ -33,7 +33,9 @@ public interface ContractProcessService extends IService<ContractProcess> {
     
     // 获取合同审批相关信息
     Map<String, Object> getContractApprovalInfo(Integer contractId);
-    
+
+    Map<String, Object> getContractConcludeInfo(Integer contractId);
+
     // 获取当前用户ID
     Integer getCurrentUserId();
 }
