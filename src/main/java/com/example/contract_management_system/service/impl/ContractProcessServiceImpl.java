@@ -27,15 +27,17 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     private final UserMapper userMapper;
     private final UserService userService;
     private final  CustomerService customerService;
+    private final CustomerMapper customerMapper;
 
-    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService,
-                                      ContractStateMapper contractStateMapper,CustomerService customerService) {
+    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper, UserService userService,
+                                      ContractStateMapper contractStateMapper, CustomerService customerService, CustomerMapper customerMapper) {
         this.contractProcessMapper = contractProcessMapper;
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
         this.userService=userService;
         this.contractStateMapper=contractStateMapper;
         this.customerService=customerService;
+        this.customerMapper = customerMapper;
     }
 
     //分配合同
@@ -280,11 +282,13 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             }
 
             Map<String, Object> info = new HashMap<>();
+            List<String> examineComments=contractProcessMapper.getContent(contract.getNum(),2);
             info.put("contractName", contract.getName());
             info.put("contractContent", contract.getContent());
             Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
             info.put("customer", customer.getName());
             info.put("concludeId", userService.getCurrentUserId());
+            info.put("examineComments", examineComments);
             return info;
         } catch (Exception e) {
             throw new SystemException("获取合同签订信息失败：", e);
