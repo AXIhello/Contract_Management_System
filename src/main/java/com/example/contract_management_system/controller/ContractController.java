@@ -192,13 +192,14 @@ public class ContractController {
     @PostMapping("/finalize/{contractNum}")
     public Result<String> finalizeContract(
             @PathVariable Integer contractNum,
-            @RequestParam("contract") String contractJson,
+            @RequestParam("content") String content,
             @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
             @RequestParam(value = "deletedAttachments", required = false) List<String> deletedAttachments,
             @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
 
-        // 手动解析 contractJson 为对象
-        Contract contract = new ObjectMapper().readValue(contractJson, Contract.class);
+        Contract contract = new Contract();
+        contract.setNum(contractNum);
+        contract.setContent(content);
 
         Integer userId = userService.getCurrentUserId();
         boolean success = contractService.updateContract(

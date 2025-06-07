@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <title>定稿合同</title>
     <style>
-        /* 你的CSS样式，保持不变，直接复制粘贴即可 */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f2f5;
@@ -126,6 +125,12 @@
         .add-attachment-btn:hover {
             background-color: #218838;
         }
+        /* 只读字段样式 */
+        .readonly-indicator {
+            color: #6c757d;
+            font-size: 0.85em;
+            font-weight: normal;
+        }
         .back-button {
             background-color: #6c757d;
             color: white;
@@ -165,29 +170,29 @@
             </div>
 
             <div class="form-group">
-                <label for="startDate">开始时间（可修改）：</label>
-                <input type="date" id="startDate" name="startDate" required />
+                <label for="startDate">开始时间：</label>
+                <input type="date" id="startDate" name="startDate" readonly />
             </div>
 
             <div class="form-group">
-                <label for="endDate">结束时间（可修改）：</label>
-                <input type="date" id="endDate" name="endDate" required />
+                <label for="endDate">结束时间：</label>
+                <input type="date" id="endDate" name="endDate" readonly />
             </div>
 
             <div class="form-group">
-                <label for="contractContent">合同内容</label>
-                <textarea id="contractContent" name="contractContent" rows="5"></textarea>
+                <label for="contractContent">合同内容（可修改）：</label>
+                <textarea id="contractContent" name="contractContent" rows="5" placeholder="请输入合同具体内容..."></textarea>
             </div>
 
             <div class="form-group">
                 <label>已上传合同附件</label>
                 <div class="attachments-container" id="existingAttachmentsContainer">
-                    <p>无已上传附件</p>
+                    <p>正在加载附件...</p>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>上传最终合同附件</label>
+                <label>新增附件</label>
                 <div class="attachments-container" id="attachmentsContainer">
                     <p>未选择附件</p>
                 </div>
@@ -213,6 +218,67 @@
     </div>
 </div>
 
+<script>
+    // 切换标签页函数
+    function switchTab(tabId, button) {
+        // 隐藏所有标签内容
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // 移除所有按钮的active状态
+        const buttons = document.querySelectorAll('.tab-buttons button');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // 显示选中的标签内容
+        const activeTab = document.getElementById(tabId);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+
+        // 给选中的按钮添加active状态
+        if (button) {
+            button.classList.add('active');
+        }
+    }
+
+    // 重置表单函数（需要在HTML中调用）
+    function resetForm() {
+        // 只重置合同内容
+        const contentField = document.getElementById('contractContent');
+        if (contentField) {
+            contentField.value = '';
+        }
+
+        // 清空新上传附件
+        if (window.newAttachments) {
+            window.newAttachments = [];
+            if (typeof renderAttachments === 'function') {
+                renderAttachments();
+            }
+        }
+
+        // 清空删除附件记录
+        if (window.deletedAttachments) {
+            window.deletedAttachments = [];
+        }
+
+        // 重新加载已有附件
+        const contractId = new URLSearchParams(window.location.search).get("id");
+        if (contractId && typeof loadExistingAttachments === 'function') {
+            loadExistingAttachments(contractId);
+        }
+
+        // 清空错误信息
+        const errorEl = document.getElementById('finalError');
+        if (errorEl) {
+            errorEl.innerText = '';
+        }
+    }
+</script>
 <script src="finalizeContract.js"></script>
 <script src="/common.js"></script>
 </body>

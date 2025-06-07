@@ -137,10 +137,18 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         logger.info("开始更新合同内容, 合同编号: {}, 用户ID: {}", contractNum, userId);
 
         // （1）数据验证
-        if (updatedContract == null || updatedContract.getName() == null || updatedContract.getName().trim().isEmpty()) {
-            logger.error("更新的合同内容为空或缺少合同名称");
+        if (updatedContract == null) {
+            logger.error("未获取到更新的合同");
             return false;
         }
+//        if(updatedContract.getName() == null){
+//            logger.error("缺少合同名称");
+//            return false;
+//        }
+//        if(updatedContract.getName().trim().isEmpty()) {
+//            logger.error("反正是个空");
+//            return false;
+//        }
 
         // （2）查询合同状态，判断是否为“待定稿”状态
         ContractState state = contractStateService.getContractState(contractNum);
