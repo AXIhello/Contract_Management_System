@@ -1,100 +1,78 @@
-// 模拟合同数据（实际中应通过后端 API 获取）
-const allContracts = [
-    { id: "HT202501", name: "购销合同A", party: "中企A", date: "2025-05-01" },
-    { id: "HT202502", name: "技术服务合同B", party: "科技公司B", date: "2025-05-03" },
-    { id: "HT202503", name: "采购合同C", party: "供应商C", date: "2025-05-04" },
-    { id: "HT202504", name: "项目合作协议D", party: "合作方D", date: "2025-05-05" },
-    // ... 可添加更多数据
-];
+let contracts = [];  // 存储待签订合同数据
 
-// 分页参数
-let currentPage = 1;
 const pageSize = 5;
-let filteredContracts = [...allContracts];
+let currentPage = 1;
 
-// 渲染表格数据
-function renderTable() {
-    const tbody = document.getElementById("toBeSignedBody");
-    tbody.innerHTML = "";
+// 渲染表格
+function renderTable(data) {
+    const tbody = document.getElementById('toBeSignedBody');
+    tbody.innerHTML = '';
 
     const start = (currentPage - 1) * pageSize;
     const end = start + pageSize;
-    const pageData = filteredContracts.slice(start, end);
+    const pageData = data.slice(start, end);
 
     if (pageData.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="5">暂无待签订合同</td>`;
-        tbody.appendChild(tr);
-        return;
+        tbody.innerHTML = `<tr><td colspan="5">暂无待签订合同</td></tr>`;
+    } else {
+        for (const c of pageData) {
+            const row = `<tr>
+                <td>${c.id || c.contractId}</td>
+                <td>${c.name || c.contractName}</td>
+                <td>${c.party || c.partyName}</td>
+                <td>${c.date || (c.createTime?.split('T')[0] || '')}</td>
+                <td>
+                    <button onclick="viewContract('${c.id || c.contractId}')">查看</button>
+                    <button onclick="signContract('${c.id || c.contractId}')">签署</button>
+                </td>
+            </tr>`;
+            tbody.insertAdjacentHTML("beforeend", row);
+        }
     }
 
-    pageData.forEach(contract => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-            <td>${contract.id}</td>
-            <td>${contract.name}</td>
-            <td>${contract.party}</td>
-            <td>${contract.date}</td>
-            <td>
-                <button onclick="viewContract('${contract.id}')">查看</button>
-                <button onclick="signContract('${contract.id}')">签署</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-
-    renderPageInfo();
+    updatePageInfo(data.length);
 }
 
-// 渲染分页信息
-function renderPageInfo() {
-    const totalPages = Math.ceil(filteredContracts.length / pageSize);
-    const pageInfo = document.getElementById("pageInfo");
-    pageInfo.textContent = `共 ${totalPages} 页 ${filteredContracts.length} 条`;
+// 更新页码显示
+function updatePageInfo(total) {
+    const pageCount = Math.ceil(total / pageSize) || 1;
+    document.getElementById('pageInfo').textContent = `共 ${pageCount} 页 ${total} 条`;
 }
 
-// 翻页函数
+// 搜索
+function searchToBeSignedContracts() {
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    const filtered = contracts.filter(c =>
+        (c.id || c.contractId || '').toLowerCase().includes(query) ||
+        (c.name || c.contractName || '').toLowerCase().includes(query) ||
+        (c.party || c.partyName || '').toLowerCase().includes(query) ||
+        (c.date || c.createTime || '').toLowerCase().includes(query)
+    );
+    currentPage = 1;
+    renderTable(filtered);
+}
+
+// 分页函数
 function goToPage(page) {
-    const totalPages = Math.ceil(filteredContracts.length / pageSize);
-    if (page < 1 || page > totalPages) return;
-    currentPage = page;
-    renderTable();
+    const pageCount = Math.ceil(contracts.length / pageSize) || 1;
+    currentPage = Math.max(1, Math.min(page, pageCount));
+    renderTable(contracts);
 }
 
 function prevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        renderTable();
-    }
+    goToPage(currentPage - 1);
 }
 
 function nextPage() {
-    const totalPages = Math.ceil(filteredContracts.length / pageSize);
-    if (currentPage < totalPages) {
-        currentPage++;
-        renderTable();
-    }
+    goToPage(currentPage + 1);
 }
 
 function goToLastPage() {
-    currentPage = Math.ceil(filteredContracts.length / pageSize);
-    renderTable();
+    const pageCount = Math.ceil(contracts.length / pageSize) || 1;
+    goToPage(pageCount);
 }
 
-// 搜索功能
-function searchToBeSignedContracts() {
-    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-    filteredContracts = allContracts.filter(contract =>
-        contract.id.toLowerCase().includes(keyword) ||
-        contract.name.toLowerCase().includes(keyword) ||
-        contract.party.toLowerCase().includes(keyword) ||
-        contract.date.toLowerCase().includes(keyword)
-    );
-    currentPage = 1;
-    renderTable();
-}
-
-// 示例操作按钮函数
+// 查看/签署按钮逻辑
 function viewContract(id) {
     alert(`查看合同：${id}`);
 }
@@ -103,5 +81,15 @@ function signContract(id) {
     alert(`签署合同：${id}`);
 }
 
-// 页面加载完自动渲染
-window.onload = renderTable;
+// 页面加载时获取数据
+fetch('/api/contract/approvalConclude')
+    .then(res => res.json())
+    .then(data => {
+        contracts = data;
+        renderTable(contracts);
+    })
+    .catch(err => {
+        console.error('获取待签订合同列表失败:', err);
+    });
+
+

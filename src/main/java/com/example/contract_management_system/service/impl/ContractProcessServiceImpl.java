@@ -7,6 +7,7 @@ import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.dto.CountersignDTO;
 import com.example.contract_management_system.mapper.*;
 import com.example.contract_management_system.pojo.*;
+import com.example.contract_management_system.service.CustomerService;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.service.ContractProcessService;
 import jakarta.persistence.PersistenceException;
@@ -24,14 +25,18 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     private final ContractStateMapper contractStateMapper;
     private final UserMapper userMapper;
     private final UserService userService;
+    private final  CustomerService customerService;
+    private final CustomerMapper customerMapper;
 
-    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper,UserService userService,
-                                      ContractStateMapper contractStateMapper) {
+    public ContractProcessServiceImpl(ContractProcessMapper contractProcessMapper, ContractMapper contractMapper, UserMapper userMapper, UserService userService,
+                                      ContractStateMapper contractStateMapper, CustomerService customerService, CustomerMapper customerMapper) {
         this.contractProcessMapper = contractProcessMapper;
         this.contractMapper = contractMapper;
         this.userMapper = userMapper;
         this.userService=userService;
         this.contractStateMapper=contractStateMapper;
+        this.customerService=customerService;
+        this.customerMapper = customerMapper;
     }
 
     //分配合同
@@ -174,6 +179,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             // 获取当前用户待审批的合同列表
             List<Integer> contractIds = contractProcessMapper.getPendingExamineContracts(userId);
             List<Map<String, Object>> contracts = new ArrayList<>();
+
             
             for (Integer contractId : contractIds) {
                 Contract contract = contractMapper.selectById(contractId);
@@ -182,11 +188,39 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
                     contractInfo.put("id", contract.getNum());
                     contractInfo.put("name", contract.getName());
                     contractInfo.put("user_id", contract.getUserId());
-                    contractInfo.put("customer", contract.getCustomer());
+                    Customer customer = customerService.getBaseMapper().selectById(contract.getCustomer());
+                    contractInfo.put("customer",customer.getName());
                     contracts.add(contractInfo);
                 }
             }
             
+            return contracts;
+        } catch (Exception e) {
+            throw new SystemException("获取待签订合同列表失败：", e);
+        }
+    }
+
+
+    @Override
+    public List<Map<String, Object>> getPendingConcludeContracts(Integer userId) {
+        try {
+            // 获取当前用户待审批的合同列表
+            List<Integer> contractIds = contractProcessMapper.getPendingConcludeContracts(userId);
+            List<Map<String, Object>> contracts = new ArrayList<>();
+
+            for (Integer contractId : contractIds) {
+                Contract contract = contractMapper.selectById(contractId);
+                if (contract != null) {
+                    Map<String, Object> contractInfo = new HashMap<>();
+                    contractInfo.put("id", contract.getNum());
+                    contractInfo.put("name", contract.getName());
+                    contractInfo.put("user_id", contract.getUserId());
+                    Customer customer = customerService.getBaseMapper().selectById(contract.getCustomer());
+                    contractInfo.put("customer",customer.getName());
+                    contracts.add(contractInfo);
+                }
+            }
+
             return contracts;
         } catch (Exception e) {
             throw new SystemException("获取待审批合同列表失败：", e);
@@ -255,10 +289,35 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
 
             Map<String, Object> info = new HashMap<>();
             info.put("contractName", contract.getName());
+            info.put("contractContent", contract.getContent());
+            Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
+            info.put("customer", customer.getName());
             info.put("approverId", userService.getCurrentUserId());
             return info;
         } catch (Exception e) {
             throw new SystemException("获取合同审批信息失败：", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getContractConcludeInfo(Integer contractId) {
+        try {
+            Contract contract = contractMapper.selectById(contractId);
+            if (contract == null) {
+                throw new BusinessException("合同不存在");
+            }
+
+            Map<String, Object> info = new HashMap<>();
+            List<String> examineComments=contractProcessMapper.getContent(contract.getNum(),2);
+            info.put("contractName", contract.getName());
+            info.put("contractContent", contract.getContent());
+            Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
+            info.put("customer", customer.getName());
+            info.put("concludeId", userService.getCurrentUserId());
+            info.put("examineComments", examineComments);
+            return info;
+        } catch (Exception e) {
+            throw new SystemException("获取合同签订信息失败：", e);
         }
     }
 
