@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.pojo.Contract;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ public interface ContractService extends IService<Contract> {
     boolean existsByNum(Integer contractNum);
 
     //修改定稿合同
-    boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract);
+    boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract, List<MultipartFile> newAttachments, List<String> deletedAttachments);
 
     //获取合同内容(用于前端显示）
     String getContractContentById(Integer contractId);

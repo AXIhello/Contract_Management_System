@@ -57,6 +57,7 @@ public class ContractAttachmentController {
     }
 
     /**
+     * @param path 文件路径
      * 删除指定的附件
      */
 
@@ -72,24 +73,9 @@ public class ContractAttachmentController {
     }
 
 
-
     /**
-     * 上传附件
+     * 下载附件
      */
-    @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>> uploadAttachment(
-            @RequestParam("conNum") Integer conNum,
-            @RequestParam("file") MultipartFile file) {
-
-        boolean success = contractAttachmentService.uploadAndSaveAttachment(conNum, file);
-
-        if (success) {
-            return ResponseEntity.ok(Map.of("code", 200, "msg", "上传成功"));
-        } else {
-            return ResponseEntity.badRequest().body(Map.of("code", 400, "msg", "上传失败"));
-        }
-    }
-
     @GetMapping("/download")
     public ResponseEntity<Resource> downloadAttachment(@RequestParam String filepath) {
         Resource fileResource = contractAttachmentService.downloadAttachment(filepath);

@@ -75,7 +75,4 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "AND conNum=#{conNum}")
     List<String> getContent(@Param("conNum") Integer conNum,@Param("type")Integer type);
 
-    @Select("SELECT content FROM contract_process WHERE conNum = #{conNum} AND type = 2")
-    List<String> getContents(@Param("conNum") Integer conNum);
-
 }

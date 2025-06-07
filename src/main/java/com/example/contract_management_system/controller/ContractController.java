@@ -2,12 +2,15 @@ package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
+import com.example.contract_management_system.dto.ContractUpdateDTO;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import com.example.contract_management_system.service.ContractProcessService;
 import com.example.contract_management_system.service.ContractService;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -185,12 +188,26 @@ public class ContractController {
         return contractService.getToBeFinishedContracts();
     }
 
-    @PutMapping("/finalize/{contractNum}")
-    public Result<String> finalizeContract(@PathVariable Integer contractNum,
-                                           @RequestBody Contract contract,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
+
+    @PostMapping("/finalize/{contractNum}")
+    public Result<String> finalizeContract(
+            @PathVariable Integer contractNum,
+            @RequestParam("contract") String contractJson,
+            @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
+            @RequestParam(value = "deletedAttachments", required = false) List<String> deletedAttachments,
+            @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+
+        // 手动解析 contractJson 为对象
+        Contract contract = new ObjectMapper().readValue(contractJson, Contract.class);
+
         Integer userId = userService.getCurrentUserId();
-        boolean success = contractService.updateContract(contractNum, userId, contract);
+        boolean success = contractService.updateContract(
+                contractNum,
+                userId,
+                contract,
+                newAttachments,
+                deletedAttachments);
+
         return success ? Result.success("更新成功") : Result.error("更新失败");
     }
 

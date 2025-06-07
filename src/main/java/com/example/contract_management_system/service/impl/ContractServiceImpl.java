@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,14 +24,16 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     private final ContractMapper contractMapper;
     private final ContractStateMapper contractStateMapper;
     private final ContractStateService contractStateService;
+    private final ContractAttachmentService contractAttachmentService;
 
     @Autowired
     private UserService userService;
 
-    public ContractServiceImpl(ContractMapper contractMapper, ContractStateMapper contractStateMapper, ContractStateService contractStateService, ContractProcessMapper contractProcessMapper) {
+    public ContractServiceImpl(ContractMapper contractMapper, ContractStateMapper contractStateMapper, ContractStateService contractStateService, ContractProcessMapper contractProcessMapper, ContractAttachmentService contractAttachmentService) {
         this.contractMapper = contractMapper;
         this.contractStateMapper = contractStateMapper;
         this.contractStateService = contractStateService;
+        this.contractAttachmentService = contractAttachmentService;
     }
 
     @Override
@@ -129,7 +132,8 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
     @Override
     @Transactional
-    public boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract) {
+    public boolean updateContract(Integer contractNum, Integer userId, Contract updatedContract,
+                                  List<MultipartFile> newAttachments, List<String> deletedAttachments) {
         logger.info("开始更新合同内容, 合同编号: {}, 用户ID: {}", contractNum, userId);
 
         // （1）数据验证
@@ -154,7 +158,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
         // （4）更新合同基本信息
         updatedContract.setNum(contractNum); // 确保是同一合同编号
-        updatedContract.setUserId(userId);   // 更新者ID（？）
+        updatedContract.setUserId(userId);   // 更新者ID
 
         UpdateWrapper<Contract> updateWrapper = new UpdateWrapper<>();
         updateWrapper.eq("num", contractNum);
@@ -162,11 +166,34 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         logger.info("合同更新结果: {}", rows > 0);
 
         if (rows > 0) {
-            // （5）保存合同定稿状态（状态类型为 3，表示“定稿完成”）
+            // （5）处理附件删除
+            if (deletedAttachments != null && !deletedAttachments.isEmpty()) {
+                for (String path : deletedAttachments) {
+                    boolean deleted = contractAttachmentService.deleteAttachment(path);
+                    logger.info("删除附件 [{}] 结果: {}", path, deleted);
+                }
+            }
+
+            // （6）处理附件新增
+
+            if (newAttachments != null && !newAttachments.isEmpty()) {
+                logger.info("开始处理 {} 个附件", newAttachments.size());
+                for (MultipartFile file : newAttachments) {
+                    if (!file.isEmpty()) {
+                        logger.info("上传附件: {}", file.getOriginalFilename());
+                        boolean result = contractAttachmentService.uploadAndSaveAttachment(contractNum, file);
+                        if (!result) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // （7）保存合同定稿状态（3 = 定稿完成）
             ContractState finalState = new ContractState();
             finalState.setConNum(contractNum);
             finalState.setConName(updatedContract.getName());
-            finalState.setType(3); // 3 = 定稿完成
+            finalState.setType(3);
             finalState.setTime(new Date());
 
             boolean stateSaved = contractStateService.updateById(finalState);
@@ -178,7 +205,6 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         return false;
     }
 
-    //TODO:附件的增删
 
 
     @Override
