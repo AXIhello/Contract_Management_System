@@ -121,9 +121,24 @@
         .attachments-list li a:hover {
             text-decoration: underline;
         }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
+<!-- 返回主控台按钮 -->
+<div style="text-align: right; margin-bottom: 10px;">
+    <button onclick="goToDashboard()" class="back-button">返回主控台</button>
+</div>
 <div class="container">
     <h2>审批合同</h2>
 
@@ -171,5 +186,6 @@
 </div>
 
 <script src="examineContract.js"></script>
+<script src="/common.js"></script>
 </body>
 </html>
