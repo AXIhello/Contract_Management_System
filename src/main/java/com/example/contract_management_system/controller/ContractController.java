@@ -2,12 +2,15 @@ package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
+import com.example.contract_management_system.dto.ContractUpdateDTO;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import com.example.contract_management_system.service.ContractProcessService;
 import com.example.contract_management_system.service.ContractService;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -21,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,7 +64,6 @@ public class ContractController {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            logger.info("✅ draftContract 接口已调用");
             logger.info("contractName: {}", contractName);
             logger.info("clientName: {}", clientName);
             logger.info("contractFiles count: {}", contractFiles != null ? contractFiles.size() : 0);
@@ -134,7 +137,6 @@ public class ContractController {
     }
 
 
-
     @GetMapping("/name")
     public Map<String, Object> getContractName(@RequestParam Integer id) {
         String name = contractService.getContractNameById(id);
@@ -150,6 +152,15 @@ public class ContractController {
             throw new RuntimeException("用户未登录");
         }
         return contractProcessService.getPendingExamineContracts(currentUserId);
+    }
+
+    @GetMapping("/approvalConclude")
+    public List<Map<String,Object>> getPendingConcludeContracts() {
+        Integer currentUserId = userService.getCurrentUserId();
+        if (currentUserId == null) {
+            throw new RuntimeException("用户未登录");
+        }
+        return contractProcessService.getPendingConcludeContracts(currentUserId);
     }
 
     @GetMapping("/getDraft")
@@ -169,18 +180,34 @@ public class ContractController {
         }
     }
 
+    //定稿界面
+
     @GetMapping("/getToBeFinishedContracts")
     public List<ContractPendingDTO> getToBeFinishedContracts() {
         System.out.println("✔ 已进入 getToBeFinishedContracts 控制器");
         return contractService.getToBeFinishedContracts();
     }
 
-    @PutMapping("/finalize/{contractNum}")
-    public Result<String> finalizeContract(@PathVariable Integer contractNum,
-                                           @RequestBody Contract contract,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
+
+    @PostMapping("/finalize/{contractNum}")
+    public Result<String> finalizeContract(
+            @PathVariable Integer contractNum,
+            @RequestParam("contract") String contractJson,
+            @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
+            @RequestParam(value = "deletedAttachments", required = false) List<String> deletedAttachments,
+            @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+
+        // 手动解析 contractJson 为对象
+        Contract contract = new ObjectMapper().readValue(contractJson, Contract.class);
+
         Integer userId = userService.getCurrentUserId();
-        boolean success = contractService.updateContract(contractNum, userId, contract);
+        boolean success = contractService.updateContract(
+                contractNum,
+                userId,
+                contract,
+                newAttachments,
+                deletedAttachments);
+
         return success ? Result.success("更新成功") : Result.error("更新失败");
     }
 
@@ -193,10 +220,18 @@ public class ContractController {
         return Result.success(contract);
     }
 
+
+
     @GetMapping("/approvalInfo/{id}")
     public Map<String, Object> getApprovalInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息
         return contractProcessService.getContractApprovalInfo(id);
+    }
+
+    @GetMapping("/concludeInfo/{id}")
+    public Map<String, Object> getConcludeInfoInfo(@PathVariable Integer id) {
+        // 获取合同审批相关信息
+        return contractProcessService.getContractConcludeInfo(id);
     }
 
     @PostMapping("/submitApproval")
@@ -208,5 +243,6 @@ public class ContractController {
         return contractProcessService.submitExamine(contractId, approvalOpinion, approvalResult);
     }
 }
+
 
 

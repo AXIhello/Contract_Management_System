@@ -7,6 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.net.MalformedURLException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public interface ContractAttachmentService extends IService<ContractAttachment> {
 
@@ -34,15 +42,15 @@ public interface ContractAttachmentService extends IService<ContractAttachment> 
 
     /**
      * 删除附件
-     * @param id 附件ID
+     * @param path 附件路径
      * @return 是否删除成功
      */
-    boolean deleteAttachment(Integer id);
+    boolean deleteAttachment(String path);
 
     /**
      * 下载附件
-     * @param id 附件ID
+     * @param relativePath 附件存储路径
      * @return 文件字节数组和响应头
      */
-    ResponseEntity<byte[]> downloadAttachment(Integer id);
+    Resource downloadAttachment(String relativePath);
 }
