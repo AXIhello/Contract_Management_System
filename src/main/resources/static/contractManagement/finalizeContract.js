@@ -2,7 +2,7 @@
 window.existingAttachments = [];
 
 // 新上传附件数组，File对象
-window.allAttachments = [];
+window.newAttachments = [];
 
 // 要删除的附件路径数组
 window.deletedAttachments = [];
@@ -266,7 +266,7 @@ function initFileUploader() {
 
             files.forEach(file => {
                 // 检查文件是否已存在
-                const exists = window.allAttachments.some(a => a.name === file.name && a.size === file.size);
+                const exists = window.newAttachments.some(a => a.name === file.name && a.size === file.size);
                 if (exists) {
                     alert(`文件 ${file.name} 已添加`);
                     return;
@@ -288,7 +288,7 @@ function initFileUploader() {
                 }
 
                 // 添加到附件列表
-                window.allAttachments.push(file);
+                window.newAttachments.push(file);
             });
 
             // 更新附件预览
@@ -306,8 +306,8 @@ function initFileUploader() {
 }
 
 // 删除新上传附件
-function removeAttachment(index) {
-    window.allAttachments.splice(index, 1);
+function removeNewAttachment(index) {
+    window.newAttachments.splice(index, 1);
     renderAttachments();
 }
 
@@ -318,12 +318,12 @@ function renderAttachments() {
 
     container.innerHTML = '';
 
-    if (window.allAttachments.length === 0) {
+    if (window.newAttachments.length === 0) {
         container.innerHTML = '<p>未选择附件</p>';
         return;
     }
 
-    window.allAttachments.forEach((file, idx) => {
+    window.newAttachments.forEach((file, idx) => {
         const fileSize = (file.size / (1024 * 1024)).toFixed(2);
         const div = document.createElement('div');
         div.className = 'attachment-item';
@@ -341,7 +341,7 @@ function renderAttachments() {
         const btn = document.createElement('button');
         btn.textContent = '删除';
         btn.type = 'button';
-        btn.onclick = () => removeAttachment(idx);
+        btn.onclick = () => removeNewAttachment(idx);
         btn.style.background = '#dc3545';
         btn.style.color = 'white';
         btn.style.border = 'none';
@@ -389,7 +389,7 @@ function resetForm() {
     }
 
     // 清空新上传附件
-    window.allAttachments = [];
+    window.newAttachments = [];
     renderAttachments();
 
     // 清空删除附件记录
@@ -432,15 +432,48 @@ if (form) {
             formData.append('id', contractId);
             formData.append('content', contractContent);
 
-            // 添加删除附件路径（JSON数组字符串）
-            formData.append('deletedAttachments', JSON.stringify(window.deletedAttachments));
-
-            // 添加新上传文件
-            window.allAttachments.forEach(file => {
-                formData.append('attachments', file);
+            // 修复删除附件的处理方式
+            const deletedAttachments = window.deletedAttachments || [];
+            console.log('原始删除附件列表:', deletedAttachments);
+            // 分别添加每个路径（推荐）
+            deletedAttachments.forEach(path => {
+                // 确保路径是字符串格式，不是JSON
+                const cleanPath = typeof path === 'string' ? path : String(path);
+                formData.append('deletedAttachments', cleanPath);
             });
 
-            const res = await fetch('/api/contract/finalize/', {
+
+            // 添加新上传文件
+            window.newAttachments.forEach((file, index) => {
+                console.log(`添加新附件 ${index}:`, {
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    lastModified: file.lastModified
+                });
+
+                // 验证文件对象的有效性
+                if (file instanceof File) {
+                    formData.append('attachments', file, file.name);
+                } else {
+                    console.error(`附件 ${index} 不是有效的File对象:`, file);
+                }
+            });
+
+            // 调试：检查FormData内容
+            console.log('FormData 内容检查:');
+            for (let [key, value] of formData.entries()) {
+                if (value instanceof File) {
+                    console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
+                } else {
+                    console.log(`${key}: ${value}`);
+                }
+            }
+
+            // 提交请求
+            console.log('开始提交请求到:', `/api/contract/finalize/${contractId}`);
+
+            const res = await fetch(`/api/contract/finalize/${contractId}`, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
