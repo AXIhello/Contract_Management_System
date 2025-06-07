@@ -96,6 +96,31 @@
         button.reset-btn:hover {
             background-color: #495057;
         }
+        .attachments-container {
+            margin-top: 1.5rem;
+        }
+        .attachments-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .attachments-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .attachments-list li:last-child {
+            border-bottom: none;
+        }
+        .attachments-list li a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .attachments-list li a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -111,6 +136,14 @@
         <div class="form-group">
             <label for="approverName">审批人</label>
             <input type="text" id="approverName" readonly />
+        </div>
+
+        <!-- 附件区域 -->
+        <div class="form-group attachments-container">
+            <label>合同附件</label>
+            <ul id="attachmentsList" class="attachments-list">
+                <li><span>加载中...</span></li>
+            </ul>
         </div>
 
         <div class="approval-section">

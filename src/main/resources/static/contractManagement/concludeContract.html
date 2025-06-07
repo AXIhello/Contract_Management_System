@@ -87,6 +87,14 @@
         ul li {
             margin-bottom: 5px;
         }
+        .attachment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
@@ -109,6 +117,12 @@
         <label>审批意见</label>
         <ul id="examineCommentsList"></ul>
 
+        <!-- 附件区域 -->
+        <label>合同附件</label>
+        <div id="existingAttachmentsContainer">
+            <p>加载中...</p>
+        </div>
+
         <label for="signInfo">签订信息</label>
         <textarea id="signInfo" name="signInfo" placeholder="请输入签订信息..."></textarea>
 
@@ -119,6 +133,6 @@
     </form>
 </div>
 
-<script src="concludeContract.js"></script>
+<script src="signContract.js"></script>
 </body>
 </html>
