@@ -1,14 +1,11 @@
-// 已有附件数组，格式示例：[{id, name, url}]
+// 附件管理变量
 window.existingAttachments = [];
-
-// 新上传附件数组，File对象
 window.newAttachments = [];
-
-// 要删除的附件路径数组
 window.deletedAttachments = [];
 
-// 页面初始化
 window.onload = async function () {
+    console.log('页面开始初始化');
+
     const contractId = new URLSearchParams(window.location.search).get("id");
     if (!contractId) {
         document.getElementById("finalError").innerText = "未提供合同 ID。";
@@ -16,25 +13,21 @@ window.onload = async function () {
     }
 
     try {
-        // 1. 获取合同信息
+        // 获取合同信息
         const response = await fetch(`/api/contract/${contractId}`, {
             method: 'GET',
             credentials: 'include'
         });
-        if (!response.ok) throw new Error("获取合同失败");
         const result = await response.json();
-        if (result.code !== 200) throw new Error(result.msg);
-
+        if (!response.ok || result.code !== 200) throw new Error(result.msg || "获取合同失败");
         const contract = result.data;
 
-        // 填充合同基本信息
         document.getElementById("contractName").value = contract.name || "";
         document.getElementById("clientName").value = contract.customer || "";
-        document.getElementById("startDate").value = contract.beginTime ? contract.beginTime.split("T")[0] : "";
-        document.getElementById("endDate").value = contract.endTime ? contract.endTime.split("T")[0] : "";
+        document.getElementById("startDate").value = contract.beginTime?.split("T")[0] || "";
+        document.getElementById("endDate").value = contract.endTime?.split("T")[0] || "";
         document.getElementById("contractContent").value = contract.content || "";
 
-        // 设置只读字段
         setFieldsReadonly();
     } catch (err) {
         console.error("加载合同失败", err);
@@ -42,490 +35,247 @@ window.onload = async function () {
         return;
     }
 
-    // 会签意见独立加载，失败不影响其他
+    // 会签意见
     try {
-        const countersignRes = await fetch(`/api/countersign/contents/${contractId}`, {
+        const res = await fetch(`/api/countersign/contents/${contractId}`, {
             method: 'GET',
             credentials: 'include'
         });
-        if (!countersignRes.ok) throw new Error("会签意见请求失败");
-        const countersignResult = await countersignRes.json();
-
+        const data = await res.json();
         const container = document.getElementById("countersignContent");
-        if (!countersignResult || countersignResult.length === 0) {
+
+        if (!res.ok || !Array.isArray(data)) {
+            throw new Error("会签数据异常");
+        }
+
+        if (data.length === 0) {
             container.innerHTML = "<p>暂无会签意见。</p>";
         } else {
-            let html = "";
-            countersignResult.forEach(item => {
-                html += `<p><strong>${item.username}：</strong>${item.content}</p>`;
-            });
-            container.innerHTML = html;
+            container.innerHTML = data.map(item =>
+                `<p><strong>${item.username}：</strong>${item.content}</p>`).join("");
         }
-    } catch (countersignErr) {
-        console.error("加载会签意见失败", countersignErr);
+    } catch (err) {
+        console.error("加载会签意见失败", err);
         document.getElementById("countersignContent").innerHTML =
             "<p style='color:red;'>加载会签意见失败。</p>";
     }
 
-    // 已有附件加载
+    // 加载已有附件
     await loadExistingAttachments(contractId);
 
-    // 初始化新附件上传控件
-    initFileUploader();
+    // 初始化上传控件
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFileUploader);
+    } else {
+        initFileUploader();
+    }
+
+    // 提交逻辑
+    const form = document.getElementById('finalizeContractForm');
+    if (form) {
+        handleFormSubmit(form, contractId);
+    }
+
+    console.log('页面初始化完成');
 };
 
-// 设置字段为只读状态
 function setFieldsReadonly() {
-    // 设置合同基本信息为只读
-    const readonlyFields = [
-        "contractName",
-        "clientName",
-        "startDate",
-        "endDate"
-    ];
-
-    readonlyFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
+    const fields = ["contractName", "clientName", "startDate", "endDate"];
+    fields.forEach(id => {
+        const field = document.getElementById(id);
         if (field) {
             field.readOnly = true;
+            field.disabled = true;
             field.style.backgroundColor = '#f8f9fa';
-            field.style.cursor = 'not-allowed';
-            field.style.border = '1px solid #dee2e6';
-
-            // 为只读字段添加提示
             field.title = '此字段不可修改';
         }
     });
-
-    // 禁用日期选择器的交互
-    const dateFields = document.querySelectorAll('input[type="date"]');
-    dateFields.forEach(field => {
-        if (readonlyFields.includes(field.id)) {
-            field.disabled = true;
-            field.style.backgroundColor = '#f8f9fa';
-        }
-    });
-
-    // 添加只读字段标识
     addReadonlyLabels();
 }
 
-// 为只读字段添加标识
 function addReadonlyLabels() {
-    const readonlyFields = [
+    const labels = [
         { id: "contractName", label: "合同名称" },
         { id: "clientName", label: "客户名称" },
         { id: "startDate", label: "开始时间" },
         { id: "endDate", label: "结束时间" }
     ];
-
-    readonlyFields.forEach(fieldInfo => {
-        const field = document.getElementById(fieldInfo.id);
-        if (field) {
-            // 查找对应的label
-            const labels = document.querySelectorAll('label');
-            labels.forEach(label => {
-                if (label.textContent.includes(fieldInfo.label) ||
-                    label.getAttribute('for') === fieldInfo.id) {
-                    // 添加只读标识
-                    if (!label.querySelector('.readonly-indicator')) {
-                        const indicator = document.createElement('span');
-                        indicator.className = 'readonly-indicator';
-                        indicator.textContent = ' (不可修改)';
-                        indicator.style.color = '#6c757d';
-                        indicator.style.fontSize = '0.85em';
-                        indicator.style.fontWeight = 'normal';
-                        label.appendChild(indicator);
-                    }
-                }
-            });
+    labels.forEach(({ id, label }) => {
+        const el = document.getElementById(id);
+        if (el) {
+            const labelEl = document.querySelector(`label[for="${id}"]`);
+            if (labelEl && !labelEl.querySelector('.readonly-indicator')) {
+                const span = document.createElement('span');
+                span.textContent = ' (不可修改)';
+                span.className = 'readonly-indicator';
+                span.style.color = '#6c757d';
+                span.style.fontSize = '0.85em';
+                labelEl.appendChild(span);
+            }
         }
     });
 }
 
-// 获取已有附件
 async function loadExistingAttachments(contractId) {
     try {
         const res = await fetch(`/api/contract/attachment/get/${contractId}`, {
             method: 'GET',
-            credentials: 'include',
+            credentials: 'include'
         });
-        if (!res.ok) throw new Error("获取附件失败");
         const data = await res.json();
-
-        if (!Array.isArray(data)) throw new Error("附件数据格式异常");
-
         window.existingAttachments = data.map(item => ({
-            id: item.id || '',
-            name: item.fileName || '',
-            url: item.fileUrl || '',
+            id: item.id,
+            name: item.fileName,
+            url: item.fileUrl
         }));
-
         renderExistingAttachments();
     } catch (err) {
-        console.error("加载已有附件失败", err);
-        const container = document.getElementById('existingAttachmentsContainer');
-        if (container) container.innerHTML = '<p style="color:red;">加载附件失败</p>';
+        document.getElementById("existingAttachmentsContainer").innerHTML =
+            '<p style="color:red;">加载附件失败</p>';
     }
 }
 
-// 渲染已有附件列表
 function renderExistingAttachments() {
     const container = document.getElementById('existingAttachmentsContainer');
-    if (!container) return;
     container.innerHTML = '';
-
     if (window.existingAttachments.length === 0) {
         container.innerHTML = '<p>无已上传附件</p>';
         return;
     }
-
     window.existingAttachments.forEach((file, idx) => {
         const div = document.createElement('div');
         div.className = 'attachment-item';
-        div.style.display = 'flex';
-        div.style.justifyContent = 'space-between';
-        div.style.alignItems = 'center';
-        div.style.padding = '8px';
-        div.style.border = '1px solid #ddd';
-        div.style.marginBottom = '5px';
-
-        // 文件信息
-        const fileInfo = document.createElement('span');
-        fileInfo.textContent = file.name;
-        fileInfo.style.flex = '1';
-
-        // 下载链接
-        const downloadBtn = document.createElement('a');
-        downloadBtn.href = `/api/contract/attachment/download?filepath=${encodeURIComponent(file.url)}`;
-        downloadBtn.textContent = '下载';
-        downloadBtn.target = '_blank';
-        downloadBtn.rel = 'noopener noreferrer';
-        downloadBtn.style.marginRight = '10px';
-        downloadBtn.style.color = '#007bff';
-        downloadBtn.style.textDecoration = 'none';
-
-        // 删除按钮
-        const delBtn = document.createElement('button');
-        delBtn.type = 'button';
-        delBtn.textContent = '删除';
-        delBtn.onclick = () => removeExistingAttachment(idx);
-        delBtn.style.background = '#dc3545';
-        delBtn.style.color = 'white';
-        delBtn.style.border = 'none';
-        delBtn.style.padding = '2px 8px';
-        delBtn.style.borderRadius = '3px';
-        delBtn.style.cursor = 'pointer';
-
-        div.appendChild(fileInfo);
-        div.appendChild(downloadBtn);
-        div.appendChild(delBtn);
+        div.innerHTML = `
+            <span>${file.name}</span>
+            <a href="/api/contract/attachment/download?filepath=${encodeURIComponent(file.url)}" target="_blank">下载</a>
+            <button type="button" onclick="removeExistingAttachment(${idx})" style="background:#dc3545;color:white;">删除</button>`;
         container.appendChild(div);
     });
 }
 
-// 删除已有附件（仅记录）
 function removeExistingAttachment(index) {
     const file = window.existingAttachments[index];
-    if (!file) return;
-
-    if (confirm(`确认删除附件 "${file.name}" 吗？`)) {
-        // 记录要删除的附件路径
+    if (confirm(`确认删除 "${file.name}" 吗？`)) {
         window.deletedAttachments.push(file.url);
-
-        // 从展示列表中移除
         window.existingAttachments.splice(index, 1);
         renderExistingAttachments();
-
-        console.log('标记删除附件:', file.url);
-        console.log('当前待删除附件列表:', window.deletedAttachments);
     }
 }
 
-// 初始化新附件上传功能
 function initFileUploader() {
     const addBtn = document.getElementById('addAttachmentBtn');
     if (!addBtn) return;
 
-    let attachmentCounter = 0;
+    const newBtn = addBtn.cloneNode(true);
+    addBtn.parentNode.replaceChild(newBtn, addBtn);
 
-    addBtn.addEventListener('click', function () {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif';
-        fileInput.id = `attachment-${attachmentCounter++}`;
-        fileInput.style.display = 'none';
-        fileInput.multiple = true; // 允许多选
+    newBtn.addEventListener('click', e => {
+        e.preventDefault();
 
-        // 添加到文档中
-        document.body.appendChild(fileInput);
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif';
+        input.multiple = true;
+        input.style.display = 'none';
 
-        // 监听文件选择
-        fileInput.addEventListener('change', function(e) {
+        input.addEventListener('change', e => {
             const files = Array.from(e.target.files);
-
             files.forEach(file => {
-                // 检查文件是否已存在
-                const exists = window.newAttachments.some(a => a.name === file.name && a.size === file.size);
-                if (exists) {
-                    alert(`文件 ${file.name} 已添加`);
-                    return;
-                }
+                const exists = window.newAttachments.some(f =>
+                    f.name === file.name &&
+                    f.size === file.size &&
+                    f.lastModified === file.lastModified);
+                if (exists) return;
 
-                // 文件大小检查
-                const maxSizeMB = 30;
-                if (file.size > maxSizeMB * 1024 * 1024) {
-                    alert(`文件 ${file.name} 大小超过${maxSizeMB}MB限制`);
-                    return;
+                const { valid, message } = validateAttachments([file]);
+                if (valid) {
+                    window.newAttachments.push(file);
+                } else {
+                    alert(message);
                 }
-
-                // 文件类型检查
-                const allowedExtensions = ["doc", "docx", "jpg", "jpeg", "png", "bmp", "gif", "pdf"];
-                const fileExt = file.name.split('.').pop().toLowerCase();
-                if (!allowedExtensions.includes(fileExt)) {
-                    alert(`文件 ${file.name} 格式不正确，只允许doc、docx、pdf、jpg、jpeg、png、bmp、gif！`);
-                    return;
-                }
-
-                // 添加到附件列表
-                window.newAttachments.push(file);
             });
-
-            // 更新附件预览
             renderAttachments();
-
-            // 移除临时文件输入框
-            document.body.removeChild(fileInput);
+            input.remove();
         });
 
-        // 触发文件选择对话框
-        fileInput.click();
+        document.body.appendChild(input);
+        input.click();
     });
 
     renderAttachments();
 }
 
-// 删除新上传附件
+function renderAttachments() {
+    const container = document.getElementById('attachmentsContainer');
+    container.innerHTML = '';
+    if (window.newAttachments.length === 0) {
+        container.innerHTML = '<p>暂无新上传附件</p>';
+        return;
+    }
+
+    window.newAttachments.forEach((file, idx) => {
+        const div = document.createElement('div');
+        div.className = 'attachment-item';
+        div.innerHTML = `
+            <span>${file.name}</span>
+            <button type="button" onclick="removeNewAttachment(${idx})" style="background:#ffc107;color:black;">删除</button>`;
+        container.appendChild(div);
+    });
+}
+
 function removeNewAttachment(index) {
     window.newAttachments.splice(index, 1);
     renderAttachments();
 }
 
-// 渲染新上传附件列表
-function renderAttachments() {
-    const container = document.getElementById('attachmentsContainer');
-    if (!container) return;
-
-    container.innerHTML = '';
-
-    if (window.newAttachments.length === 0) {
-        container.innerHTML = '<p>未选择附件</p>';
-        return;
+function validateAttachments(files) {
+    const allowed = ["doc", "docx", "pdf", "jpg", "jpeg", "png", "bmp", "gif"];
+    for (let file of files) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowed.includes(ext)) {
+            return { valid: false, message: `文件 ${file.name} 格式不支持` };
+        }
+        if (file.size > 30 * 1024 * 1024) {
+            return { valid: false, message: `文件 ${file.name} 超过30MB限制` };
+        }
     }
-
-    window.newAttachments.forEach((file, idx) => {
-        const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-        const div = document.createElement('div');
-        div.className = 'attachment-item';
-        div.style.display = 'flex';
-        div.style.justifyContent = 'space-between';
-        div.style.alignItems = 'center';
-        div.style.padding = '8px';
-        div.style.border = '1px solid #ddd';
-        div.style.marginBottom = '5px';
-
-        const span = document.createElement('span');
-        span.textContent = `${file.name} (${fileSize} MB)`;
-        span.style.flex = '1';
-
-        const btn = document.createElement('button');
-        btn.textContent = '删除';
-        btn.type = 'button';
-        btn.onclick = () => removeNewAttachment(idx);
-        btn.style.background = '#dc3545';
-        btn.style.color = 'white';
-        btn.style.border = 'none';
-        btn.style.padding = '2px 8px';
-        btn.style.borderRadius = '3px';
-        btn.style.cursor = 'pointer';
-
-        div.appendChild(span);
-        div.appendChild(btn);
-        container.appendChild(div);
-    });
+    return { valid: true };
 }
 
-// 设置输入框加载状态（只对可编辑字段生效）
-function setInputsLoading(isLoading) {
-    // 只对可编辑的字段和按钮设置加载状态
-    const editableSelectors = [
-        '#contractContent',
-        '#addAttachmentBtn',
-        'button[type="submit"]',
-        '.attachment-item button'
-    ];
-
-    editableSelectors.forEach(selector => {
-        const elements = document.querySelectorAll(selector);
-        elements.forEach(element => {
-            element.disabled = isLoading;
-            if (isLoading) {
-                element.style.opacity = '0.7';
-                element.style.cursor = 'not-allowed';
-            } else {
-                element.style.opacity = '1';
-                element.style.cursor = element.type === 'button' ? 'pointer' : 'auto';
-            }
-        });
-    });
-}
-
-// 重置表单及附件（只重置可编辑部分）
-function resetForm() {
-    // 只重置合同内容
-    const contentField = document.getElementById('contractContent');
-    if (contentField) {
-        contentField.value = '';
-    }
-
-    // 清空新上传附件
-    window.newAttachments = [];
-    renderAttachments();
-
-    // 清空删除附件记录
-    window.deletedAttachments = [];
-
-    // 重新加载已有附件
-    const contractId = new URLSearchParams(window.location.search).get("id");
-    if (contractId) {
-        loadExistingAttachments(contractId);
-    }
-}
-
-// 表单提交（简化验证，只验证可编辑字段）
-const form = document.getElementById('finalizeContractForm');
-if (form) {
+// 表单提交处理
+function handleFormSubmit(form, contractId) {
     form.addEventListener('submit', async function (e) {
         e.preventDefault();
-        const finalError = document.getElementById('finalError');
-        if (finalError) finalError.innerText = '';
 
-        setInputsLoading(true);
-
-        const contractId = new URLSearchParams(window.location.search).get("id");
-        if (!contractId) {
-            if (finalError) finalError.innerText = '合同ID不能为空';
-            setInputsLoading(false);
+        const content = document.getElementById('contractContent').value.trim();
+        if (!content) {
+            alert("合同内容不能为空");
             return;
         }
 
-        const contractContent = document.getElementById('contractContent').value.trim();
-        if (!contractContent) {
-            if (finalError) finalError.innerText = '合同内容不能为空';
-            setInputsLoading(false);
-            return;
-        }
+        const formData = new FormData();
+        formData.append("content", content);
+        formData.append("deletedAttachments", JSON.stringify(window.deletedAttachments));
+        window.newAttachments.forEach(file => {
+            formData.append("newAttachments", file);
+        });
 
         try {
-            const formData = new FormData();
-
-            formData.append('id', contractId);
-            formData.append('content', contractContent);
-
-            // 修复删除附件的处理方式
-            const deletedAttachments = window.deletedAttachments || [];
-            console.log('原始删除附件列表:', deletedAttachments);
-            // 分别添加每个路径（推荐）
-            deletedAttachments.forEach(path => {
-                // 确保路径是字符串格式，不是JSON
-                const cleanPath = typeof path === 'string' ? path : String(path);
-                formData.append('deletedAttachments', cleanPath);
-            });
-
-
-            // 添加新上传文件
-            window.newAttachments.forEach((file, index) => {
-                console.log(`添加新附件 ${index}:`, {
-                    name: file.name,
-                    size: file.size,
-                    type: file.type,
-                    lastModified: file.lastModified
-                });
-
-                // 验证文件对象的有效性
-                if (file instanceof File) {
-                    formData.append('attachments', file, file.name);
-                } else {
-                    console.error(`附件 ${index} 不是有效的File对象:`, file);
-                }
-            });
-
-            // 调试：检查FormData内容
-            console.log('FormData 内容检查:');
-            for (let [key, value] of formData.entries()) {
-                if (value instanceof File) {
-                    console.log(`${key}: File(${value.name}, ${value.size} bytes)`);
-                } else {
-                    console.log(`${key}: ${value}`);
-                }
-            }
-
-            // 提交请求
-            console.log('开始提交请求到:', `/api/contract/finalize/${contractId}`);
-
             const res = await fetch(`/api/contract/finalize/${contractId}`, {
                 method: 'POST',
-                body: formData,
-                credentials: 'include'
+                credentials: 'include',
+                body: formData
             });
-
             const result = await res.json();
-            if (result.code !== 200) {
-                throw new Error(result.msg || '提交失败');
+            if (res.ok && result.code === 200) {
+                alert("提交成功");
+                window.location.href = "/contract/list"; // 或其他跳转
+            } else {
+                alert("提交失败：" + result.msg);
             }
-
-            alert('合同定稿成功！');
-            window.location.href = '/contracts/view?id=' + contractId;
-
         } catch (err) {
-            console.error("提交失败", err);
-            if (finalError) finalError.innerText = "提交失败：" + err.message;
-        } finally {
-            setInputsLoading(false);
+            console.error('提交出错', err);
+            alert("提交出错：" + err.message);
         }
     });
 }
-
-
-// 移除原有的日期联动逻辑（因为日期字段已设为只读）
-// 注释掉以下代码块
-/*
-const startDateInput = document.getElementById("startDate");
-const endDateInput = document.getElementById("endDate");
-
-if (startDateInput && endDateInput) {
-    startDateInput.addEventListener("change", () => {
-        if (startDateInput.value) {
-            endDateInput.min = startDateInput.value;
-            if (endDateInput.value && endDateInput.value < startDateInput.value) {
-                endDateInput.value = startDateInput.value;
-            }
-        } else {
-            endDateInput.min = "";
-        }
-    });
-}
-*/
-
-// 切换标签示例（如果有标签页切换需求）
-function switchTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(t => t.style.display = 'none');
-    const activeTab = document.getElementById(tabId);
-    if (activeTab) activeTab.style.display = 'block';
-}
-
-// 初始化默认标签显示
-document.addEventListener('DOMContentLoaded', () => {
-    switchTab('contractInfoTab');  // 例如默认显示合同信息标签页
-});
