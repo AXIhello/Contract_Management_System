@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,6 +170,8 @@ public class ContractController {
         }
     }
 
+    //定稿界面
+
     @GetMapping("/getToBeFinishedContracts")
     public List<ContractPendingDTO> getToBeFinishedContracts() {
         System.out.println("✔ 已进入 getToBeFinishedContracts 控制器");
@@ -193,6 +196,8 @@ public class ContractController {
         return Result.success(contract);
     }
 
+
+
     @GetMapping("/approvalInfo/{id}")
     public Map<String, Object> getApprovalInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息
@@ -208,5 +213,6 @@ public class ContractController {
         return contractProcessService.submitExamine(contractId, approvalOpinion, approvalResult);
     }
 }
+
 
 
