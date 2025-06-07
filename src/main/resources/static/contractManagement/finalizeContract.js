@@ -255,7 +255,9 @@ function handleFormSubmit(form, contractId) {
 
         const formData = new FormData();
         formData.append("content", content);
-        formData.append("deletedAttachments", JSON.stringify(window.deletedAttachments));
+        window.deletedAttachments.forEach(filename => {
+            formData.append("deletedAttachments", filename);
+        });
         window.newAttachments.forEach(file => {
             formData.append("newAttachments", file);
         });
