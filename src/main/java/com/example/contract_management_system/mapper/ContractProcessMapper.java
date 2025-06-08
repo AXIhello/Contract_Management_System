@@ -50,6 +50,11 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "WHERE conNum = #{conNum} AND type = 2 AND (state = 0 OR state = 2)")
     boolean checkAllExamined(@Param("conNum") Integer conNum);
 
+    @Select("SELECT COUNT(*) = 0 " +
+            "FROM contract_process " +
+            "WHERE conNum = #{conNum} AND type = 3 AND (state = 0 OR state = 2)")
+    boolean checkAllConclude(@Param("conNum") Integer conNum);
+
     @Select("SELECT cp.conNum " +
             "FROM contract_process cp " +
             "JOIN contract_state cs ON cp.conNum = cs.conNum " +

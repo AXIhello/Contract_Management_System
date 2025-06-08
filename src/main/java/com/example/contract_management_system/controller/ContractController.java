@@ -262,6 +262,14 @@ public class ContractController {
     }
 
     @PreAuthorize("hasAuthority('sign_contract')")
+    @PostMapping("/submitSign")
+    public boolean submitSign(@RequestBody Map<String, Object> request) {
+        Integer contractId = Integer.valueOf((String) request.get("contractId"));
+        String approvalOpinion = (String) request.get("approvalOpinion");
+        return contractProcessService.submitConclude(contractId, approvalOpinion);
+    }
+
+    @PreAuthorize("hasAuthority('approve_contract')")
     @PostMapping("/submitApproval")
     public boolean submitApproval(@RequestBody Map<String, Object> request) {
         Integer contractId = Integer.valueOf((String) request.get("contractId"));
