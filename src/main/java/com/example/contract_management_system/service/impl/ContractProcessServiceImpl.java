@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -290,14 +292,14 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             Map<String, Object> info = new HashMap<>();
             info.put("contractName", contract.getName());
             info.put("contractContent", contract.getContent());
-            info.put("beginTime", contract.getBeginTime());
-            info.put("endTime", contract.getEndTime());
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            info.put("beginTime", contract.getBeginTime() != null ? sdf.format(contract.getBeginTime()) : null);
+            info.put("endTime", contract.getEndTime() != null ? sdf.format(contract.getEndTime()) : null);
+
             Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
             info.put("customer", customer.getName());
             info.put("approverId", userService.getCurrentUserId());
             info.put("approverName", userService.getUsernameById(getCurrentUserId()));
-            info.put("startDate", new Timestamp(System.currentTimeMillis()));  //有问题
-            info.put("endDate", new Timestamp(System.currentTimeMillis()));  //有问题
             return info;
         } catch (Exception e) {
             throw new SystemException("获取合同审批信息失败：", e);

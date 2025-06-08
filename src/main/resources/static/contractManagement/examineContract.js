@@ -24,9 +24,10 @@ document.addEventListener("DOMContentLoaded", () => {
             document.getElementById("contractName").value = data.contractName || "";
             document.getElementById("approverName").value = data.approverName || "";
             document.getElementById("clientName").value = data.customer || "";
-            document.getElementById("startDate").value = data.startDate?.split("T")[0] || "";
-            document.getElementById("endDate").value = data.endDate?.split("T")[0] || "";
+            document.getElementById("beginTime").value = data.beginTime?.split("T")[0] || "";
+            document.getElementById("endTime").value = data.endTime?.split("T")[0] || "";
             document.getElementById("contractContent").value = data.contractContent || "";
+
             setFieldsReadonly();
         })
         .catch((error) => {
