@@ -68,11 +68,25 @@ function goToLastPage() {
 
 // 启动时请求后端接口获取数据
 fetch('/api/contract/getDraft')
-    .then(res => res.json())
+    .then(async response => {
+        const data = await response.json();
+        if (!response.ok) {
+            // 权限不足或未登录等
+            if (data.code === 403) {
+                throw new Error("权限不足，无法起草合同");
+            } else if (data.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(data.msg || "请求失败");
+            }
+        }
+        return data;
+    })
     .then(data => {
         contracts = data;
         renderTable(contracts);
     })
     .catch(err => {
         console.error('获取合同列表失败:', err);
+        alert(err.message); // 可选：弹出错误信息给用户看
     });

@@ -5,6 +5,7 @@ import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.dto.CountersignDTO;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.pojo.ContractProcess;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,9 @@ public interface ContractProcessService extends IService<ContractProcess> {
     
     // 获取待会签的合同列表
     List<Contract> getPendingCountersignContracts(Integer userId);
-    
+
+    List<ContractProcess> getPendingProcessesByUserId(Integer userId);
+
     // 根据ID获取合同信息
     Contract getContractById(Integer id);
     
@@ -29,12 +32,17 @@ public interface ContractProcessService extends IService<ContractProcess> {
 
     List<Map<String, Object>> getPendingConcludeContracts(Integer userId);
 
+    @Transactional
+    boolean submitConclude(Integer contractId, String comment);
+
     // 提交审批意见
     boolean submitExamine(Integer contractId, String comment, Integer state);
     
     // 检查是否所有审批人都已通过
     boolean checkAllExamined(Integer contractId);
-    
+
+    boolean checkAllConclude(Integer contractId);
+
     // 获取合同审批相关信息
     Map<String, Object> getContractApprovalInfo(Integer contractId);
 

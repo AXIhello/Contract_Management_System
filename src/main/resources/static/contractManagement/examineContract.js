@@ -14,11 +14,20 @@ document.addEventListener("DOMContentLoaded", () => {
     // 获取合同审批信息
     fetch(`/api/contract/approvalInfo/${contractId}`, {
         method: 'GET',
-        credentials: 'include',  // 关键点！让浏览器带上 cookie（包含 JSESSIONID）
+        credentials: 'include',
     })
-        .then((res) => {
-            if (!res.ok) throw new Error("网络响应失败");
-            return res.json();
+        .then(async (res) => {
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法访问该资源");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
         })
         .then((data) => {
             document.getElementById("contractName").value = data.contractName || "";
@@ -32,34 +41,41 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch((error) => {
             console.error("获取审批信息失败:", error);
-            alert("获取合同审批信息失败，请稍后重试。");
+            alert(error.message);
         });
 
     // 获取并渲染附件列表
     fetch(`/api/contract/attachment/get/${contractId}`)
-        .then((res) => {
-            if (!res.ok) throw new Error("获取附件失败");
-            return res.json();
+        .then(async (res) => {
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法访问该资源");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
         })
         .then((attachments) => {
             if (!Array.isArray(attachments)) {
                 throw new Error("附件数据格式异常");
             }
 
-            // 存储附件信息到全局变量
             window.existingAttachments = attachments.map(item => ({
                 id: item.id || '',
                 name: item.fileName || '',
                 url: item.fileUrl || '',
             }));
 
-            // 渲染附件列表
             renderAttachments();
         })
         .catch((error) => {
             console.error("获取附件失败:", error);
             document.getElementById("attachmentsList").innerHTML =
-                "<li><span style='color: red;'>加载附件失败</span></li>";
+                `<li><span style='color: red;'>${error.message}</span></li>`;
         });
 
     // 渲染附件列表
@@ -127,18 +143,26 @@ document.addEventListener("DOMContentLoaded", () => {
             },
             body: JSON.stringify(payload),
         })
-            .then((res) => {
-                if (!res.ok) throw new Error("提交失败");
-                return res.json();
+            .then(async (res) => {
+                const data = await res.json();
+                if (!res.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法提交审批");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+                return data;
             })
             .then((data) => {
                 alert("审批提交成功！");
-                // 可选：提交后跳转或者清空表单
                 window.location.href = "/queryAndStatistics/toBeExaminedContractList.html";
             })
             .catch((error) => {
                 console.error("审批提交失败:", error);
-                alert("审批提交失败，请稍后重试。");
+                alert(error.message);
             });
     });
 

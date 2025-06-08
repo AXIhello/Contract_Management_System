@@ -41,7 +41,18 @@ function submitUser() {
                 throw new Error('响应格式错误，服务器可能未返回 JSON');
             }
 
-            if (res.ok && result.success) {
+            if (!res.ok) {
+                // 权限不足或未登录等
+                if (result.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (result.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(result.msg || "请求失败");
+                }
+            }
+
+            if (result.success) {
                 alert(result.msg || '添加成功！');
                 resetForm();
             } else {
@@ -50,6 +61,7 @@ function submitUser() {
         })
         .catch((err) => {
             console.error('提交错误:', err);
-            alert('无法连接服务器，或服务器异常，请稍后重试');
+            alert(err.message || '无法连接服务器，或服务器异常，请稍后重试');
         });
+
 }

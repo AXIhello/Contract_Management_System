@@ -68,16 +68,27 @@ function renderPerms(selectedPerms) {
 }
 
 window.addEventListener('DOMContentLoaded', () => {
-
-    fetch(`/api/role/detail/${name}`)
-        .then(res => res.json())
+    fetch(`/api/role/detail/${roleName}`)
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
+        })
         .then(data => {
             document.getElementById('roleName').value = data.name || '';
             document.getElementById('roleDesc').value = data.desc || '';
             renderPerms(data.perms || []);
         })
-        .catch(() => {
-            document.getElementById('errorMsg').textContent = '加载角色信息失败';
+        .catch(err => {
+            document.getElementById('errorMsg').textContent = err.message || '加载角色信息失败';
             document.getElementById('errorMsg').style.display = 'block';
         });
 });
@@ -87,7 +98,7 @@ function resetForm() {
 }
 
 // TODO: 后端需要实现 POST /api/role/update
-function submitEdit() {
+async function submitEdit() {
     const name = document.getElementById('roleName').value.trim();
     const desc = document.getElementById('roleDesc').value.trim();
     const perms = Array.from(document.querySelectorAll('input[name=perm]:checked')).map(cb => cb.value);
@@ -97,13 +108,22 @@ function submitEdit() {
         return;
     }
     const data = { name, desc, perms };
-    fetch('/api/role/update', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-    })
-    .then(res => res.json())
-    .then(result => {
+    try {
+        const res = await fetch('/api/role/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (!res.ok) {
+            if (result.code === 403) {
+                throw new Error("权限不足，无法起草合同");
+            } else if (result.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(result.msg || "请求失败");
+            }
+        }
         if (result.success) {
             document.getElementById('successMsg').style.display = 'block';
             document.getElementById('errorMsg').style.display = 'none';
@@ -112,10 +132,9 @@ function submitEdit() {
             document.getElementById('errorMsg').style.display = 'block';
             document.getElementById('successMsg').style.display = 'none';
         }
-    })
-    .catch(() => {
-        document.getElementById('errorMsg').textContent = '系统异常，修改失败！';
+    } catch (err) {
+        document.getElementById('errorMsg').textContent = err.message || '系统异常，修改失败！';
         document.getElementById('errorMsg').style.display = 'block';
         document.getElementById('successMsg').style.display = 'none';
-    });
-} 
+    }
+}

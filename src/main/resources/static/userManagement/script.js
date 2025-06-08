@@ -27,22 +27,32 @@ document.addEventListener("DOMContentLoaded", () => {
                     credentials: "include",
                 });
 
-                const result = await res.json();
-                console.log(result);
+                const data = await res.json();
 
-                if (result.success) {
+                if (!res.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法起草合同");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+
+                console.log(data);
+
+                if (data.success) {
                     alert("登录成功，欢迎 " + username);
-                    // 根据用户身份跳转（示例：根据用户名判断）
                     if (username === "admin") {
                         window.location.href = "/dashboard-admin.html";
                     } else {
                         window.location.href = "/dashboard-user.html";
                     }
                 } else {
-                    error.textContent = result.msg;
+                    error.textContent = data.msg;
                 }
             } catch (err) {
-                error.textContent = "网络错误，请稍后再试";
+                error.textContent = err.message || "网络错误，请稍后再试";
                 console.error(err);
             }
         });
@@ -78,16 +88,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     }),
                 });
 
-                const result = await res.json();
+                const data = await res.json();
 
-                if (result.success) {
+                if (!res.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法起草合同");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+
+                if (data.success) {
                     alert("注册成功！");
                     window.location.href = "/userManagement/login.html";
                 } else {
-                    error.textContent = result.msg;
+                    error.textContent = data.msg;
                 }
             } catch (err) {
-                error.textContent = "网络错误，请稍后再试";
+                error.textContent = err.message || "网络错误，请稍后再试";
                 console.error(err);
             }
         });

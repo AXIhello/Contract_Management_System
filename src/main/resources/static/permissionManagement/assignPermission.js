@@ -31,12 +31,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     try {
         const userRes = await fetch(`/api/right/userinfo/${userId}`);
         const userData = await userRes.json();
+        if (!userRes.ok) {
+            if (userData.code === 403) throw new Error("权限不足，无法起草合同");
+            else if (userData.code === 401) throw new Error("未登录或登录已过期，请重新登录");
+            else throw new Error(userData.msg || "请求失败");
+        }
 
         document.getElementById('username').textContent = userData.username || '未知用户';
         selectedRoles = userData.roleNames || [];
 
         const roleRes = await fetch('/api/role/list');
         const roleList = await roleRes.json();
+        if (!roleRes.ok) {
+            if (roleList.code === 403) throw new Error("权限不足，无法起草合同");
+            else if (roleList.code === 401) throw new Error("未登录或登录已过期，请重新登录");
+            else throw new Error(roleList.msg || "请求失败");
+        }
 
         renderRoleCheckboxes(selectedRoles, roleList);
     } catch (error) {
@@ -62,7 +72,20 @@ function submitAssign() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, roles })
     })
-        .then(res => res.json())
+        .then(res => {
+            return res.json().then(data => {
+                if (!res.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法起草合同");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+                return data;
+            });
+        })
         .then(result => {
             if (result.success) {
                 alert('分配成功！');
@@ -70,7 +93,8 @@ function submitAssign() {
                 alert(result.message || '分配失败！');
             }
         })
-        .catch(() => {
-            alert('系统异常，分配失败！');
+        .catch(err => {
+            alert(err.message || '系统异常，分配失败！');
         });
+
 }

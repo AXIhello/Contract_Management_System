@@ -19,6 +19,17 @@ window.onload = async function () {
             credentials: 'include'
         });
         const result = await response.json();
+
+        if (!response.ok) {
+            if (result.code === 403) {
+                throw new Error("权限不足，无法起草合同");
+            } else if (result.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(result.msg || "请求失败");
+            }
+        }
+
         if (!response.ok || result.code !== 200) throw new Error(result.msg || "获取合同失败");
         const contract = result.data;
 
@@ -42,6 +53,15 @@ window.onload = async function () {
             credentials: 'include'
         });
         const data = await res.json();
+        if (!res.ok) {
+            if (data.code === 403) {
+                throw new Error("权限不足，无法查看会签意见");
+            } else if (data.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(data.msg || "请求失败");
+            }
+        }
         const container = document.getElementById("countersignContent");
 
         if (!res.ok || !Array.isArray(data)) {
@@ -123,6 +143,15 @@ async function loadExistingAttachments(contractId) {
             credentials: 'include'
         });
         const data = await res.json();
+        if (!res.ok) {
+            if (data.code === 403) {
+                throw new Error("权限不足，无法查看会签意见");
+            } else if (data.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(data.msg || "请求失败");
+            }
+        }
         window.existingAttachments = data.map(item => ({
             id: item.id,
             name: item.fileName,
@@ -269,6 +298,17 @@ function handleFormSubmit(form, contractId) {
                 body: formData
             });
             const result = await res.json();
+
+            if (!res.ok) {
+                if (result.code === 403) {
+                    throw new Error("权限不足，无法提交合同");
+                } else if (result.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(result.msg || "请求失败");
+                }
+            }
+
             if (res.ok && result.code === 200) {
                 alert("提交成功");
                 window.location.href = "/contract/list"; // 或其他跳转

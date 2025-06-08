@@ -37,13 +37,23 @@ document.getElementById("addCustomerForm").addEventListener("submit", function (
         headers: {
             "Content-Type": "application/json"
         },
+        credentials: "include", // 带上 cookie/session
         body: JSON.stringify(customerData)
     })
-        .then(response => {
-            if (!response.ok) throw new Error("系统异常");
-            return response.json();
-        })
-        .then(data => {
+        .then(async response => {
+            const data = await response.json();
+
+            if (!response.ok) {
+                // 权限不足或未登录等
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法添加客户");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+
             if (data.success) {
                 result.style.color = "green";
                 result.textContent = "添加成功！";
@@ -54,6 +64,6 @@ document.getElementById("addCustomerForm").addEventListener("submit", function (
         })
         .catch(error => {
             console.error("系统异常：", error);
-            result.textContent = "系统异常！";
+            result.textContent = error.message || "系统异常！";
         });
 });
