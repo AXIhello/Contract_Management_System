@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>定稿合同</title>
     <style>
         body {
@@ -16,6 +16,30 @@
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             max-width: 800px;
             margin: auto;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ccc;
+        }
+        .tab-buttons button {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            background-color: #e9ecef;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 4px 4px 0 0;
+        }
+        .tab-buttons button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         h2 {
             background-color: #007bff;
@@ -59,13 +83,17 @@
         .button-group button:hover {
             background-color: #0056b3;
         }
-
         .error {
             color: red;
             margin: 10px 0;
         }
         .attachments-container {
             margin-top: 10px;
+        }
+        .attachment-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
         }
         .attachment-item span {
             flex: 1;
@@ -97,55 +125,161 @@
         .add-attachment-btn:hover {
             background-color: #218838;
         }
+        /* 只读字段样式 */
+        .readonly-indicator {
+            color: #6c757d;
+            font-size: 0.85em;
+            font-weight: normal;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
+<!-- 返回主控台按钮 -->
+<div style="text-align: right; margin-bottom: 10px;">
+    <button onclick="goToDashboard()" class="back-button">返回主控台</button>
+</div>
 <div class="container">
     <h2>定稿合同</h2>
 
-    <form id="finalizeContractForm" enctype="multipart/form-data">
-        <div class="form-group">
-            <label for="contractName">合同名称：</label>
-            <input type="text" id="contractName" name="contractName" readonly>
-        </div>
+    <div class="tab-buttons">
+        <button class="active" onclick="switchTab('editTab', this)">修改定稿</button>
+        <button onclick="switchTab('commentTab', this)">会签意见</button>
+    </div>
 
-        <div class="form-group">
-            <label for="clientName">客户名称：</label>
-            <input type="text" id="clientName" name="clientName" readonly>
-        </div>
-
-        <div class="form-group">
-            <label for="startDate">开始时间（可修改）：</label>
-            <input type="date" id="startDate" name="startDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="endDate">结束时间（可修改）：</label>
-            <input type="date" id="endDate" name="endDate" required>
-        </div>
-
-        <div class="form-group">
-            <label for="contractContent">合同内容</label>
-            <textarea id="contractContent" name="contractContent" rows="5"></textarea>
-        </div>
-
-        <div class="form-group">
-            <label>上传最终合同附件</label>
-            <div class="attachments-container" id="attachmentsContainer">
-                <p>未选择附件</p>
+    <div id="editTab" class="tab-content active">
+        <form id="finalizeContractForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="contractName">合同名称：</label>
+                <input type="text" id="contractName" name="contractName" readonly />
             </div>
-            <button type="button" id="addAttachmentBtn" class="add-attachment-btn">添加附件</button>
-        </div>
 
-        <div class="error" id="finalError"></div>
+            <div class="form-group">
+                <label for="clientName">客户名称：</label>
+                <input type="text" id="clientName" name="clientName" readonly />
+            </div>
 
-        <div class="button-group">
-            <button type="button" onclick="resetForm()">重置</button>
-            <button type="submit">提交定稿</button>
+            <div class="form-group">
+                <label for="startDate">开始时间：</label>
+                <input type="date" id="startDate" name="startDate" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="endDate">结束时间：</label>
+                <input type="date" id="endDate" name="endDate" readonly />
+            </div>
+
+            <div class="form-group">
+                <label for="contractContent">合同内容（可修改）：</label>
+                <textarea id="contractContent" name="contractContent" rows="5" placeholder="请输入合同具体内容..."></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>已上传合同附件</label>
+                <div class="attachments-container" id="existingAttachmentsContainer">
+                    <p>正在加载附件...</p>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>新增附件</label>
+                <div class="attachments-container" id="attachmentsContainer">
+                    <p>未选择附件</p>
+                </div>
+                <button type="button" id="addAttachmentBtn" class="add-attachment-btn">添加附件</button>
+            </div>
+
+            <div class="error" id="finalError"></div>
+
+            <div class="button-group">
+                <button type="button" onclick="resetForm()">重置</button>
+                <button type="submit">提交定稿</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="commentTab" class="tab-content">
+        <div class="form-group">
+            <label>会签意见：</label>
+            <div id="countersignContent">
+                <p>正在加载会签意见...</p>
+            </div>
         </div>
-    </form>
+    </div>
 </div>
 
+<script>
+    // 切换标签页函数
+    function switchTab(tabId, button) {
+        // 隐藏所有标签内容
+        const tabs = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.classList.remove('active');
+        });
+
+        // 移除所有按钮的active状态
+        const buttons = document.querySelectorAll('.tab-buttons button');
+        buttons.forEach(btn => {
+            btn.classList.remove('active');
+        });
+
+        // 显示选中的标签内容
+        const activeTab = document.getElementById(tabId);
+        if (activeTab) {
+            activeTab.classList.add('active');
+        }
+
+        // 给选中的按钮添加active状态
+        if (button) {
+            button.classList.add('active');
+        }
+    }
+
+    // 重置表单函数（需要在HTML中调用）
+    function resetForm() {
+        // 只重置合同内容
+        const contentField = document.getElementById('contractContent');
+        if (contentField) {
+            contentField.value = '';
+        }
+
+        // 清空新上传附件
+        if (window.newAttachments) {
+            window.newAttachments = [];
+            if (typeof renderAttachments === 'function') {
+                renderAttachments();
+            }
+        }
+
+        // 清空删除附件记录
+        if (window.deletedAttachments) {
+            window.deletedAttachments = [];
+        }
+
+        // 重新加载已有附件
+        const contractId = new URLSearchParams(window.location.search).get("id");
+        if (contractId && typeof loadExistingAttachments === 'function') {
+            loadExistingAttachments(contractId);
+        }
+
+        // 清空错误信息
+        const errorEl = document.getElementById('finalError');
+        if (errorEl) {
+            errorEl.innerText = '';
+        }
+    }
+</script>
 <script src="finalizeContract.js"></script>
+<script src="/common.js"></script>
 </body>
 </html>

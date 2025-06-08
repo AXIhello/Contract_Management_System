@@ -1,5 +1,6 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.mapper.ContractAttachmentMapper;
 import com.example.contract_management_system.pojo.ContractAttachment;
@@ -8,7 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.util.Pair;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -18,8 +21,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -118,28 +124,54 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
         return contractAttachmentMapper.selectByConNum(conNum);
     }
 
+    @Value("${file.upload.path}")
+    private String uploadBasePath;
     @Override
-    public boolean deleteAttachment(Integer id) {
+    public Resource downloadAttachment(String relativePath) {
+        Path filePath = Paths.get(uploadBasePath).resolve(Paths.get(relativePath).getFileName().toString()).normalize();
+        File file = filePath.toFile();
+
+        if (!file.exists() || !file.isFile()) {
+            throw new RuntimeException("文件不存在：" + filePath);
+        }
+
         try {
-            // 先获取附件信息，删除文件
-            ContractAttachment attachment = contractAttachmentMapper.selectById(id);
-            if (attachment != null) {
-                File file = new File(attachment.getPath());
-                if (file.exists()) {
-                    boolean deleted = file.delete();
-                    if (!deleted) {
-                        logger.warn("文件删除失败: {}", attachment.getPath());
-                    }
+            return new UrlResource(file.toURI());
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("文件路径无效：" + filePath, e);
+        }
+    }
+
+
+    public boolean deleteAttachment(String relativePath) {
+        try {
+            // 先构造文件完整路径（基于uploadBasePath）
+            Path filePath = Paths.get(uploadBasePath).resolve(Paths.get(relativePath).getFileName().toString()).normalize();
+            File file = filePath.toFile();
+
+            // 删除文件
+            if (file.exists()) {
+                boolean deleted = file.delete();
+                if (!deleted) {
+                    logger.warn("文件删除失败: {}", filePath);
                 }
-                // 删除数据库记录
-                return contractAttachmentMapper.deleteById(id) > 0;
+            } else {
+                logger.warn("文件不存在，无法删除: {}", filePath);
             }
-            return false;
+
+            // 根据相对路径删除数据库记录
+            QueryWrapper<ContractAttachment> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("path", relativePath);  // 确保传入的 relativePath 是数据库里的 path 字段值
+            int rows = contractAttachmentMapper.delete(queryWrapper);
+
+            return rows > 0;
         } catch (Exception e) {
             logger.error("删除附件失败", e);
             return false;
         }
     }
+
+
 
     /**
      * 根据文件名获取文件类型
@@ -189,34 +221,6 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
         return false;
     }
 
-    @Override
-    public ResponseEntity<byte[]> downloadAttachment(Integer id) {
-        try {
-            ContractAttachment attachment = contractAttachmentMapper.selectById(id);
-            if (attachment == null) {
-                logger.error("附件不存在: {}", id);
-                return ResponseEntity.notFound().build();
-            }
 
-            File file = new File(uploadPath + File.separator + attachment.getPath());
-            if (!file.exists()) {
-                logger.error("附件文件不存在: {}", file.getAbsolutePath());
-                return ResponseEntity.notFound().build();
-            }
 
-            byte[] fileContent = Files.readAllBytes(file.toPath());
-            
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", 
-                new String(attachment.getFileName().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1));
-            
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(fileContent);
-        } catch (Exception e) {
-            logger.error("下载附件失败", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
 }

@@ -2,12 +2,15 @@ package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
+import com.example.contract_management_system.dto.ContractUpdateDTO;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import com.example.contract_management_system.service.ContractProcessService;
 import com.example.contract_management_system.service.ContractService;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,6 +202,8 @@ public class ContractController {
                     .body(Map.of("success", false, "message", "分配失败"));
         }
     }
+
+    //定稿界面
     @GetMapping("/getToBeFinishedContracts")
     public List<ContractPendingDTO> getToBeFinishedContracts() {
         System.out.println("已进入 getToBeFinishedContracts 控制器");
@@ -205,12 +211,27 @@ public class ContractController {
     }
 
     @PreAuthorize("hasAuthority('finalize_contract')")
-    @PutMapping("/finalize/{contractNum}")
-    public Result<String> finalizeContract(@PathVariable Integer contractNum,
-                                           @RequestBody Contract contract,
-                                           @AuthenticationPrincipal UserDetails userDetails) {
+
+    @PostMapping("/finalize/{contractNum}")
+    public Result<String> finalizeContract(
+            @PathVariable Integer contractNum,
+            @RequestParam("content") String content,
+            @RequestParam(value = "newAttachments", required = false) List<MultipartFile> newAttachments,
+            @RequestParam(value = "deletedAttachments", required = false) List<String> deletedAttachments,
+            @AuthenticationPrincipal UserDetails userDetails) throws JsonProcessingException {
+
+        Contract contract = new Contract();
+        contract.setNum(contractNum);
+        contract.setContent(content);
+
         Integer userId = userService.getCurrentUserId();
-        boolean success = contractService.updateContract(contractNum, userId, contract);
+        boolean success = contractService.updateContract(
+                contractNum,
+                userId,
+                contract,
+                newAttachments,
+                deletedAttachments);
+
         return success ? Result.success("更新成功") : Result.error("更新失败");
     }
 
@@ -223,10 +244,18 @@ public class ContractController {
         return Result.success(contract);
     }
 
+
+
     @GetMapping("/approvalInfo/{id}")
     public Map<String, Object> getApprovalInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息
         return contractProcessService.getContractApprovalInfo(id);
+    }
+
+    @GetMapping("/concludeInfo/{id}")
+    public Map<String, Object> getConcludeInfoInfo(@PathVariable Integer id) {
+        // 获取合同审批相关信息
+        return contractProcessService.getContractConcludeInfo(id);
     }
 
     @PostMapping("/submitApproval")
@@ -238,5 +267,6 @@ public class ContractController {
         return contractProcessService.submitExamine(contractId, approvalOpinion, approvalResult);
     }
 }
+
 
 

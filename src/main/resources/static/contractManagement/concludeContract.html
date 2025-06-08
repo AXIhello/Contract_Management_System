@@ -14,7 +14,7 @@
             padding: 20px 30px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            max-width: 700px;
+            max-width: 800px;
             margin: auto;
         }
         h2 {
@@ -30,7 +30,7 @@
             margin-top: 15px;
             margin-bottom: 6px;
         }
-        input[readonly] {
+        input[readonly], textarea[readonly] {
             background-color: #e9ecef;
             border: 1px solid #ced4da;
             padding: 8px 10px;
@@ -41,7 +41,6 @@
         }
         textarea {
             width: 100%;
-            height: 150px;
             padding: 10px;
             border: 1px solid #ced4da;
             border-radius: 4px;
@@ -77,32 +76,79 @@
         button.reset-btn:hover {
             background-color: #495057;
         }
+        ul {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 10px 15px;
+            margin-top: 5px;
+            list-style-type: disc;
+        }
+        ul li {
+            margin-bottom: 5px;
+        }
+        .attachment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+        }
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
+<!-- 返回主控台按钮 -->
+<div style="text-align: right; margin-bottom: 10px;">
+    <button onclick="goToDashboard()" class="back-button">返回主控台</button>
+</div>
 <div class="container">
     <h2>签订合同</h2>
 
     <form id="signContractForm">
         <label for="contractName">合同名称</label>
-        <input type="text" id="contractName" name="contractName" readonly />
+        <input type="text" id="contractName" readonly />
 
         <label for="clientName">客户</label>
-        <input type="text" id="clientName" name="clientName" readonly />
+        <input type="text" id="clientName" readonly />
 
         <label for="signerName">签订员</label>
-        <input type="text" id="signerName" name="signerName" readonly />
+        <input type="text" id="signerName" readonly />
+
+        <label for="contractInfo">合同信息</label>
+        <textarea id="contractInfo" readonly></textarea>
+
+        <label>审批意见</label>
+        <ul id="examineCommentsList"></ul>
+
+        <!-- 附件区域 -->
+        <label>合同附件</label>
+        <div id="existingAttachmentsContainer">
+            <p>加载中...</p>
+        </div>
 
         <label for="signInfo">签订信息</label>
         <textarea id="signInfo" name="signInfo" placeholder="请输入签订信息..."></textarea>
 
         <div class="btn-group">
             <button type="submit" class="submit-btn">提交</button>
-            <button type="button" class="reset-btn" onclick="resetForm()">重置</button>
+            <button type="button" class="reset-btn" id="resetBtn">重置</button>
         </div>
     </form>
 </div>
 
 <script src="concludeContract.js"></script>
+<script src="/common.js"></script>
 </body>
 </html>

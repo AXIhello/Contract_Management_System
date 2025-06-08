@@ -4,8 +4,32 @@
     <meta charset="UTF-8" />
     <title>添加用户</title>
     <link rel="stylesheet" href="../style.css" />
+    <style>
+        /* 返回主控台按钮固定右上角 */
+        .back-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            transition: background-color 0.3s ease;
+        }
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+    </style>
 </head>
 <body>
+
+<div style="text-align: right; margin-bottom: 10px;">
+    <button onclick="goToDashboard()" class="back-button">返回主控台</button>
+</div>
 <form id="addUserForm">
     <h2>添加用户</h2>
 
@@ -22,8 +46,9 @@
         <button type="button" onclick="resetForm()">重置</button>
         <button type="button" onclick="submitUser()">提交</button>
     </div>
-
 </form>
+
 <script src="addUser.js"></script>
+<script src="/common.js"></script>
 </body>
 </html>

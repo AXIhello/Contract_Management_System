@@ -1,7 +1,11 @@
-// 存储所有附件的数组
-window.allAttachments = [];
+// 附件管理变量
+window.existingAttachments = [];
+window.newAttachments = [];
+window.deletedAttachments = [];
 
 window.onload = async function () {
+    console.log('页面开始初始化');
+
     const contractId = new URLSearchParams(window.location.search).get("id");
     if (!contractId) {
         document.getElementById("finalError").innerText = "未提供合同 ID。";
@@ -9,190 +13,271 @@ window.onload = async function () {
     }
 
     try {
+        // 获取合同信息
         const response = await fetch(`/api/contract/${contractId}`, {
             method: 'GET',
             credentials: 'include'
         });
-
-        if (!response.ok) throw new Error("获取合同失败");
-
         const result = await response.json();
-        if (result.code !== 200) throw new Error(result.msg);
-
+        if (!response.ok || result.code !== 200) throw new Error(result.msg || "获取合同失败");
         const contract = result.data;
 
-        // 填充表单
         document.getElementById("contractName").value = contract.name || "";
         document.getElementById("clientName").value = contract.customer || "";
-        document.getElementById("startDate").value = contract.beginTime ? contract.beginTime.split("T")[0] : "";
-        document.getElementById("endDate").value = contract.endTime ? contract.endTime.split("T")[0] : "";
+        document.getElementById("startDate").value = contract.beginTime?.split("T")[0] || "";
+        document.getElementById("endDate").value = contract.endTime?.split("T")[0] || "";
         document.getElementById("contractContent").value = contract.content || "";
 
+        setFieldsReadonly();
     } catch (err) {
         console.error("加载合同失败", err);
         document.getElementById("finalError").innerText = "加载合同失败：" + err.message;
-    }
-
-    // 初始化附件上传功能
-    initFileUploader();
-};
-
-// 初始化附件上传功能
-function initFileUploader() {
-    // 添加附件按钮点击事件
-    document.getElementById('addAttachmentBtn').addEventListener('click', function() {
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif';
-        fileInput.style.display = 'none';
-
-        // 允许多文件选择
-        fileInput.multiple = true;
-
-        // 添加到文档中
-        document.body.appendChild(fileInput);
-
-        // 监听文件选择
-        fileInput.addEventListener('change', function(e) {
-            const files = Array.from(e.target.files);
-
-            files.forEach(file => {
-                // 检查文件是否已存在
-                const exists = allAttachments.some(a => a.name === file.name && a.size === file.size);
-                if (exists) {
-                    alert('该文件已添加');
-                    return;
-                }
-
-                // 添加到附件列表
-                allAttachments.push(file);
-
-                // 更新附件预览
-                updateAttachmentsPreview();
-            });
-
-            // 移除临时文件输入框
-            document.body.removeChild(fileInput);
-        });
-
-        // 触发文件选择对话框
-        fileInput.click();
-    });
-
-    // 动态限制结束时间不能小于开始时间
-    const startDateInput = document.getElementById("startDate");
-    const endDateInput = document.getElementById("endDate");
-
-    startDateInput.addEventListener("change", () => {
-        if (startDateInput.value) {
-            endDateInput.min = startDateInput.value;
-            if (endDateInput.value && endDateInput.value < startDateInput.value) {
-                endDateInput.value = startDateInput.value;
-            }
-        } else {
-            endDateInput.min = "";
-        }
-    });
-}
-
-// 更新附件预览
-function updateAttachmentsPreview() {
-    const container = document.getElementById('attachmentsContainer');
-    container.innerHTML = '';
-
-    if (allAttachments && allAttachments.length > 0) {
-        allAttachments.forEach((file, index) => {
-            const fileSize = (file.size / (1024 * 1024)).toFixed(2);
-            const fileItem = document.createElement('div');
-            fileItem.className = 'attachment-item';
-            fileItem.innerHTML = `
-                <span>${file.name} (${fileSize} MB)</span>
-                <button type="button" onclick="removeAttachment(${index})">删除</button>
-            `;
-            container.appendChild(fileItem);
-        });
-    } else {
-        container.innerHTML = '<p>未选择附件</p>';
-    }
-}
-
-// 删除附件
-function removeAttachment(index) {
-    allAttachments.splice(index, 1);
-    updateAttachmentsPreview();
-}
-
-// 重置表单
-window.resetForm = function() {
-    document.getElementById('finalizeContractForm').reset();
-    document.getElementById('finalError').textContent = '';
-    allAttachments = [];
-    updateAttachmentsPreview();
-};
-
-// 表单提交处理
-document.getElementById("finalizeContractForm").addEventListener("submit", async function (e) {
-    e.preventDefault();
-
-    const contractId = new URLSearchParams(window.location.search).get("id");
-    if (!contractId) {
-        document.getElementById("finalError").innerText = "合同 ID 缺失，无法提交";
         return;
     }
 
-    const updatedContract = {
-        name: document.getElementById("contractName").value,
-        customer: document.getElementById("clientName").value,
-        beginTime: document.getElementById("startDate").value,
-        endTime: document.getElementById("endDate").value,
-        content: document.getElementById("contractContent").value
-    };
-
+    // 会签意见
     try {
-        // 创建 FormData 对象
-        const formData = new FormData();
+        const res = await fetch(`/api/countersign/contents/${contractId}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const data = await res.json();
+        const container = document.getElementById("countersignContent");
 
-        // 添加合同数据
-        formData.append('contract', JSON.stringify(updatedContract));
-
-        // 验证
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const errorElement = document.getElementById('finalError');
-
-        errorElement.textContent = '';
-
-        if (!startDate || !endDate) {
-            errorElement.textContent = '请填写开始时间和结束时间';
-            return;
+        if (!res.ok || !Array.isArray(data)) {
+            throw new Error("会签数据异常");
         }
 
-        // 验证附件
-        if (allAttachments.length === 0) {
-            errorElement.textContent = '请至少上传一个附件';
-            return;
+        if (data.length === 0) {
+            container.innerHTML = "<p>暂无会签意见。</p>";
+        } else {
+            container.innerHTML = data.map(item =>
+                `<p><strong>${item.username}：</strong>${item.content}</p>`).join("");
         }
-
-        // 添加所有附件
-        allAttachments.forEach(file => {
-            formData.append('contractFiles', file);
-        });
-
-        // 提交表单数据
-        const response = await fetch(`/api/contract/finalize/${contractId}`, {
-            method: 'PUT',
-            credentials: 'include',
-            body: formData
-        });
-
-        const result = await response.json();
-        if (result.code !== 200) throw new Error(result.msg);
-
-        alert("定稿提交成功！");
-        window.location.href = "/userManagement/dashboard.html"; // 修改为你希望跳转的页面
-
     } catch (err) {
-        console.error("提交失败", err);
-        document.getElementById("finalError").innerText = "提交失败：" + err.message;
+        console.error("加载会签意见失败", err);
+        document.getElementById("countersignContent").innerHTML =
+            "<p style='color:red;'>加载会签意见失败。</p>";
     }
-});
+
+    // 加载已有附件
+    await loadExistingAttachments(contractId);
+
+    // 初始化上传控件
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initFileUploader);
+    } else {
+        initFileUploader();
+    }
+
+    // 提交逻辑
+    const form = document.getElementById('finalizeContractForm');
+    if (form) {
+        handleFormSubmit(form, contractId);
+    }
+
+    console.log('页面初始化完成');
+};
+
+function setFieldsReadonly() {
+    const fields = ["contractName", "clientName", "startDate", "endDate"];
+    fields.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.readOnly = true;
+            field.disabled = true;
+            field.style.backgroundColor = '#f8f9fa';
+            field.title = '此字段不可修改';
+        }
+    });
+    addReadonlyLabels();
+}
+
+function addReadonlyLabels() {
+    const labels = [
+        { id: "contractName", label: "合同名称" },
+        { id: "clientName", label: "客户名称" },
+        { id: "startDate", label: "开始时间" },
+        { id: "endDate", label: "结束时间" }
+    ];
+    labels.forEach(({ id, label }) => {
+        const el = document.getElementById(id);
+        if (el) {
+            const labelEl = document.querySelector(`label[for="${id}"]`);
+            if (labelEl && !labelEl.querySelector('.readonly-indicator')) {
+                const span = document.createElement('span');
+                span.textContent = ' (不可修改)';
+                span.className = 'readonly-indicator';
+                span.style.color = '#6c757d';
+                span.style.fontSize = '0.85em';
+                labelEl.appendChild(span);
+            }
+        }
+    });
+}
+
+async function loadExistingAttachments(contractId) {
+    try {
+        const res = await fetch(`/api/contract/attachment/get/${contractId}`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const data = await res.json();
+        window.existingAttachments = data.map(item => ({
+            id: item.id,
+            name: item.fileName,
+            url: item.fileUrl
+        }));
+        renderExistingAttachments();
+    } catch (err) {
+        document.getElementById("existingAttachmentsContainer").innerHTML =
+            '<p style="color:red;">加载附件失败</p>';
+    }
+}
+
+function renderExistingAttachments() {
+    const container = document.getElementById('existingAttachmentsContainer');
+    container.innerHTML = '';
+    if (window.existingAttachments.length === 0) {
+        container.innerHTML = '<p>无已上传附件</p>';
+        return;
+    }
+    window.existingAttachments.forEach((file, idx) => {
+        const div = document.createElement('div');
+        div.className = 'attachment-item';
+        div.innerHTML = `
+            <span>${file.name}</span>
+            <a href="/api/contract/attachment/download?filepath=${encodeURIComponent(file.url)}" target="_blank">下载</a>
+            <button type="button" onclick="removeExistingAttachment(${idx})" style="background:#dc3545;color:white;">删除</button>`;
+        container.appendChild(div);
+    });
+}
+
+function removeExistingAttachment(index) {
+    const file = window.existingAttachments[index];
+    if (confirm(`确认删除 "${file.name}" 吗？`)) {
+        window.deletedAttachments.push(file.url);
+        window.existingAttachments.splice(index, 1);
+        renderExistingAttachments();
+    }
+}
+
+function initFileUploader() {
+    const addBtn = document.getElementById('addAttachmentBtn');
+    if (!addBtn) return;
+
+    const newBtn = addBtn.cloneNode(true);
+    addBtn.parentNode.replaceChild(newBtn, addBtn);
+
+    newBtn.addEventListener('click', e => {
+        e.preventDefault();
+
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.doc,.docx,.pdf,.jpg,.jpeg,.png,.bmp,.gif';
+        input.multiple = true;
+        input.style.display = 'none';
+
+        input.addEventListener('change', e => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const exists = window.newAttachments.some(f =>
+                    f.name === file.name &&
+                    f.size === file.size &&
+                    f.lastModified === file.lastModified);
+                if (exists) return;
+
+                const { valid, message } = validateAttachments([file]);
+                if (valid) {
+                    window.newAttachments.push(file);
+                } else {
+                    alert(message);
+                }
+            });
+            renderAttachments();
+            input.remove();
+        });
+
+        document.body.appendChild(input);
+        input.click();
+    });
+
+    renderAttachments();
+}
+
+function renderAttachments() {
+    const container = document.getElementById('attachmentsContainer');
+    container.innerHTML = '';
+    if (window.newAttachments.length === 0) {
+        container.innerHTML = '<p>暂无新上传附件</p>';
+        return;
+    }
+
+    window.newAttachments.forEach((file, idx) => {
+        const div = document.createElement('div');
+        div.className = 'attachment-item';
+        div.innerHTML = `
+            <span>${file.name}</span>
+            <button type="button" onclick="removeNewAttachment(${idx})" style="background:#ffc107;color:black;">删除</button>`;
+        container.appendChild(div);
+    });
+}
+
+function removeNewAttachment(index) {
+    window.newAttachments.splice(index, 1);
+    renderAttachments();
+}
+
+function validateAttachments(files) {
+    const allowed = ["doc", "docx", "pdf", "jpg", "jpeg", "png", "bmp", "gif"];
+    for (let file of files) {
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowed.includes(ext)) {
+            return { valid: false, message: `文件 ${file.name} 格式不支持` };
+        }
+        if (file.size > 30 * 1024 * 1024) {
+            return { valid: false, message: `文件 ${file.name} 超过30MB限制` };
+        }
+    }
+    return { valid: true };
+}
+
+// 表单提交处理
+function handleFormSubmit(form, contractId) {
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const content = document.getElementById('contractContent').value.trim();
+        if (!content) {
+            alert("合同内容不能为空");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("content", content);
+        window.deletedAttachments.forEach(filename => {
+            formData.append("deletedAttachments", filename);
+        });
+        window.newAttachments.forEach(file => {
+            formData.append("newAttachments", file);
+        });
+
+        try {
+            const res = await fetch(`/api/contract/finalize/${contractId}`, {
+                method: 'POST',
+                credentials: 'include',
+                body: formData
+            });
+            const result = await res.json();
+            if (res.ok && result.code === 200) {
+                alert("提交成功");
+                window.location.href = "/contract/list"; // 或其他跳转
+            } else {
+                alert("提交失败：" + result.msg);
+            }
+        } catch (err) {
+            console.error('提交出错', err);
+            alert("提交出错：" + err.message);
+        }
+    });
+}
