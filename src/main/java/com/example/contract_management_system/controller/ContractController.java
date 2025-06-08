@@ -263,10 +263,9 @@ public class ContractController {
 
     @PostMapping("/submitApproval")
     public boolean submitApproval(@RequestBody Map<String, Object> request) {
-        Integer contractId = (Integer) request.get("contractId");
+        Integer contractId = Integer.valueOf((String) request.get("contractId"));
         String approvalOpinion = (String) request.get("approvalOpinion");
-        Integer approvalResult = (Integer) request.get("approvalResult");
-        
+        Integer approvalResult = "approved".equals(request.get("approvalResult")) ? 1 : 2;
         return contractProcessService.submitExamine(contractId, approvalOpinion, approvalResult);
     }
 }
