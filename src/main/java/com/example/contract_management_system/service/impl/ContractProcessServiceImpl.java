@@ -290,6 +290,8 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             Map<String, Object> info = new HashMap<>();
             info.put("contractName", contract.getName());
             info.put("contractContent", contract.getContent());
+            info.put("beginTime", contract.getBeginTime());
+            info.put("endTime", contract.getEndTime());
             Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
             info.put("customer", customer.getName());
             info.put("approverId", userService.getCurrentUserId());
