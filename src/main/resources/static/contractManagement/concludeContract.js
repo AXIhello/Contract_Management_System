@@ -15,10 +15,19 @@ window.onload = async function () {
             method: 'GET',
             credentials: 'include'
         });
-        if (!response.ok) throw new Error("获取合同失败");
-        const result = await response.json();
-        if (result.code !== 200) throw new Error(result.msg);
 
+        const result = await response.json();
+        if (!response.ok) {
+            if (result.code === 403) {
+                throw new Error("权限不足，无法起草合同");
+            } else if (result.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(result.msg || "请求失败");
+            }
+        }
+
+        if (result.code !== 200) throw new Error(result.msg);
         const contract = result.data;
 
         // 填充合同基本信息
@@ -57,8 +66,17 @@ async function loadExistingAttachments(contractId) {
             method: 'GET',
             credentials: 'include',
         });
-        if (!res.ok) throw new Error("获取附件失败");
+
         const data = await res.json();
+        if (!res.ok) {
+            if (data.code === 403) {
+                throw new Error("权限不足，无法获取附件");
+            } else if (data.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(data.msg || "请求失败");
+            }
+        }
 
         if (!Array.isArray(data)) throw new Error("附件数据格式异常");
 
@@ -72,7 +90,7 @@ async function loadExistingAttachments(contractId) {
     } catch (err) {
         console.error("加载已有附件失败", err);
         const container = document.getElementById('existingAttachmentsContainer');
-        if (container) container.innerHTML = '<p style="color:red;">加载附件失败</p>';
+        if (container) container.innerHTML = '<p style="color:red;">加载附件失败：' + err.message + '</p>';
     }
 }
 
@@ -102,7 +120,7 @@ function renderExistingAttachments() {
         fileInfo.textContent = file.name;
         fileInfo.style.flex = '1';
 
-        // 下载链接 - 使用您提供的接口格式
+        // 下载链接
         const downloadBtn = document.createElement('a');
         downloadBtn.href = `/api/contract/attachment/download?filepath=${encodeURIComponent(file.url)}`;
         downloadBtn.textContent = '下载';
@@ -120,33 +138,21 @@ function renderExistingAttachments() {
 
 // 设置输入框加载状态
 function setInputsLoading(isLoading) {
-    const editableSelectors = [
-        '#signInfo',
-        'button[type="submit"]'
-    ];
-
+    const editableSelectors = ['#signInfo', 'button[type="submit"]'];
     editableSelectors.forEach(selector => {
         const elements = document.querySelectorAll(selector);
         elements.forEach(element => {
             element.disabled = isLoading;
-            if (isLoading) {
-                element.style.opacity = '0.7';
-                element.style.cursor = 'not-allowed';
-            } else {
-                element.style.opacity = '1';
-                element.style.cursor = element.type === 'button' ? 'pointer' : 'auto';
-            }
+            element.style.opacity = isLoading ? '0.7' : '1';
+            element.style.cursor = isLoading ? 'not-allowed' : (element.type === 'button' ? 'pointer' : 'auto');
         });
     });
 }
 
 // 重置表单
 function resetForm() {
-    // 重置表单字段
     document.getElementById('signInfo').value = '';
     document.getElementById('errorMessage').innerText = '';
-
-    // 重新加载已有附件
     const contractId = new URLSearchParams(window.location.search).get("id");
     if (contractId) {
         loadExistingAttachments(contractId);
@@ -179,7 +185,6 @@ if (form) {
 
         try {
             const formData = new FormData();
-
             formData.append('contractId', contractId);
             formData.append('signInfo', signInfo);
 
@@ -190,12 +195,22 @@ if (form) {
             });
 
             const result = await res.json();
+            if (!res.ok) {
+                if (result.code === 403) {
+                    throw new Error("权限不足，无法提交签订信息");
+                } else if (result.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(result.msg || "请求失败");
+                }
+            }
+
             if (result.code !== 200) {
                 throw new Error(result.msg || '提交失败');
             }
 
             alert('签订信息提交成功！');
-            window.location.href = '/contracts/list'; // 跳转回合同列表页
+            window.location.href = '/contracts/list';
 
         } catch (err) {
             console.error("提交失败", err);

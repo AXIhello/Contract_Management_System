@@ -105,7 +105,7 @@ let signerSelect, approveSelect, signListSelect;
 
 // 动态拉人员列表，初始化 MultiSelect
 function initMultiSelects(userList) {
-    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);;
+    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);
     approveSelect = new MultiSelect(document.getElementById('approveSelect'), userList);
     signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList)
 }
@@ -126,41 +126,68 @@ async function submitAssign() {
     try {
         // 1. 分配会签人
         for (const userId of countersignerIds) {
-            const request = {
-                conNum: id,
-                userId: userId
-            };
-            await fetch('/api/contract/assign/countersign', {
+            const request = { conNum: id, userId: userId };
+            const response = await fetch('/api/contract/assign/countersign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(request)
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法分配会签人");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
         }
 
         // 2. 分配审批人
         for (const userId of approverIds) {
-            const request = {
-                conNum: id,
-                userId: userId
-            };
-            await fetch('/api/contract/assign/approve', {
+            const request = { conNum: id, userId: userId };
+            const response = await fetch('/api/contract/assign/approve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(request)
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法分配审批人");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
         }
 
         // 3. 分配签订人
         for (const userId of signerIds) {
-            const request = {
-                conNum: id,
-                userId: userId
-            };
-            await fetch('/api/contract/assign/sign', {
+            const request = { conNum: id, userId: userId };
+            const response = await fetch('/api/contract/assign/sign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(request)
             });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法分配签订人");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
         }
 
         alert('分配成功！');
@@ -219,13 +246,26 @@ document.getElementById('btnBack').addEventListener('click', cancelAssign);
 window.addEventListener('DOMContentLoaded', () => {
     // 返回User对象数组
     fetch('/api/user/list')
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法访问人员列表");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
+        })
         .then(data => {
             initMultiSelects(data);
         })
         .catch(err => {
             console.error('获取人员列表失败:', err);
-            // 失败时可用默认假数据初始化
+            alert(err.message || '获取人员失败');
+            // 失败时使用默认假数据
             initMultiSelects([
                 { userId: 1, username: '张三' },
                 { userId: 2, username: '李四' },
@@ -233,16 +273,31 @@ window.addEventListener('DOMContentLoaded', () => {
             ]);
         });
 
+
     const conId = new URLSearchParams(window.location.search).get('id') || 'C001';
     fetch(`/api/contract/name?id=${conId}`)
-        .then(res => res.json())
+        .then(async res => {
+            const data = await res.json();
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法获取合同名称");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
+        })
         .then(data => {
             updateContractTitle(data.name || '未知合同');
         })
         .catch(err => {
             console.error('获取合同名失败:', err);
+            alert(err.message || '获取合同名失败');
             updateContractTitle('未知合同');
         });
+
 
 
 });

@@ -22,7 +22,20 @@ function submitRole() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(res => res.json())
+        .then(res => {
+            return res.json().then(data => {
+                if (!res.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法起草合同");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+                return data;
+            });
+        })
         .then(result => {
             if (result.success) {
                 alert('角色添加成功！');
@@ -31,7 +44,7 @@ function submitRole() {
                 alert(result.msg || '添加失败！');
             }
         })
-        .catch(() => {
-            alert('系统异常，添加失败！');
+        .catch(err => {
+            alert(err.message || '系统异常，添加失败！');
         });
 }
