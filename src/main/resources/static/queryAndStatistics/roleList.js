@@ -57,7 +57,20 @@ function goToLastPage() { currentPage = Math.ceil(roles.length / itemsPerPage); 
 // 注册时保留字检测：由后端保证不允许 admin/operator 注册
 
 fetch('/api/role/list')
-    .then(res => res.json())
+    .then(res => {
+        return res.json().then(data => {
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
+        });
+    })
     .then(data => {
         // 过滤掉 admin 和 operator，避免重复
         const dynamicRoles = data.filter(r => r.name !== 'admin' && r.name !== 'operator');
@@ -68,12 +81,28 @@ fetch('/api/role/list')
         ];
         renderTable(roles);
     })
-    .catch(err => { renderTable(roles); });
+    .catch(err => {
+        alert(err.message || '加载角色列表失败');
+        renderTable(roles);
+    });
 
 // 删除角色，通过 name 作为唯一标识
 function deleteRole(name) {
     fetch(`/api/role/delete/${encodeURIComponent(name)}`, { method: 'DELETE' })
-        .then(res => res.json())
+        .then(res => {
+            return res.json().then(data => {
+                if (!res.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法起草合同");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+                return data;
+            });
+        })
         .then(result => {
             if (result.success) {
                 roles = roles.filter(r => r.name !== name);
@@ -83,5 +112,7 @@ function deleteRole(name) {
                 alert(result.message || '删除失败！');
             }
         })
-        .catch(() => { alert('系统异常，删除失败！'); });
+        .catch(err => {
+            alert(err.message || '系统异常，删除失败！');
+        });
 }

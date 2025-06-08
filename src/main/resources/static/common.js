@@ -5,11 +5,20 @@ async function goToDashboard() {
             credentials: 'include', // 保证 session / cookie 能带上
         });
 
-        if (!response.ok) throw new Error('未登录或无法获取用户信息');
+        const data = await response.json();
 
-        const user = await response.json();
+        if (!response.ok) {
+            // 权限不足或未登录等
+            if (data.code === 403) {
+                throw new Error("权限不足，无法起草合同");
+            } else if (data.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(data.msg || "请求失败");
+            }
+        }
 
-        const username = user.username ?? '';
+        const username = data.username ?? '';
 
         if (username === 'admin') {
             window.location.href = '/dashboard-admin.html';
@@ -19,7 +28,7 @@ async function goToDashboard() {
 
     } catch (error) {
         console.error('跳转失败:', error);
-        alert('请先登录');
+        alert(error.message || '请先登录');
         window.location.href = '/userManagement/login.html';
     }
 }

@@ -2,19 +2,27 @@ const userId = new URLSearchParams(window.location.search).get('id');
 
 window.addEventListener('DOMContentLoaded', () => {
     fetch(`/api/user/detail/${userId}`)
-        .then(res => res.json())
-        .then(data => {
+        .then(res => res.json().then(data => {
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+
             document.getElementById('userId').value = data.id || '';
             document.getElementById('username').value = data.username || '';
-        })
-        .catch(() => {
-            document.getElementById('errorMsg').textContent = '加载用户信息失败';
+        }))
+        .catch(err => {
+            document.getElementById('errorMsg').textContent = err.message || '加载用户信息失败';
             document.getElementById('errorMsg').style.display = 'block';
         });
 });
 
 function resetForm() {
-    // 重新加载用户信息
     window.location.reload();
 }
 
@@ -44,9 +52,18 @@ function submitEdit() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
     })
-        .then(res => res.json())
-        .then(result => {
-            if (result.success()) {
+        .then(res => res.json().then(result => {
+            if (!res.ok) {
+                if (result.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (result.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(result.msg || "请求失败");
+                }
+            }
+
+            if (result.success) {
                 document.getElementById('successMsg').style.display = 'block';
                 document.getElementById('errorMsg').style.display = 'none';
             } else {
@@ -54,11 +71,10 @@ function submitEdit() {
                 document.getElementById('errorMsg').style.display = 'block';
                 document.getElementById('successMsg').style.display = 'none';
             }
-        })
-        .catch(() => {
-            document.getElementById('errorMsg').textContent = '系统异常，修改失败！';
+        }))
+        .catch(err => {
+            document.getElementById('errorMsg').textContent = err.message || '系统异常，修改失败！';
             document.getElementById('errorMsg').style.display = 'block';
             document.getElementById('successMsg').style.display = 'none';
         });
-
-} 
+}

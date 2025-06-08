@@ -58,14 +58,37 @@ function nextPage() { const maxPage = Math.ceil(users.length / itemsPerPage); if
 function goToLastPage() { currentPage = Math.ceil(users.length / itemsPerPage); renderTable(users); }
 
 fetch('/api/user/list')
-    .then(res => res.json())
-    .then(data => { users = data; renderTable(users); })
-    .catch(err => { console.error('获取用户列表失败:', err); });
+    .then(res => res.json().then(data => {
+        if (!res.ok) {
+            if (data.code === 403) {
+                throw new Error("权限不足，无法起草合同");
+            } else if (data.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(data.msg || "请求失败");
+            }
+        }
+        users = data;
+        renderTable(users);
+    }))
+    .catch(err => {
+        console.error('获取用户列表失败:', err.message || err);
+        alert(err.message || '获取用户列表失败');
+    });
 
 function deleteUser(id) {
     fetch(`/api/user/delete/${id}`, { method: 'DELETE' })
-        .then(res => res.json())
-        .then(result => {
+        .then(res => res.json().then(result => {
+            if (!res.ok) {
+                if (result.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (result.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(result.msg || "请求失败");
+                }
+            }
+
             if (result.success) {
                 users = users.filter(u => u.userId !== id);  // 注意 userId 而不是 id
                 renderTable(users);
@@ -73,6 +96,8 @@ function deleteUser(id) {
             } else {
                 alert(result.message || '删除失败！');
             }
-        })
-        .catch(() => { alert('系统异常，删除失败！'); });
+        }))
+        .catch(err => {
+            alert(err.message || '系统异常，删除失败！');
+        });
 }

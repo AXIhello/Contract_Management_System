@@ -11,10 +11,18 @@ window.onload = function () {
 function loadDraftContracts() {
     fetch("/api/contract/getToBeFinishedContracts")
         .then(response => {
-            if (!response.ok) {
-                throw new Error("网络响应失败");
-            }
-            return response.json();
+            return response.json().then(data => {
+                if (!response.ok) {
+                    if (data.code === 403) {
+                        throw new Error("权限不足，无法起草合同");
+                    } else if (data.code === 401) {
+                        throw new Error("未登录或登录已过期，请重新登录");
+                    } else {
+                        throw new Error(data.msg || "请求失败");
+                    }
+                }
+                return data;
+            });
         })
         .then(data => {
             draftContracts = data;
@@ -22,9 +30,12 @@ function loadDraftContracts() {
             updatePageInfo();            // 更新页码信息
         })
         .catch(error => {
-            console.error("获取合同数据失败：", error)
+            console.error("获取合同数据失败：", error);
+            // 这里也可以提示用户，比如：
+            alert(error.message || "系统异常，获取合同数据失败");
         });
 }
+
 
 // 渲染表格
 function renderDraftContractsTable() {
