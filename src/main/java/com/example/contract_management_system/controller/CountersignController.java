@@ -58,6 +58,7 @@ public class CountersignController {
             result.put("name", contract.getName());
             result.put("beginTime",contract.getBeginTime());
             result.put("endTime",contract.getEndTime());
+            result.put("contractNum",contract.getNum());
             result.put("customer",contract.getCustomer());
             result.put("userId",contract.getUserId());
             result.put("content", contract.getContent());
