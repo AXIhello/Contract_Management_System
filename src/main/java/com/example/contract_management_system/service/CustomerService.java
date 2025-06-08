@@ -8,5 +8,6 @@ import java.util.List;
 public interface CustomerService extends IService<Customer> {
     boolean addCustomer(Customer customer);
     List<Customer> queryCustomers(Integer customerId, String name);
-
+    boolean deleteCustomerById(Integer num);
+    boolean updateCustomer(Customer customer);
 }
