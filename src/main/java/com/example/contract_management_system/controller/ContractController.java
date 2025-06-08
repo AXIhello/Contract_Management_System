@@ -257,10 +257,11 @@ public class ContractController {
     @PreAuthorize("hasAuthority('sign_contract')")
     @GetMapping("/concludeInfo/{id}")
     public Map<String, Object> getConcludeInfoInfo(@PathVariable Integer id) {
-        // 获取合同审批相关信息
+        // 合同签订
         return contractProcessService.getContractConcludeInfo(id);
     }
 
+    @PreAuthorize("hasAuthority('sign_contract')")
     @PostMapping("/submitApproval")
     public boolean submitApproval(@RequestBody Map<String, Object> request) {
         Integer contractId = Integer.valueOf((String) request.get("contractId"));
