@@ -2,11 +2,20 @@
 window.existingAttachments = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const contractId = urlParams.get("id") || "defaultId"; // 从URL获取合同ID
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const contractId = urlParams.get("id") || "defaultId"; // 从URL获取合同ID
+
+    const contractId = new URLSearchParams(window.location.search).get("id");
+    if (!contractId) {
+        document.getElementById("finalError").innerText = "未提供合同 ID。";
+        return;
+    }
 
     // 获取合同审批信息
-    fetch(`/api/contract/approvalInfo/${contractId}`)
+    fetch(`/api/contract/approvalInfo/${contractId}`, {
+        method: 'GET',
+        credentials: 'include',  // 关键点！让浏览器带上 cookie（包含 JSESSIONID）
+    })
         .then((res) => {
             if (!res.ok) throw new Error("网络响应失败");
             return res.json();
