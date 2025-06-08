@@ -55,6 +55,9 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "WHERE conNum = #{conNum} AND type = 3 AND (state = 0 OR state = 2)")
     boolean checkAllConclude(@Param("conNum") Integer conNum);
 
+    @Select("SELECT * FROM contract_process WHERE state = 0 AND user_id = #{userId}")
+    List<ContractProcess> selectPendingByUserId(Integer userId);
+
     @Select("SELECT cp.conNum " +
             "FROM contract_process cp " +
             "JOIN contract_state cs ON cp.conNum = cs.conNum " +

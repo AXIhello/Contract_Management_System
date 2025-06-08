@@ -79,6 +79,11 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     }
 
     @Override
+    public List<ContractProcess> getPendingProcessesByUserId(Integer userId) {
+        return contractProcessMapper.selectPendingByUserId(userId);
+    }
+
+    @Override
     public List<Contract> getPendingCountersignContracts(Integer userId) {
         try {
             // 获取当前用户待会签的合同列表

@@ -15,7 +15,9 @@ public interface ContractProcessService extends IService<ContractProcess> {
     
     // 获取待会签的合同列表
     List<Contract> getPendingCountersignContracts(Integer userId);
-    
+
+    List<ContractProcess> getPendingProcessesByUserId(Integer userId);
+
     // 根据ID获取合同信息
     Contract getContractById(Integer id);
     
