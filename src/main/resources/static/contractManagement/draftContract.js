@@ -220,7 +220,7 @@ document.getElementById("draftContractForm").addEventListener("submit", function
             this.reset();
             allAttachments = [];
             updateAttachmentsPreview();
-            window.location.href = '/contracts';
+            window.location.href = '/dashboard-user.html';
         })
         .catch(err => {
             console.error('提交失败:', err);

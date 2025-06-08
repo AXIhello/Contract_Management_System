@@ -137,7 +137,7 @@ async function submitCountersign() {
 
         if (data.success) {
             alert('会签提交成功！');
-            window.location.href = '/toBeCountersignedContractList.html';
+            window.location.href = '/queryAndStatistics/toBeCountersignedContractList.html';
         } else {
             alert('会签提交失败：' + (data.message || '未知错误'));
         }
