@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then((data) => {
                 alert("审批提交成功！");
                 // 可选：提交后跳转或者清空表单
-                // window.location.href = "/somepage";
+                window.location.href = "/queryAndStatistics/toBeExaminedContractList.html";
             })
             .catch((error) => {
                 console.error("审批提交失败:", error);
