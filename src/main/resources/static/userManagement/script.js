@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            console.log("输入用户名：" + username);
+            console.log("输入密码：" + password);
+
             try {
                 const res = await fetch(`/api/user/login`, {
                     method: "POST",
@@ -25,6 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 const result = await res.json();
+                console.log(result);
 
                 if (result.success) {
                     alert("登录成功，欢迎 " + username);

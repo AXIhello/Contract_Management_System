@@ -199,27 +199,32 @@ document.getElementById("draftContractForm").addEventListener("submit", function
         method: 'POST',
         body: formData
     })
-        .then(response => {
-            if (!response.ok) throw new Error('网络响应异常');
-            return response.json();
+        .then(async response => {
+            const data = await response.json();
+
+            if (!response.ok) {
+                // 权限不足或未登录等
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法起草合同");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+
+            return data;
         })
         .then(data => {
-            if (data.success) {
-                alert("合同起草成功！");
-                this.reset();
-                allAttachments = [];
-                updateAttachmentsPreview();
-                window.location.href = '/contracts';
-            } else {
-                error.textContent = data.message || "起草失败，请重试！";
-                // 失败时解除输入框禁用状态
-                setInputsLoading(false);
-            }
+            alert("合同起草成功！");
+            this.reset();
+            allAttachments = [];
+            updateAttachmentsPreview();
+            window.location.href = '/contracts';
         })
         .catch(err => {
             console.error('提交失败:', err);
-            error.textContent = "网络错误，请检查网络连接后重试！";
-            // 错误时解除输入框禁用状态
+            error.textContent = err.message || "网络错误，请稍后重试";
             setInputsLoading(false);
         })
         .finally(() => {

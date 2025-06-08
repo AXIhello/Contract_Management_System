@@ -10,6 +10,7 @@ import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +49,7 @@ public class ContractController {
         return contractService.createContract(contract);
     }
 
+    @PreAuthorize("hasAuthority('draft_contract')")
     @PostMapping("/draft")
     public Map<String, Object> draftContract(
             @RequestParam("contractName") String contractName,
@@ -164,8 +166,29 @@ public class ContractController {
         return contractService.getDraftContracts();
     }
 
-    @PostMapping("/assign")
-    public ResponseEntity<Map<String, Object>> assignContract(@RequestBody AssignContractRequest request) {
+
+    @PreAuthorize("hasAuthority('assign_countersign')")
+    @PostMapping("/assign/countersign")
+    public ResponseEntity<?> assignCountersign(@RequestBody AssignContractRequest request) {
+        request.setType(1); // 会签类型
+        return handleAssign(request);
+    }
+
+    @PreAuthorize("hasAuthority('assign_approve')")
+    @PostMapping("/assign/approve")
+    public ResponseEntity<?> assignApprove(@RequestBody AssignContractRequest request) {
+        request.setType(2); // 审批类型
+        return handleAssign(request);
+    }
+
+    @PreAuthorize("hasAuthority('assign_sign')")
+    @PostMapping("/assign/sign")
+    public ResponseEntity<?> assignSign(@RequestBody AssignContractRequest request) {
+        request.setType(3); // 签订类型
+        return handleAssign(request);
+    }
+
+    private ResponseEntity<?> handleAssign(AssignContractRequest request) {
         boolean success = contractProcessService.assignContract(request);
         if (success) {
             return ResponseEntity.ok(Map.of("success", true, "message", "分配成功"));
@@ -175,13 +198,13 @@ public class ContractController {
                     .body(Map.of("success", false, "message", "分配失败"));
         }
     }
-
     @GetMapping("/getToBeFinishedContracts")
     public List<ContractPendingDTO> getToBeFinishedContracts() {
-        System.out.println("✔ 已进入 getToBeFinishedContracts 控制器");
+        System.out.println("已进入 getToBeFinishedContracts 控制器");
         return contractService.getToBeFinishedContracts();
     }
 
+    @PreAuthorize("hasAuthority('finalize_contract')")
     @PutMapping("/finalize/{contractNum}")
     public Result<String> finalizeContract(@PathVariable Integer contractNum,
                                            @RequestBody Contract contract,

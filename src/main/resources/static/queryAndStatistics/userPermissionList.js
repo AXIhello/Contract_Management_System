@@ -11,8 +11,8 @@ function renderTable(data) {
     for (const item of pageData) {
         const row = `<tr>
             <td>${item.username}</td>
-            <td>${item.rolename}</td>
-            <td><a href="assignPermission.html?userid=${item.userid}">授权</a></td>
+            <td>${item.roleNames}</td>
+            <td><a href="/permissionManagement/assignPermission.html?userId=${item.userId}">授权</a></td>
         </tr>`;
         body.insertAdjacentHTML("beforeend", row);
     }
@@ -30,13 +30,11 @@ function prevPage() { if (currentPage > 1) { currentPage--; renderTable(userPerm
 function nextPage() { const maxPage = Math.ceil(userPerms.length / itemsPerPage); if (currentPage < maxPage) { currentPage++; renderTable(userPerms); } }
 function goToLastPage() { currentPage = Math.ceil(userPerms.length / itemsPerPage); renderTable(userPerms); }
 
-// TODO: 后端需要实现 GET /api/permission/userlist
-fetch('/api/permission/userlist')
+fetch('/api/right/list')
     .then(res => res.json())
     .then(data => { userPerms = data; renderTable(userPerms); })
     .catch(err => { console.error('获取用户权限列表失败:', err); });
 
-// TODO: 分配权限页面需要动态获取角色列表，管理员和操作员为固定项，其他角色从/api/role/list获取
 window.roleListForPermission = async function() {
     let roles = [
         { id: 1, name: '管理员' },

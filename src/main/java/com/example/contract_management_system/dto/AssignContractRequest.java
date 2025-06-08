@@ -12,6 +12,7 @@ public class AssignContractRequest {
     @Getter
     private int conNum;    // 合同ID
     @JsonProperty("type")
+    @Setter
     @Getter
     private int type;           // 操作类型
     @JsonProperty("userId")

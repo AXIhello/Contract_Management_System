@@ -8,21 +8,25 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-import static org.springframework.security.authorization.AuthenticatedAuthorizationManager.rememberMe;
 
 @Configuration
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final MyUserDetailsServiceImpl myUserDetailsService;
+    private final MyAccessDeniedHandler myAccessDeniedHandler;
 
-    public SecurityConfig(MyUserDetailsServiceImpl myUserDetailsService) {
+    public SecurityConfig(MyUserDetailsServiceImpl myUserDetailsService,
+                          MyAccessDeniedHandler myAccessDeniedHandler) {
         this.myUserDetailsService = myUserDetailsService;
+        this.myAccessDeniedHandler = myAccessDeniedHandler;
     }
 
     @Bean
@@ -76,6 +80,10 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/userManagement/login.html")  // 登出成功后跳转登录页
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
+                )
+                // ✅ 注册自定义 AccessDeniedHandler
+                .exceptionHandling(exception -> exception
+                        .accessDeniedHandler(myAccessDeniedHandler)
                 );
         return http.build();
     }

@@ -110,54 +110,57 @@ function initMultiSelects(userList) {
     signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList)
 }
 
-// 提交分配
+//提交分配
 async function submitAssign() {
     const contractId = new URLSearchParams(window.location.search).get('id');
-    if (contractId) {
-        console.log("合同 ID 更新为：", contractId);
-    } else {
-        console.error('未找到合同 ID');
+    const id = parseInt(contractId);
+    if (!id) {
+        alert("无法获取合同ID");
+        return;
     }
 
     const signerIds = signerSelect.getSelectedUserIds();
     const approverIds = approveSelect.getSelectedUserIds();
     const countersignerIds = signListSelect.getSelectedUserIds();
 
-    console.log("原始 contractId:", contractId, "类型:", typeof contractId);
-
-    const id = parseInt(contractId);
-
-    console.log("转化 contractId:", id, "类型:", typeof id);
-
     try {
         // 1. 分配会签人
         for (const userId of countersignerIds) {
             const request = {
                 conNum: id,
-                type: 1, // 1表示会签
                 userId: userId
             };
-            await assignToBackend(request);
+            await fetch('/api/contract/assign/countersign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
         }
 
         // 2. 分配审批人
         for (const userId of approverIds) {
             const request = {
                 conNum: id,
-                type: 2, // 2表示审批
                 userId: userId
             };
-            await assignToBackend(request);
+            await fetch('/api/contract/assign/approve', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
         }
 
         // 3. 分配签订人
         for (const userId of signerIds) {
             const request = {
                 conNum: id,
-                type: 3, // 3表示签订
                 userId: userId
             };
-            await assignToBackend(request);
+            await fetch('/api/contract/assign/sign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(request)
+            });
         }
 
         alert('分配成功！');
@@ -171,6 +174,7 @@ async function submitAssign() {
         alert('分配失败: ' + error.message);
     }
 }
+
 
 async function assignToBackend(request) {
     const response = await fetch('/api/contract/assign', {

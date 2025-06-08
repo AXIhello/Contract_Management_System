@@ -15,6 +15,4 @@ public class User {
     @Getter
     private String username;
     private String password;
-
-
 }

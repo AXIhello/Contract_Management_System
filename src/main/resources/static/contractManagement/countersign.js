@@ -8,26 +8,6 @@ function formatDate(dateString) {
     return date.toLocaleDateString('zh-CN');
 }
 
-// TODO: 后端需要实现的接口
-// GET /api/countersign/contract/{id}
-// 请求参数：id (合同编号)
-// 返回数据格式：
-// {
-//   "num": "合同编号",
-//   "name": "合同名称",
-//   "userId": "创建用户ID",
-//   "beginTime": "开始日期",
-//   "endTime": "结束日期",
-//   "content": "合同内容",
-//   "customer": "客户ID",
-//   "attachments": [
-//     {
-//       "id": "附件ID",
-//       "name": "附件名称",
-//       "url": "附件下载URL"
-//     }
-//   ]
-// }
 window.addEventListener('DOMContentLoaded', () => {
     if (contractId) {
         fetch(`/api/countersign/contract/${contractId}`)
