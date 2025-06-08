@@ -19,11 +19,10 @@ function renderTable(data) {
             const row = `<tr>
                 <td>${c.id || c.contractId}</td>
                 <td>${c.name || c.contractName}</td>
-                <td>${c.party || c.partyName}</td>
-                <td>${c.date || (c.createTime?.split('T')[0] || '')}</td>
+                <td>${c.customer}</td>
+                <td>${c.beginTime}</td>
                 <td>
                     <button onclick="viewContract('${c.id || c.contractId}')">查看</button>
-                    <button onclick="signContract('${c.id || c.contractId}')">签署</button>
                 </td>
             </tr>`;
             tbody.insertAdjacentHTML("beforeend", row);
@@ -43,10 +42,10 @@ function updatePageInfo(total) {
 function searchToBeSignedContracts() {
     const query = document.getElementById("searchInput").value.toLowerCase();
     const filtered = contracts.filter(c =>
-        (c.id || c.contractId || '').toLowerCase().includes(query) ||
-        (c.name || c.contractName || '').toLowerCase().includes(query) ||
-        (c.party || c.partyName || '').toLowerCase().includes(query) ||
-        (c.date || c.createTime || '').toLowerCase().includes(query)
+        c.id.toLowerCase().includes(query) ||
+        c.name.toLowerCase().includes(query) ||
+        c.clientName.toLowerCase().includes(query) ||
+        c.beginTime.includes(query)
     );
     currentPage = 1;
     renderTable(filtered);
@@ -72,14 +71,16 @@ function goToLastPage() {
     goToPage(pageCount);
 }
 
-// 查看/签署按钮逻辑
+// 实现查看按钮跳转逻辑
 function viewContract(id) {
-    alert(`查看合同：${id}`);
+    if (!id) {
+        alert("合同编号无效");
+        return;
+    }
+    // 跳转到签订合同页面
+    window.location.href = `/contractManagement/concludeContract.html?id=${encodeURIComponent(id)}`;
 }
 
-function signContract(id) {
-    alert(`签署合同：${id}`);
-}
 
 // 页面加载时获取数据
 fetch('/api/contract/approvalConclude')

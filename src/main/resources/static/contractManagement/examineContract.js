@@ -2,9 +2,6 @@
 window.existingAttachments = [];
 
 document.addEventListener("DOMContentLoaded", () => {
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const contractId = urlParams.get("id") || "defaultId"; // 从URL获取合同ID
-
     const contractId = new URLSearchParams(window.location.search).get("id");
     if (!contractId) {
         document.getElementById("finalError").innerText = "未提供合同 ID。";

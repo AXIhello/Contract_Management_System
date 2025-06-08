@@ -224,6 +224,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
                     contractInfo.put("user_id", contract.getUserId());
                     Customer customer = customerService.getBaseMapper().selectById(contract.getCustomer());
                     contractInfo.put("customer",customer.getName());
+                    contractInfo.put("beginTime", contract.getBeginTime());
                     contracts.add(contractInfo);
                 }
             }
@@ -375,8 +376,13 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             info.put("contractContent", contract.getContent());
             Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
             info.put("customer", customer.getName());
-            info.put("concludeId", userService.getCurrentUserId());
+            info.put("signerName", userService.getUsernameById(getCurrentUserId()));
             info.put("examineComments", examineComments);
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            info.put("beginTime", contract.getBeginTime() != null ? sdf.format(contract.getBeginTime()) : null);
+            info.put("endTime", contract.getEndTime() != null ? sdf.format(contract.getEndTime()) : null);
+
             return info;
         } catch (Exception e) {
             throw new SystemException("获取合同签订信息失败：", e);
