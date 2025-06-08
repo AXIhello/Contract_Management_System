@@ -8,7 +8,6 @@ import com.example.contract_management_system.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -21,6 +20,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
     @Override
     @Transactional
     public boolean addCustomer(Customer customer){
+
         return customerMapper.insert(customer) > 0;
     }
 
@@ -39,5 +39,13 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
         }
         return customerMapper.selectList(wrapper);
     }
+    @Override
+    public boolean deleteCustomerById(Integer num){
+        return customerMapper.deleteById(num)>0;
+    }
 
+    @Override
+    public boolean updateCustomer(Customer customer){
+        return customerMapper.updateById(customer)>0;
+    }
 }
