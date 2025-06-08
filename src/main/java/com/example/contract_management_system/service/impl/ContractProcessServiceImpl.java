@@ -294,6 +294,8 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             info.put("customer", customer.getName());
             info.put("approverId", userService.getCurrentUserId());
             info.put("approverName", userService.getUsernameById(getCurrentUserId()));
+            info.put("startDate", new Timestamp(System.currentTimeMillis()));  //有问题
+            info.put("endDate", new Timestamp(System.currentTimeMillis()));  //有问题
             return info;
         } catch (Exception e) {
             throw new SystemException("获取合同审批信息失败：", e);

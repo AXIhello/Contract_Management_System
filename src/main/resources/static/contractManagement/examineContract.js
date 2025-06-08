@@ -23,6 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
         .then((data) => {
             document.getElementById("contractName").value = data.contractName || "";
             document.getElementById("approverName").value = data.approverName || "";
+            document.getElementById("clientName").value = data.customer || "";
+            document.getElementById("startDate").value = data.startDate?.split("T")[0] || "";
+            document.getElementById("endDate").value = data.endDate?.split("T")[0] || "";
+            document.getElementById("contractContent").value = data.contractContent || "";
+            setFieldsReadonly();
         })
         .catch((error) => {
             console.error("获取审批信息失败:", error);
