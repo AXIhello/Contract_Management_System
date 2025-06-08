@@ -1,15 +1,18 @@
 package com.example.contract_management_system.controller;
 
+import com.baomidou.mybatisplus.extension.conditions.ChainWrapper;
 import com.example.contract_management_system.dto.CountersignDTO;
 import com.example.contract_management_system.pojo.Contract;
 import com.example.contract_management_system.pojo.ContractAttachment;
+import com.example.contract_management_system.pojo.Customer;
 import com.example.contract_management_system.service.ContractProcessService;
+import com.example.contract_management_system.service.CustomerService;
 import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import com.example.contract_management_system.service.CustomerService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,14 +25,14 @@ public class CountersignController {
 
     private final ContractProcessService contractProcessService;
     private final UserService userService;
-    private final ContractAttachmentService contractAttachmentService;
+    private final CustomerService customerService;;
 
     public CountersignController(ContractProcessService contractProcessService,
                                UserService userService,
-                               ContractAttachmentService contractAttachmentService) {
+                               CustomerService customerService) {
         this.contractProcessService = contractProcessService;
         this.userService = userService;
-        this.contractAttachmentService = contractAttachmentService;
+        this.customerService=customerService;
     }
 
     //获取会签意见
@@ -58,8 +61,10 @@ public class CountersignController {
             result.put("name", contract.getName());
             result.put("beginTime",contract.getBeginTime());
             result.put("endTime",contract.getEndTime());
+
+            Customer customer=customerService.getBaseMapper().selectById(contract.getCustomer());
             result.put("contractNum",contract.getNum());
-            result.put("customer",contract.getCustomer());
+            result.put("customer",customer.getName());
             result.put("userId",contract.getUserId());
             result.put("content", contract.getContent());
         } else {
@@ -68,37 +73,6 @@ public class CountersignController {
             result.put("attachments", List.of());
         }
         return result;
-    }
-
-
-    private String getMimeType(String fileExtension) {
-        switch (fileExtension) {
-            case "pdf":
-                return "application/pdf";
-            case "doc":
-                return "application/msword";
-            case "docx":
-                return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-            case "xls":
-                return "application/vnd.ms-excel";
-            case "xlsx":
-                return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-            case "png":
-                return "image/png";
-            case "jpg":
-            case "jpeg":
-                return "image/jpeg";
-            case "gif":
-                return "image/gif";
-            case "txt":
-                return "text/plain";
-            case "zip":
-                return "application/zip";
-            case "rar":
-                return "application/x-rar-compressed";
-            default:
-                return "application/octet-stream";
-        }
     }
 
     @PostMapping("/submit")
