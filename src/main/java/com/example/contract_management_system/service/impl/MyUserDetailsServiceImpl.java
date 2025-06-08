@@ -42,7 +42,7 @@ public class MyUserDetailsServiceImpl implements UserDetailsService {
         List<Role> roles = new ArrayList<>();
         if (roleNames != null && !roleNames.isEmpty()) {
             QueryWrapper<Role> wrapper = new QueryWrapper<>();
-            wrapper.in("roleName", roleNames);
+            wrapper.in("name", roleNames);
             roles = roleMapper.selectList(wrapper);
         }
 
