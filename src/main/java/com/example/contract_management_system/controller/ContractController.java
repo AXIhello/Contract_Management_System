@@ -203,6 +203,7 @@ public class ContractController {
         }
     }
 
+
     //定稿界面
     @GetMapping("/getToBeFinishedContracts")
     public List<ContractPendingDTO> getToBeFinishedContracts() {
@@ -235,6 +236,7 @@ public class ContractController {
         return success ? Result.success("更新成功") : Result.error("更新失败");
     }
 
+    @PreAuthorize("hasAuthority('query_contract')")
     @GetMapping("/{id}")
     public Result<Contract> getContractById(@PathVariable Integer id) {
         Contract contract = contractService.getById(id);
@@ -245,13 +247,14 @@ public class ContractController {
     }
 
 
-
+    @PreAuthorize("hasAuthority('approve_contract')")
     @GetMapping("/approvalInfo/{id}")
     public Map<String, Object> getApprovalInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息
         return contractProcessService.getContractApprovalInfo(id);
     }
 
+    @PreAuthorize("hasAuthority('sign_contract')")
     @GetMapping("/concludeInfo/{id}")
     public Map<String, Object> getConcludeInfoInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息

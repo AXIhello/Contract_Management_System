@@ -3,6 +3,7 @@ package com.example.contract_management_system.controller;
 import com.example.contract_management_system.pojo.*;
 import com.example.contract_management_system.service.*;
 import com.example.contract_management_system.util.Result;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -43,7 +44,7 @@ public class RightController {
         return result;
     }
 
-
+    @PreAuthorize("hasAuthority('query_user')")
     // 获取用户的用户名和角色
     @GetMapping("/userinfo/{userId}")
     public Map<String, Object> getUserInfo(@PathVariable("userId") int userId) {
@@ -61,7 +62,7 @@ public class RightController {
         result.put("roleNames", roleNames != null ? roleNames : Collections.emptyList());
         return result;
     }
-
+    @PreAuthorize("hasAuthority('assign_perm')")
     // 分配角色给用户
     @PostMapping("/assign")
     public Result<String> assignRoles(@RequestBody Map<String, Object> payload) {

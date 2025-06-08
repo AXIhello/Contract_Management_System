@@ -11,6 +11,7 @@ import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.example.contract_management_system.service.CustomerService;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class CountersignController {
         return contractProcessService.getPendingCountersignContracts(currentUserId);
     }
 
+    @PreAuthorize("hasAuthority('countersign_contract')")
     @GetMapping("/contract/{id}")
     public Map<String, Object> getContractInfo(@PathVariable Integer id) {
         Contract contract = contractProcessService.getContractById(id);

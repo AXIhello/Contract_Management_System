@@ -9,6 +9,7 @@ import com.example.contract_management_system.util.Result;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -124,7 +125,7 @@ public class UserController {
 
         return ResponseEntity.ok(result);
     }
-
+    @PreAuthorize("hasAuthority('delete_user')")
     @DeleteMapping("/delete/{id}")
     public Result<String> deleteUserById(@PathVariable("id") int userId) {
         boolean success = userService.deleteUserById(userId);
@@ -134,7 +135,7 @@ public class UserController {
             return Result.error("删除失败，用户不存在！");
         }
     }
-
+    @PreAuthorize("hasAuthority('query_user')")
     @GetMapping("/detail/{id}")
     public Result<User> getUserDetail(@PathVariable("id") int id) {
         User user = userService.getById(id);
@@ -144,7 +145,7 @@ public class UserController {
             return Result.error("用户不存在");
         }
     }
-
+    @PreAuthorize("hasAuthority('edit_user')")
     @PostMapping("/update")
     public Result<?> updateUser(@RequestBody User user) {
         // 查找原始用户

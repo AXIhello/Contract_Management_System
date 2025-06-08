@@ -4,6 +4,7 @@ import com.example.contract_management_system.dto.RoleRequest;
 import com.example.contract_management_system.util.Result;
 import com.example.contract_management_system.pojo.Role;
 import com.example.contract_management_system.service.RoleService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,11 +18,11 @@ public class RoleController {
         this.roleService = roleService;
     }
 
-
+    @PreAuthorize("hasAuthority('query_role')")
     @GetMapping("/list")
     public List<Role> getAllRoles() {
         return roleService.getAllRoles();}
-
+    @PreAuthorize("hasAuthority('add_role')")
     @PostMapping("/add")
     public Result<String> addRole(@RequestBody RoleRequest roleRequest) {
         String name = roleRequest.getName();
@@ -40,7 +41,7 @@ public class RoleController {
         return success ? Result.success("添加成功") : Result.error("添加失败！");
     }
 
-
+    @PreAuthorize("hasAuthority('delete_role')")
     @DeleteMapping("/delete/{name}")
     public Result<String> deleteByName(@PathVariable("name") String name) {
         boolean success = roleService.deleteByName(name);
@@ -50,14 +51,14 @@ public class RoleController {
             return com.example.contract_management_system.util.Result.error("删除失败，用户不存在！");
         }
     }
-
+    @PreAuthorize("hasAuthority('query_role')")
     // 获取角色详情（根据 name）
     @GetMapping("/detail/{name}")
     public Result<RoleRequest> getRoleDetail(@PathVariable String name) {
         RoleRequest roleRequest = roleService.getRoleDetailByName(name);
         return roleRequest != null ? Result.success(roleRequest) : Result.error("角色不存在");
     }
-
+    @PreAuthorize("hasAuthority('edit_role')")
     // 修改角色（根据 name 更新）
     @PostMapping("/update")
     public Result<String> updateRole(@RequestBody RoleRequest roleRequest) {

@@ -3,6 +3,7 @@ package com.example.contract_management_system.controller;
 import com.example.contract_management_system.pojo.Customer;
 import com.example.contract_management_system.service.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -15,7 +16,7 @@ public class CustomerController {
 
     @Autowired
     private CustomerService customerService;
-
+    @PreAuthorize("hasAuthority('add_client')")
     // 新增客户
     @PostMapping("/add")
     public Map<String, Object> addCustomer(@RequestBody Customer customer) {
@@ -35,7 +36,7 @@ public class CustomerController {
 
         return result;
     }
-
+    @PreAuthorize("hasAuthority('query_client')")
     // 查询客户（模糊查询）
     @GetMapping("/query")
     public Map<String, Object> queryCustomers(

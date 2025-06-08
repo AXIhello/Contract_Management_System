@@ -15,13 +15,13 @@ public class ContractStateController {
         this.contractStateService = contractStateService;
     }
 
-    @PutMapping("/{conNum}")
-    public boolean updateContractState(@PathVariable Integer conNum, @RequestParam Integer type) {
-        return contractStateService.updateContractState(conNum, type);
-    }
-    
-    @GetMapping("/{conNum}")
-    public ContractState getContractState(@PathVariable Integer conNum) {
-        return contractStateService.getContractState(conNum);
-    }
+//    @PutMapping("/{conNum}")
+//    public boolean updateContractState(@PathVariable Integer conNum, @RequestParam Integer type) {
+//        return contractStateService.updateContractState(conNum, type);
+//    }
+//
+//    @GetMapping("/{conNum}")
+//    public ContractState getContractState(@PathVariable Integer conNum) {
+//        return contractStateService.getContractState(conNum);
+//    }
 } 
