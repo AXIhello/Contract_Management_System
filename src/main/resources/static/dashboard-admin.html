@@ -202,6 +202,12 @@
 </head>
 <body>
 
+<!-- 横幅通知 -->
+<div id="bannerNotification" class="alert alert-info text-center fixed-top" style="display: none; z-index: 1050;" role="alert">
+    <span id="bannerMessage"></span>
+</div>
+
+
 <!-- 顶部导航 -->
 <nav class="navbar navbar-expand-lg navbar-dark navbar-skyblue d-flex align-items-center" style="height: 80px;">
     <div class="container-fluid">
@@ -221,7 +227,7 @@
                             <h6 style="visibility: hidden;">占位符</h6> <!-- 保持对齐 -->
                             <a href="queryAndStatistics/toBeExaminedContractList.html">审批合同</a>
                             <a href="queryAndStatistics/toBeConcludedContractList.html">签订合同</a>
-                            <a href="contractManagement/query.html">查询合同</a>
+                            <a href="queryAndStatistics/searchContractList.html">查询合同</a>
                         </div>
                     </div>
                 </div>
@@ -259,7 +265,7 @@
                         <!-- 日志管理 -->
                         <div>
                             <h6><i class="fas fa-book"></i> 日志管理</h6>
-                            <a href="/system/logs.html">日志管理</a>
+                            <a href="/logManage.html">日志管理</a>
                         </div>
 
                         <!-- 权限管理 + 子页面 -->
@@ -271,13 +277,21 @@
                             </h6>
                             <a href="userManagement/userManage.html">用户管理</a>
                             <a href="queryAndStatistics/roleList.html">角色管理</a>
-                            <a href="permissionManagement/functionManagement.html">功能操作</a>
                             <a href="queryAndStatistics/userPermissionList.html">分配权限</a>
                         </div>
                     </div>
                 </div>
             </li>
         </ul>
+
+        <!-- 消息通知图标 -->
+        <div class="position-relative me-3" id="notificationIcon" style="cursor: pointer;">
+            <i class="fas fa-bell fa-lg text-white"></i>
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notificationBadge" style="display: none;">
+                0
+            </span>
+        </div>
+
 
         <!-- 右侧用户栏 -->
         <div class="d-flex align-items-center">
@@ -350,6 +364,17 @@
         </div>
     </div>
 </div>
+
+<!-- 通知下拉框 -->
+<div id="notificationBox" class="dropdown-menu dropdown-menu-end shadow" style="position: absolute; top: 80px; right: 100px; display: none; min-width: 300px;">
+    <h6 class="dropdown-header">通知</h6>
+    <div id="notificationList">
+        <!-- 动态通知插入这里 -->
+    </div>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-center text-primary" href="#">查看全部通知</a>
+</div>
+
 
 <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 <script src="dashboard-admin.js"></script>
