@@ -122,3 +122,65 @@ async function logout(e) {
     }
 }
 
+
+const notifications = [];
+
+function addNotification(message, type = "info") {
+    const time = new Date().toLocaleTimeString();
+    const notif = { message, time, type };
+    notifications.unshift(notif);
+
+    renderNotificationList();
+    updateBadge();
+    showBanner(message);
+}
+
+function showBanner(message) {
+    const banner = document.getElementById("bannerNotification");
+    const bannerMsg = document.getElementById("bannerMessage");
+    bannerMsg.textContent = message;
+    banner.style.display = "block";
+
+    setTimeout(() => {
+        banner.style.display = "none";
+    }, 3000);
+}
+
+function renderNotificationList() {
+    const list = document.getElementById("notificationList");
+    list.innerHTML = "";
+
+    notifications.forEach((notif) => {
+        const item = document.createElement("a");
+        item.className = "dropdown-item";
+        item.href = "#";
+        item.innerHTML = `<i class="fas fa-info-circle me-2 text-${notif.type}"></i> ${notif.message} <br><small class="text-muted">${notif.time}</small>`;
+        list.appendChild(item);
+    });
+}
+
+function updateBadge() {
+    const badge = document.getElementById("notificationBadge");
+    if (notifications.length > 0) {
+        badge.textContent = notifications.length;
+        badge.style.display = "inline-block";
+    } else {
+        badge.style.display = "none";
+    }
+}
+
+document.getElementById("notificationIcon").addEventListener("click", function () {
+    const box = document.getElementById("notificationBox");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+});
+
+// 事件通知触发器（可由起草、审批等逻辑触发）
+function notifyEvent(type, userName, contractTitle) {
+    const msgMap = {
+        'draft': `合同《${contractTitle}》已起草，请 ${userName} 会签。`,
+        'examined': `合同《${contractTitle}》已审批，请 ${userName} 签订。`
+    };
+    addNotification(msgMap[type]);
+}
+
+
