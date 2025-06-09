@@ -108,8 +108,7 @@ function goToLastPage() {
 
 // 新增合同（跳转或弹窗）
 function addContract() {
-    alert("跳转到起草合同模块");
-    // 示例：location.href = '/draftContract.html';
+    location.href = '/contractManagement/draftContract.html';
 }
 
 
