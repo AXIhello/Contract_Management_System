@@ -3,8 +3,12 @@ package com.example.contract_management_system.service.impl;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.dto.RoleRequest;
 import com.example.contract_management_system.mapper.RoleMapper;
+import com.example.contract_management_system.mapper.UserMapper;
 import com.example.contract_management_system.pojo.Role;
+import com.example.contract_management_system.pojo.User;
+import com.example.contract_management_system.service.LogService;
 import com.example.contract_management_system.service.RoleService;
+import com.example.contract_management_system.service.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -13,10 +17,14 @@ import java.util.List;
 
 @Service
 public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements RoleService {
-    private  final RoleMapper roleMapper;
+    private final RoleMapper roleMapper;
+    private final UserService userService;
+    private final LogService logService;
 
-    public RoleServiceImpl(RoleMapper roleMapper) {
+    public RoleServiceImpl(RoleMapper roleMapper, UserService userService, LogService logService) {
         this.roleMapper = roleMapper;
+        this.userService = userService;
+        this.logService = logService;
     }
 
     @Override
@@ -26,6 +34,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     @Override
     public boolean deleteByName(String name){
+        Integer userId = userService.getCurrentUserId();
+        logService.addLog(userId, 2, "Role", name);
         return roleMapper.deleteByName(name) > 0;
     }
 
@@ -40,6 +50,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         role.setName(name);
         role.setDescription(desc);
         role.setFunctions(String.join(",", perms));
+        Integer userId = userService.getCurrentUserId();
+        logService.addLog(userId, 1, "Role", name);
         int insert = roleMapper.insert(role);
         return insert > 0;
     }
@@ -73,6 +85,8 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         String functionStr = dto.getPerms() == null ? "" : String.join(",", dto.getPerms());
         existing.setFunctions(functionStr);
 
+        Integer userId = userService.getCurrentUserId();
+        logService.addLog(userId, 3, "Role", dto.getName());
         return roleMapper.updateByName(existing) > 0;
     }
 

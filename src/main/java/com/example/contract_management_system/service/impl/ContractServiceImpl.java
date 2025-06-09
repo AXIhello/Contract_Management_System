@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -25,15 +26,16 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
     private final ContractStateMapper contractStateMapper;
     private final ContractStateService contractStateService;
     private final ContractAttachmentService contractAttachmentService;
+    private final LogService logService;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
-
-    public ContractServiceImpl(ContractMapper contractMapper, ContractStateMapper contractStateMapper, ContractStateService contractStateService, ContractProcessMapper contractProcessMapper, ContractAttachmentService contractAttachmentService) {
+    public ContractServiceImpl(ContractMapper contractMapper, ContractStateMapper contractStateMapper, ContractStateService contractStateService, ContractProcessMapper contractProcessMapper, ContractAttachmentService contractAttachmentService, LogService logService, UserService userService) {
         this.contractMapper = contractMapper;
         this.contractStateMapper = contractStateMapper;
         this.contractStateService = contractStateService;
         this.contractAttachmentService = contractAttachmentService;
+        this.logService = logService;
+        this.userService = userService;
     }
 
     @Override
@@ -116,6 +118,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         contractState.setTime(new Date());
 
         return contractStateService.save(contractState);
+
     }
 
     @Override
@@ -196,7 +199,6 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
                     }
                 }
             }
-
             // （7）保存合同定稿状态（3 = 定稿完成）
             ContractState finalState = new ContractState();
             finalState.setConNum(contractNum);
@@ -207,13 +209,14 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
             boolean stateSaved = contractStateService.updateById(finalState);
             logger.info("合同定稿状态保存结果: {}", stateSaved);
 
+            Contract contract = contractMapper.selectById(contractNum);
+            logService.addLog(userId, 3,"Contract", contract.getName());
+
             return stateSaved;
         }
 
         return false;
     }
-
-
 
     @Override
     public List<ContractPendingDTO> getToBeFinishedContracts() {

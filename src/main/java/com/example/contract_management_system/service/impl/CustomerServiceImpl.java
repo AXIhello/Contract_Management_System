@@ -5,7 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.mapper.CustomerMapper;
 import com.example.contract_management_system.pojo.Customer;
 import com.example.contract_management_system.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.contract_management_system.service.LogService;
+import com.example.contract_management_system.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,13 +15,21 @@ import java.util.List;
 @Service
 public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> implements CustomerService {
 
-    @Autowired
-    private CustomerMapper customerMapper;
+    private final CustomerMapper customerMapper;
+    private final LogService logService;
+    private final UserService userService;
 
-    @Override
+    public CustomerServiceImpl(CustomerMapper customerMapper, LogService logService, UserService userService) {
+        this.customerMapper = customerMapper;
+        this.logService = logService;
+        this.userService = userService;
+    }
+
     @Transactional
+    @Override
     public boolean addCustomer(Customer customer){
-
+        Integer userId = userService.getCurrentUserId();
+        logService.addLog(userId, 1, "Customer", customer.getName());
         return customerMapper.insert(customer) > 0;
     }
 
@@ -41,11 +50,16 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
     }
     @Override
     public boolean deleteCustomerById(Integer num){
+        Customer customer = customerMapper.selectById(num);
+        Integer userId = userService.getCurrentUserId();
+        logService.addLog(userId, 2, "Customer", customer.getName());
         return customerMapper.deleteById(num)>0;
     }
 
     @Override
     public boolean updateCustomer(Customer customer){
+        Integer userId = userService.getCurrentUserId();
+        logService.addLog(userId, 3, "Customer", customer.getName());
         return customerMapper.updateById(customer)>0;
     }
 }

@@ -77,6 +77,7 @@ public class CountersignController {
         return result;
     }
 
+    @PreAuthorize("hasAuthority('countersign_contract')")
     @PostMapping("/submit")
     public ResponseEntity<Map<String, Object>> submitCountersign(@RequestBody Map<String, Object> request) {
         Integer contractId = Integer.parseInt((String) request.get("contractId"));

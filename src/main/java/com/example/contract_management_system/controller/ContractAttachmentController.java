@@ -1,5 +1,6 @@
 package com.example.contract_management_system.controller;
 
+import com.example.contract_management_system.service.LogService;
 import com.example.contract_management_system.util.Result;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
@@ -34,6 +35,11 @@ public class ContractAttachmentController {
 
     @Autowired
     private ContractAttachmentService contractAttachmentService;
+    private final LogService logService;
+
+    public ContractAttachmentController(LogService logService) {
+        this.logService = logService;
+    }
 
 
     //附件相关

@@ -2,9 +2,11 @@ package com.example.contract_management_system.controller;
 
 import com.example.contract_management_system.pojo.Customer;
 import com.example.contract_management_system.service.CustomerService;
+import com.example.contract_management_system.service.UserService;
 import com.example.contract_management_system.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -15,8 +17,14 @@ import java.util.Map;
 @RequestMapping("/api/customer")
 public class CustomerController {
 
-    @Autowired
-    private CustomerService customerService;
+    private final CustomerService customerService;
+    private final UserService userService;
+
+    public CustomerController(CustomerService customerService, UserService userService) {
+        this.customerService = customerService;
+        this.userService = userService;
+    }
+
     @PreAuthorize("hasAuthority('add_client')")
     @PostMapping("/add")
     public Result<Customer> addCustomer(@RequestBody Customer customer) {
@@ -57,6 +65,7 @@ public class CustomerController {
     @PreAuthorize("hasAuthority('update_client')")
     @PutMapping("/update")
     public Result<Void> updateCustomer(@RequestBody Customer customer) {
+        Integer userId = userService.getCurrentUserId();
         boolean success = customerService.updateCustomer(customer);
         return success ? Result.success() : Result.error("更新失败！");
     }

@@ -4,10 +4,7 @@ import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.dto.ContractUpdateDTO;
 import com.example.contract_management_system.pojo.Contract;
-import com.example.contract_management_system.service.ContractAttachmentService;
-import com.example.contract_management_system.service.ContractProcessService;
-import com.example.contract_management_system.service.ContractService;
-import com.example.contract_management_system.service.UserService;
+import com.example.contract_management_system.service.*;
 import com.example.contract_management_system.util.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,12 +37,14 @@ public class ContractController {
     private final ContractProcessService contractProcessService;
     private final UserService userService;
     private final ContractAttachmentService contractAttachmentService;
+    private final LogService logService;
 
-    public ContractController(ContractService contractService, ContractProcessService contractProcessService, UserService userService,  ContractAttachmentService contractAttachmentService) {
+    public ContractController(ContractService contractService, ContractProcessService contractProcessService, UserService userService, ContractAttachmentService contractAttachmentService, LogService logService) {
         this.contractService = contractService;
         this.contractProcessService = contractProcessService;
         this.userService = userService;
         this.contractAttachmentService = contractAttachmentService;
+        this.logService = logService;
     }
 
     @PostMapping
@@ -107,9 +106,16 @@ public class ContractController {
                         if (!file.isEmpty()) {
                             logger.info("上传附件: {}", file.getOriginalFilename());
                             boolean result = contractAttachmentService.uploadAndSaveAttachment(contract.getNum(), file);
+
                             if (!result) {
                                 attachmentSuccess = false;
                                 break;
+                            }
+
+                            boolean logSuccess = logService.addLog(userId, 1, "ConTractAttachment", file.getOriginalFilename());
+                            if (!logSuccess) {
+                                response.put("success", false);
+                                response.put("message", "合同起草成功，但日志记录失败");
                             }
                         }
                     }
@@ -125,6 +131,13 @@ public class ContractController {
                     response.put("message", "合同起草成功，但部分或全部附件上传失败");
                     response.put("contractId", contract.getNum());
                 }
+
+                boolean logSuccess = logService.addLog(userId, 1, "ConTract", contractName);
+                if (!logSuccess) {
+                    response.put("success", false);
+                    response.put("message", "合同起草成功，但日志记录失败");
+                }
+
             } else {
                 response.put("success", false);
                 response.put("message", "合同起草失败");

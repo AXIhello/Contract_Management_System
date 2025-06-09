@@ -4,6 +4,7 @@ package com.example.contract_management_system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.contract_management_system.mapper.UserMapper;
 import com.example.contract_management_system.pojo.User;
+import com.example.contract_management_system.service.LogService;
 import com.example.contract_management_system.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,12 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;  // 注入密码编码器
+    private final LogService logService;
 
-    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserServiceImpl(UserMapper userMapper, PasswordEncoder passwordEncoder, LogService logService) {
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
+        this.logService = logService;
     }
 
 
@@ -43,34 +46,37 @@ public class UserServiceImpl implements UserService {
         String encodedPassword = passwordEncoder.encode(user.getPassword());
         user.setPassword(encodedPassword);
 
-        return userMapper.insert(user) > 0;
+        boolean success = userMapper.insert(user) > 0;
+        if (success) {
+            logService.addLog(user.getUserId(), 1, "User", user.getUsername());}
+        return success;
     }
 
     @Override
     public Integer getCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         logger.info("当前认证信息: {}", authentication);
-        
+
         if (authentication == null || !authentication.isAuthenticated()) {
             logger.error("用户未认证");
             return null;
         }
-        
+
         Object principal = authentication.getPrincipal();
         logger.info("认证主体: {}", principal);
-        
+
         if (principal instanceof UserDetails userDetails) {
             String username = userDetails.getUsername();
             logger.info("当前用户名: {}", username);
-            
+
             QueryWrapper<User> query = new QueryWrapper<>();
             query.eq("username", username);
             User user = userMapper.selectOne(query);
             logger.info("查询到的用户信息: {}", user);
-            
+
             return user != null ? user.getUserId() : null;
         }
-        
+
         logger.error("认证主体不是UserDetails类型");
         return null;
     }
@@ -87,6 +93,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUserById(int userId){
+        User user = getById(userId);
+        logService.addLog(userId, 2, "User", user.getUsername());
         return userMapper.deleteById(userId) > 0;
     }
 
@@ -97,6 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateById(User user){
+        logService.addLog(user.getUserId(), 3, "User", user.getUsername());
         return userMapper.updateById(user) > 0;
     }
 
