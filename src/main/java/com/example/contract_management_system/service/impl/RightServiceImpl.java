@@ -32,7 +32,7 @@ public class RightServiceImpl implements RightService {
     public void assignRolesToUser(int userId, List<String> roleNames) {
         User user = userMapper.selectById(userId);
         for(String roleName : roleNames) {
-            logService.addLog(userId, 1, "Right", user.getUsername() + roleName);
+            logService.addLog(userId, 1, "Right","UserName: " + user.getUsername() + "RoleName: " + roleName);
             rightMapper.assignRights(userId,roleName);
         }
     }

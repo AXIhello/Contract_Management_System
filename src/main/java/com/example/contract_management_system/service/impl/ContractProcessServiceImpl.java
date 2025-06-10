@@ -75,7 +75,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
             if (affectedRows != 1) {
                 throw new PersistenceException("插入合同流程失败！");
             }
-            logService.addLog(user.getUserId(), 1, "ContractProcess", user.getUsername() + " " + contract.getName());
+            logService.addLog(user.getUserId(), 1, "ContractProcess", "UserName: " + user.getUsername() + ", ContactName: " + contract.getName());
 
             return true;
         } catch (DataAccessException e) {
@@ -189,13 +189,13 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
                 throw new PersistenceException("更新会签状态失败");
             }
             User user = userMapper.selectById(userId);
-            logService.addLog(userId, 3, "ContractProcess", contract.getName() + user.getUsername());
+            logService.addLog(userId, 3, "ContractProcess","ContractName: " + contract.getName() +"UserName: " + user.getUsername());
 
             boolean allCountersign = contractProcessMapper.checkAllCountersigned(contractId);
 
             if(allCountersign){
                 contractStateMapper.updateContractState(contractId,2,1,new Timestamp(System.currentTimeMillis()));
-                logService.addLog(user.getUserId(), 3, "ContractState", contract.getName());
+                logService.addLog(user.getUserId(), 3, "ContractState","ContractName: " + contract.getName());
             }
             return true;
         } catch (BusinessException e) {
@@ -257,7 +257,6 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
         }
     }
 
-
     @Override
     public List<Map<String, Object>> getPendingConcludeContracts(Integer userId) {
         try {
@@ -312,13 +311,13 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
                 throw new PersistenceException("更新审批状态失败");
             }
             User user = userMapper.selectById(userId);
-            logService.addLog(userId, 3, "ContractProcess", contract.getName() + user.getUsername());
+            logService.addLog(userId, 3, "ContractProcess","ContractName: " + contract.getName() +"UserName: " + user.getUsername());
 
             // 5. 检查是否所有审批人都已通过
             if (checkAllConclude(contractId)) {
                 // 更新合同状态为审批完成（type=4）
                 contractStateMapper.updateContractState(contractId, 5, 4, new Timestamp(System.currentTimeMillis()));
-                logService.addLog(user.getUserId(), 3, "ContractState", contract.getName());
+                logService.addLog(user.getUserId(), 3, "ContractState","ContractName: " + contract.getName());
             }
 
             return true;
@@ -357,14 +356,14 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
                 throw new PersistenceException("更新审批状态失败");
             }
             User user = userMapper.selectById(userId);
-            logService.addLog(userId, 3, "ContractProcess", contract.getName() + user.getUsername());
+            logService.addLog(userId, 3, "ContractProcess","ContractName: " + contract.getName() +"UserName: " + user.getUsername());
 
 
             // 5. 检查是否所有审批人都已通过
             if (state == 1 && checkAllExamined(contractId)) {
                 // 更新合同状态为审批完成（type=4）
                 contractStateMapper.updateContractState(contractId, 4, 3, new Timestamp(System.currentTimeMillis()));
-                logService.addLog(user.getUserId(), 3, "ContractState", contract.getName());
+                logService.addLog(user.getUserId(), 3, "ContractState","ContractName: " + contract.getName());
             }
 
             return true;

@@ -35,7 +35,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
     @Override
     public boolean deleteByName(String name){
         Integer userId = userService.getCurrentUserId();
-        logService.addLog(userId, 2, "Role", name);
+        logService.addLog(userId, 2, "Role","RoleName: " + name);
         return roleMapper.deleteByName(name) > 0;
     }
 
@@ -51,7 +51,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         role.setDescription(desc);
         role.setFunctions(String.join(",", perms));
         Integer userId = userService.getCurrentUserId();
-        logService.addLog(userId, 1, "Role", name);
+        logService.addLog(userId, 1, "Role","RoleName: " + name);
         int insert = roleMapper.insert(role);
         return insert > 0;
     }
@@ -86,7 +86,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         existing.setFunctions(functionStr);
 
         Integer userId = userService.getCurrentUserId();
-        logService.addLog(userId, 3, "Role", dto.getName());
+        logService.addLog(userId, 3, "Role","RoleName: " + dto.getName());
         return roleMapper.updateByName(existing) > 0;
     }
 

@@ -109,7 +109,7 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
             if (saved) {
                 logger.info("附件信息保存到数据库成功");
                 Integer userId = userService.getCurrentUserId();
-                logService.addLog(userId, 1, "ContractAttachment", contract.getName()+ " " + originalFileName);
+                logService.addLog(userId, 1, "ContractAttachment", "ContractName: " + contract.getName()+ ", AttachmentName: " + originalFileName);
             } else {
                 logger.error("附件信息保存到数据库失败");
                 destFile.delete();
@@ -136,7 +136,7 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
 
             if (rows > 0) {
                 Integer userId = userService.getCurrentUserId();
-                logService.addLog(userId, 2, "ContractAttachment", relativePath);
+                logService.addLog(userId, 2, "ContractAttachment", "AttachmentName: " + relativePath);
             }
 
             String fullPath = uploadPath + File.separator + new File(relativePath).getName();
