@@ -32,7 +32,14 @@ function loadCustomers() {
         .then(response => {
             console.log('收到响应:', response);
             if (!response.ok) {
-                throw new Error('网络响应异常');
+                // 权限不足或未登录等
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法查询客户");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录已过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
             }
             return response.json();
         })

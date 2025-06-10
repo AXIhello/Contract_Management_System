@@ -73,7 +73,7 @@ window.addEventListener('DOMContentLoaded', () => {
             const data = await res.json();
             if (!res.ok) {
                 if (data.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
+                    throw new Error("权限不足，无法查询角色");
                 } else if (data.code === 401) {
                     throw new Error("未登录或登录已过期，请重新登录");
                 } else {
@@ -97,7 +97,6 @@ function resetForm() {
     window.location.reload();
 }
 
-// TODO: 后端需要实现 POST /api/role/update
 async function submitEdit() {
     const name = document.getElementById('roleName').value.trim();
     const desc = document.getElementById('roleDesc').value.trim();
@@ -117,7 +116,7 @@ async function submitEdit() {
         const result = await res.json();
         if (!res.ok) {
             if (result.code === 403) {
-                throw new Error("权限不足，无法起草合同");
+                throw new Error("权限不足，无法编辑角色");
             } else if (result.code === 401) {
                 throw new Error("未登录或登录已过期，请重新登录");
             } else {

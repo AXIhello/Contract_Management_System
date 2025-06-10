@@ -51,15 +51,15 @@ public class RoleController {
             return com.example.contract_management_system.util.Result.error("删除失败，用户不存在！");
         }
     }
-    @PreAuthorize("hasAuthority('query_role')")
     // 获取角色详情（根据 name）
+    @PreAuthorize("hasAuthority('query_role')")
     @GetMapping("/detail/{name}")
     public Result<RoleRequest> getRoleDetail(@PathVariable String name) {
         RoleRequest roleRequest = roleService.getRoleDetailByName(name);
         return roleRequest != null ? Result.success(roleRequest) : Result.error("角色不存在");
     }
-    @PreAuthorize("hasAuthority('edit_role')")
     // 修改角色（根据 name 更新）
+    @PreAuthorize("hasAuthority('edit_role')")
     @PostMapping("/update")
     public Result<String> updateRole(@RequestBody RoleRequest roleRequest) {
         if (roleRequest.getName() == null || roleRequest.getName().trim().isEmpty()) {

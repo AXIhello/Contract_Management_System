@@ -124,9 +124,25 @@ async function submitAssign() {
     const countersignerIds = signListSelect.getSelectedUserIds();
 
     try {
-        // 1. 分配会签人
+        // 🔸 第一步：预处理（清空流程表 + 设置状态）
+        const prepareResponse = await fetch(`/api/contract/assign/prepare/${id}`, {
+            method: 'PUT'
+        });
+        const prepareData = await prepareResponse.json();
+
+        if (!prepareResponse.ok) {
+            if (prepareData.code === 403) {
+                throw new Error("权限不足，无法初始化合同流程");
+            } else if (prepareData.code === 401) {
+                throw new Error("未登录或登录已过期，请重新登录");
+            } else {
+                throw new Error(prepareData.msg || "初始化失败");
+            }
+        }
+
+        // 🔸 第二步：分配会签人
         for (const userId of countersignerIds) {
-            const request = { conNum: id, userId: userId };
+            const request = { conNum: id, userId };
             const response = await fetch('/api/contract/assign/countersign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -146,9 +162,9 @@ async function submitAssign() {
             }
         }
 
-        // 2. 分配审批人
+        // 🔸 第三步：分配审批人
         for (const userId of approverIds) {
-            const request = { conNum: id, userId: userId };
+            const request = { conNum: id, userId };
             const response = await fetch('/api/contract/assign/approve', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -168,9 +184,9 @@ async function submitAssign() {
             }
         }
 
-        // 3. 分配签订人
+        // 🔸 第四步：分配签订人
         for (const userId of signerIds) {
-            const request = { conNum: id, userId: userId };
+            const request = { conNum: id, userId };
             const response = await fetch('/api/contract/assign/sign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -196,11 +212,13 @@ async function submitAssign() {
         } else {
             window.location.href = "assignContract.html";
         }
+
     } catch (error) {
         console.error('分配失败:', error);
         alert('分配失败: ' + error.message);
     }
 }
+
 
 // 取消分配，返回上一页或刷新
 function cancelAssign() {

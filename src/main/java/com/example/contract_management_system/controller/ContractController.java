@@ -1,13 +1,12 @@
 package com.example.contract_management_system.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
-import com.example.contract_management_system.dto.ContractUpdateDTO;
-import com.example.contract_management_system.pojo.Contract;
+import com.example.contract_management_system.pojo.*;
 import com.example.contract_management_system.service.*;
 import com.example.contract_management_system.util.Result;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,13 +37,20 @@ public class ContractController {
     private final UserService userService;
     private final ContractAttachmentService contractAttachmentService;
     private final LogService logService;
+    private final ContractStateService contractStateService;
 
-    public ContractController(ContractService contractService, ContractProcessService contractProcessService, UserService userService, ContractAttachmentService contractAttachmentService, LogService logService) {
+    public ContractController(ContractService contractService,
+                              ContractProcessService contractProcessService,
+                              UserService userService,
+                              ContractAttachmentService contractAttachmentService,
+                              LogService logService,
+                              ContractStateService contractStateService) {
         this.contractService = contractService;
         this.contractProcessService = contractProcessService;
         this.userService = userService;
         this.contractAttachmentService = contractAttachmentService;
         this.logService = logService;
+        this.contractStateService = contractStateService;
     }
 
     @PostMapping
@@ -183,6 +189,22 @@ public class ContractController {
         return contractService.getDraftContracts();
     }
 
+    @PutMapping("/assign/prepare/{contractId}")
+    public Result<Void> prepareAssign(@PathVariable("contractId") Integer contractId) {
+        // 删除流程表中该合同所有记录
+        contractProcessService.remove(new QueryWrapper<ContractProcess>().eq("conNum", contractId));
+
+        // 设置合同状态为 1
+        ContractState state = contractStateService.getById(contractId);
+        if (state == null) {
+            state = new ContractState();
+            state.setConNum(contractId);
+        }
+        state.setType(1);
+        contractStateService.saveOrUpdate(state);
+
+        return Result.success();
+    }
 
     @PreAuthorize("hasAuthority('assign_countersign')")
     @PostMapping("/assign/countersign")
