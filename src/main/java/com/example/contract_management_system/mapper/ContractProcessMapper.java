@@ -11,6 +11,7 @@ import java.util.List;
 @Mapper
 public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
 
+
     @Insert("INSERT INTO contract_process (conNum, type, state, user_id, content, time) " +
             "VALUES (#{conNum}, #{type}, #{state}, #{userId}, #{content}, #{time})")
     int insertContractProcess(@Param("conNum") int conNum,
@@ -55,8 +56,7 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "WHERE conNum = #{conNum} AND type = 3 AND (state = 0 OR state = 2)")
     boolean checkAllConclude(@Param("conNum") Integer conNum);
 
-    @Select("SELECT * FROM contract_process WHERE state = 0 AND user_id = #{userId}")
-    List<ContractProcess> selectPendingByUserId(Integer userId);
+
 
     @Select("SELECT cp.conNum " +
             "FROM contract_process cp " +

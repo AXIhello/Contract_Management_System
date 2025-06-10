@@ -92,7 +92,43 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
 
     @Override
     public List<ContractProcess> getPendingProcessesByUserId(Integer userId) {
-        return contractProcessMapper.selectPendingByUserId(userId);
+        // 现在使用 ContractStateMapper 的方法
+        List<Map<String, Object>> pendingTasks = contractStateMapper.selectPendingByUserId(userId);
+        List<ContractProcess> result = new ArrayList<>();
+
+        for (Map<String, Object> task : pendingTasks) {
+            Integer conNum = (Integer) task.get("conNum");
+            String taskType = (String) task.get("taskType");
+
+            // 根据任务类型获取对应的 ContractProcess 记录
+            ContractProcess process = null;
+
+            switch (taskType) {
+                case "COUNTERSIGN":
+                    process = contractProcessMapper.getContractProcess(conNum, userId, 1);
+                    break;
+                case "EXAMINE":
+                    process = contractProcessMapper.getContractProcess(conNum, userId, 2);
+                    break;
+                case "CONCLUDE":
+                    process = contractProcessMapper.getContractProcess(conNum, userId, 3);
+                    break;
+                case "DRAFT":
+                    // 定稿任务不在 contract_process 表中，可以创建一个虚拟的 ContractProcess 对象
+                    process = new ContractProcess();
+                    process.setConNum(conNum);
+                    process.setUserId(userId);
+                    process.setType(0); // 用0表示定稿任务
+                    process.setState(0);
+                    break;
+            }
+
+            if (process != null) {
+                result.add(process);
+            }
+        }
+
+        return result;
     }
 
     @Override
