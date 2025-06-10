@@ -81,7 +81,7 @@ function deleteUser(id) {
         .then(res => res.json().then(result => {
             if (!res.ok) {
                 if (result.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
+                    throw new Error("权限不足，无法删除用户");
                 } else if (result.code === 401) {
                     throw new Error("未登录或登录已过期，请重新登录");
                 } else {

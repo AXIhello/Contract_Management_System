@@ -273,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(async (res) => {
             const data = await res.json();
             if (!res.ok) {
-                if (data.code === 403) throw new Error("权限不足，无法访问附件");
+                if (data.code === 403) throw new Error("权限不足，无法查看附件");
                 if (data.code === 401) throw new Error("未登录或登录已过期，请重新登录");
                 throw new Error(data.msg || "请求失败");
             }
@@ -352,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
             concludeOpinion: comments,
         };
 
-        fetch("/api/contract/submitConclude", {
+        fetch("/api/contract/submitSign", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -362,7 +362,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .then(async (res) => {
                 const data = await res.json();
                 if (!res.ok) {
-                    if (data.code === 403) throw new Error("权限不足，无法提交结项");
+                    if (data.code === 403) throw new Error("权限不足，无法签订合同");
                     if (data.code === 401) throw new Error("未登录或登录已过期，请重新登录");
                     throw new Error(data.msg || "请求失败");
                 }
@@ -370,7 +370,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(() => {
                 alert("结项提交成功！");
-                window.location.href = "/queryAndStatistics/concludedContractList.html";
+                window.location.href = "/queryAndStatistics/searchContractList.html";
             })
             .catch((error) => {
                 console.error("结项提交失败:", error);

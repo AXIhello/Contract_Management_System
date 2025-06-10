@@ -20,17 +20,6 @@ async function getCurrentUser() {
         if (!response.ok) throw new Error('Failed to fetch user info');
         const user = await response.json();
 
-        if (!response.ok) {
-            // 权限不足或未登录等
-            if (data.code === 403) {
-                throw new Error("权限不足，无法起草合同");
-            } else if (data.code === 401) {
-                throw new Error("未登录或登录已过期，请重新登录");
-            } else {
-                throw new Error(data.msg || "请求失败");
-            }
-        }
-
         document.getElementById('currentUsername').textContent = user.username ?? '未知用户';
         document.getElementById('userFullName').textContent = user.username ?? '未知用户';
         document.getElementById('userRole').textContent = user.role ?? '未知角色';

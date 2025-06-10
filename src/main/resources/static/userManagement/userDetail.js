@@ -4,12 +4,12 @@ window.addEventListener('DOMContentLoaded', () => {
     fetch(`/api/user/detail/${userId}`)
         .then(res => res.json().then(data => {
             if (!res.ok) {
-                if (data.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
-                } else if (data.code === 401) {
+                if (result.code === 403) {
+                    throw new Error("权限不足，无法查询用户");
+                } else if (result.code === 401) {
                     throw new Error("未登录或登录已过期，请重新登录");
                 } else {
-                    throw new Error(data.msg || "请求失败");
+                    throw new Error(result.msg || "请求失败");
                 }
             }
 
@@ -55,7 +55,7 @@ function submitEdit() {
         .then(res => res.json().then(result => {
             if (!res.ok) {
                 if (result.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
+                    throw new Error("权限不足，无法编辑用户");
                 } else if (result.code === 401) {
                     throw new Error("未登录或登录已过期，请重新登录");
                 } else {
