@@ -34,4 +34,5 @@ public interface ContractService extends IService<Contract> {
     List<ContractPendingDTO> getToBeFinishedContracts();
 
 
+    List<Contract> getAllContracts();
 }

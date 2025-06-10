@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .then(() => {
                 alert("结项提交成功！");
-                window.location.href = "/queryAndStatistics/searchContractList.html";
+                window.location.href = "/queryAndStatistics/toBeConcludedContractList.html";
             })
             .catch((error) => {
                 console.error("结项提交失败:", error);

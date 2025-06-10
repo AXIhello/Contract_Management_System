@@ -4,7 +4,7 @@ const pageSize = 5;
 
 // 统一获取合同数据
 function loadContracts() {
-    fetch('/api/contract/all')
+    fetch('/api/contract/list')
         .then(res => res.json().then(data => {
             if (!res.ok) {
                 if (data.code === 403) {
@@ -40,15 +40,15 @@ function renderTable(data) {
     if (pageData.length === 0) {
         tbody.innerHTML = `<tr><td colspan="4">暂无数据</td></tr>`;
     } else {
-        for (const c of pageData) {
+        for (const contract of pageData) {
             const row = `
                 <tr>
-                    <td>${c.id}</td>
-                    <td>${c.name}</td>
-                    <td>${c.status}</td>
+                    <td>${contract.num}</td>
+                    <td>${contract.name}</td>
+                    <td>${contract.state}</td>
                     <td>
-                        <a href="/contractManagement/finalizeContract.html?id=${c.id}">修改</a>
-                        <button onclick="deleteContract('${contract.id}')">删除</button>
+                        <a href="/contractManagement/finalizeContract.html?id=${contract.num}">修改</a>
+                        <button onclick="deleteContract('${contract.num}')">删除</button>
                     </td>
                 </tr>`;
             tbody.insertAdjacentHTML('beforeend', row);
@@ -113,10 +113,29 @@ function addContract() {
 
 
 // 删除合同
-function deleteContract(contractId) {
-    if (confirm(`确认删除合同 ${contractId} 吗？`)) {
+async function deleteContract(contractId) {
+    if (!confirm(`确认删除合同 ${contractId} 吗？`)) return;
+
+    try {
+        const response = await fetch(`/api/contract/deleteAll/${contractId}`, {
+            method: 'DELETE',
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+            throw new Error(data.msg || "删除失败");
+        }
+
+        // 从前端列表中移除已删除合同
         contracts = contracts.filter(c => c.id !== contractId);
         renderTable(contracts);
+        alert(`合同 ${contractId} 删除成功`);
+        location.reload();
+
+    } catch (err) {
+        console.error('删除失败:', err);
+        alert(`删除失败: ${err.message}`);
     }
 }
 

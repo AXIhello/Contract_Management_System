@@ -251,6 +251,10 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         //TODO:显示附件列表，提供下载功能
     }
 
+    @Override
+    public List<Contract> getAllContracts() {
+        return contractMapper.selectList(null);
+    }
 
 
     private ContractPendingDTO convertToDTO(Contract contract) {

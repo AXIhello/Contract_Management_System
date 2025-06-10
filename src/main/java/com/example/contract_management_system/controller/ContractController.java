@@ -1,6 +1,7 @@
 package com.example.contract_management_system.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.contract_management_system.dto.ContractDTO;
 import com.example.contract_management_system.dto.ContractPendingDTO;
 import com.example.contract_management_system.dto.AssignContractRequest;
 import com.example.contract_management_system.pojo.*;
@@ -14,13 +15,9 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.*;
 
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 
 import org.slf4j.Logger;
@@ -156,6 +153,59 @@ public class ContractController {
 
         return response;
     }
+
+    @GetMapping("/list")
+    public List<ContractDTO> getContracts() {
+        // 查询所有合同
+        List<Contract> contracts = contractService.list();
+
+        List<ContractDTO> contractDTOList = new ArrayList<>();
+        for (Contract contract : contracts) {
+            ContractDTO dto = new ContractDTO();
+            dto.setNum(contract.getNum());
+            dto.setName(contract.getName());
+            dto.setCustomer(contract.getCustomer());
+
+            ContractState state = contractStateService.getById(contract.getNum());
+            if (state != null) {
+                dto.setState(state.getType());
+            } else {
+                dto.setState(0); // 默认状态为 0
+            }
+
+            contractDTOList.add(dto);
+        }
+
+        return contractDTOList;
+    }
+
+    @DeleteMapping("/deleteAll/{contractId}")
+    public Result<Void> deleteAllContractData(@PathVariable("contractId") int contractId) {
+        try {
+            Integer userId = userService.getCurrentUserId();
+            Contract  contract = contractService.getById(contractId);
+            // 1. 删除合同流程
+            contractProcessService.remove(new QueryWrapper<ContractProcess>().eq("conNum", contractId));
+
+            logService.addLog(userId, 2, "ContractProcess", "ContactName: " + contract.getName());
+
+            // 2. 删除合同状态
+            contractStateService.remove(new QueryWrapper<ContractState>().eq("conNum", contractId));
+
+            logService.addLog(userId, 2, "ContractState", "ContactName: " + contract.getName());
+
+            // 3. 最后删除合同本身
+            contractService.removeById(contractId);
+
+            logService.addLog(userId, 2, "Contract", "ContactName: " + contract.getName());
+
+            return Result.success();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("删除失败：" + e.getMessage());
+        }
+    }
+
 
 
     @GetMapping("/name")
