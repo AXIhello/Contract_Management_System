@@ -138,6 +138,8 @@ public class RightController {
         List<String> roleNames = (List<String>) payload.get("roles");
 
         try {
+            // 先删除该用户已有的所有角色记录
+            rightService.removeAllRolesFromUser(userId);
             rightService.assignRolesToUser(userId, roleNames);
             return Result.success("用户权限分配成功");
         } catch (Exception e) {

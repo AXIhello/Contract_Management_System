@@ -1,5 +1,6 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.dto.RoleRequest;
 import com.example.contract_management_system.mapper.RoleMapper;
@@ -77,7 +78,7 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
 
     @Override
     public boolean updateRoleByName(RoleRequest dto) {
-        Role existing = roleMapper.selectByName(dto.getName());
+        Role existing = roleMapper.selectByName(dto.getOldName());
         if (existing == null) return false;
 
         existing.setDescription(dto.getDesc());
@@ -95,5 +96,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return roleMapper.selectRoleNamesWithRight(rightName);
     }
 
-
+    @Override
+    public Role getByName(String name) {
+        QueryWrapper<Role> query = new QueryWrapper<>();
+        query.eq("name", name);
+        return roleMapper.selectOne(query);
+    }
 }

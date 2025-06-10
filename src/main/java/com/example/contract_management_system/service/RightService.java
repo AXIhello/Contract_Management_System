@@ -12,4 +12,6 @@ public interface RightService {
     void assignRolesToUser(int userId, List<String> roleNames);
 
     List<User> selectUserWithRole(String roleName);
+
+    void removeAllRolesFromUser(int userId);
 }

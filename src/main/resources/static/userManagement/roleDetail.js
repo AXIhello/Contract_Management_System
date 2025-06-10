@@ -1,4 +1,5 @@
 const roleName = new URLSearchParams(window.location.search).get('name');
+const role = fetchRoleByName(roleName);
 
 const allPerms = [
     { group: '合同管理', perms: [
@@ -14,7 +15,6 @@ const allPerms = [
         { value: 'assign_countersign', label: '分配会签' },
         { value: 'assign_approve', label: '分配审批' },
         { value: 'assign_sign', label: '分配签订' },
-        { value: 'query_process', label: '流程查询' },
     ]},
     { group: '用户管理', perms: [
         { value: 'add_user', label: '新增用户' },
@@ -28,12 +28,6 @@ const allPerms = [
         { value: 'query_role', label: '查询角色' },
         { value: 'delete_role', label: '删除角色' },
     ]},
-    { group: '功能操作', perms: [
-        { value: 'add_func', label: '新增功能' },
-        { value: 'edit_func', label: '编辑功能' },
-        { value: 'query_func', label: '查询功能' },
-        { value: 'delete_func', label: '删除功能' },
-    ]},
     { group: '权限管理', perms: [
         { value: 'assign_perm', label: '配置权限' },
     ]},
@@ -44,8 +38,31 @@ const allPerms = [
         { value: 'delete_client', label: '删除客户' },
     ]},
 ];
+async function fetchRoleByName(roleName) {
+    try {
+        const response = await fetch(`/api/role/${encodeURIComponent(roleName)}`);
+        const result = await response.json();
+
+        if (result.success) {
+            const role = result.data;
+
+            // 填入到页面元素中
+            document.getElementById('roleName').value = role.name;
+            document.getElementById('roleDescription').textContent = role.description || "无描述";
+        } else {
+            alert("获取角色失败: " + result.msg);
+        }
+    } catch (error) {
+        console.error("请求失败:", error);
+        alert("系统异常，无法获取角色信息");
+    }
+}
 
 function renderPerms(selectedPerms) {
+    document.getElementById('roleName').value = roleName;
+    document.getElementById('roleDesc').value = role.description || "未知描述";
+
+
     const permList = document.getElementById('permList');
     permList.innerHTML = '';
     allPerms.forEach(group => {
@@ -93,6 +110,7 @@ window.addEventListener('DOMContentLoaded', () => {
         });
 });
 
+
 function resetForm() {
     window.location.reload();
 }
@@ -106,7 +124,7 @@ async function submitEdit() {
         document.getElementById('errorMsg').style.display = 'block';
         return;
     }
-    const data = { name, desc, perms };
+    const data = { roleName, name, desc, perms };
     try {
         const res = await fetch('/api/role/update', {
             method: 'POST',

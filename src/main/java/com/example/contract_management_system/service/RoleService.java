@@ -20,4 +20,7 @@ public interface RoleService extends IService<Role> {
     boolean updateRoleByName(RoleRequest dto);
 
     List<String> selectRoleNamesWithRight(String rightName);
+
+    Role getByName(String name);
+
 }

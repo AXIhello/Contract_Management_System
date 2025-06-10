@@ -1,7 +1,9 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.example.contract_management_system.mapper.RightMapper;
 import com.example.contract_management_system.mapper.UserMapper;
+import com.example.contract_management_system.pojo.Right;
 import com.example.contract_management_system.pojo.User;
 import com.example.contract_management_system.service.LogService;
 import com.example.contract_management_system.service.RightService;
@@ -47,5 +49,12 @@ public class RightServiceImpl implements RightService {
             users.add(userMapper.selectById(userId));
         }
         return users;
+    }
+
+    @Override
+    public void removeAllRolesFromUser(int userId) {
+        QueryWrapper<Right> query = new QueryWrapper<>();
+        query.eq("user_id", userId);
+        rightMapper.delete(query);
     }
 }

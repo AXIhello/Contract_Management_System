@@ -19,8 +19,8 @@ function renderTable(data) {
                 <button onclick="window.location.href='/userManagement/roleDetail.html?name=${role.name}'">编辑</button>
             </td>
         `;
-        // 右键菜单删除，admin 和 operator 不可删除
-        if (role.name !== 'admin' && role.name !== 'operator') {
+        // 右键菜单删除，管理员不可删除
+        if (role.name !== '管理员') {
             row.addEventListener('contextmenu', function(e) {
                 e.preventDefault();
                 if (confirm(`确定要删除角色：${role.name} 吗？`)) {
@@ -54,8 +54,6 @@ function prevPage() { if (currentPage > 1) { currentPage--; renderTable(roles); 
 function nextPage() { const maxPage = Math.ceil(roles.length / itemsPerPage); if (currentPage < maxPage) { currentPage++; renderTable(roles); } }
 function goToLastPage() { currentPage = Math.ceil(roles.length / itemsPerPage); renderTable(roles); }
 
-// 注册时保留字检测：由后端保证不允许 admin/operator 注册
-
 fetch('/api/role/list')
     .then(res => {
         return res.json().then(data => {
@@ -75,8 +73,6 @@ fetch('/api/role/list')
         // 过滤掉 admin 和 operator，避免重复
         const dynamicRoles = data.filter(r => r.name !== 'admin' && r.name !== 'operator');
         roles = [
-            { name: 'admin' },
-            { name: 'operator' },
             ...dynamicRoles
         ];
         renderTable(roles);

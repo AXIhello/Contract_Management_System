@@ -7,9 +7,10 @@ async function goToDashboard() {
 
         const data = await response.json();
 
-        fetch(`/right/isAdmin/${data.userId}`)
-            .then(res => res.json())
-            .then(isAdmin => {
+        fetch(`/api/right/isAdmin/${data.userId}`)
+            .then(res => res.text())  // 注意：返回的是文本，需要转成布尔值
+            .then(text => {
+                const isAdmin = text === "true";
                 if (isAdmin) {
                     window.location.href = "/dashboard-admin.html";
                 } else {
@@ -18,7 +19,6 @@ async function goToDashboard() {
             })
             .catch(err => {
                 console.error("权限判断失败", err);
-                // 权限判断失败也跳转普通页面或者给提示
                 window.location.href = "/dashboard-user.html";
             });
 

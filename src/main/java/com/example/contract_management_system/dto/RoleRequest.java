@@ -6,6 +6,10 @@ import lombok.*;
 import java.util.List;
 
 public class RoleRequest {
+    @JsonProperty("oldName")
+    @Getter
+    @Setter
+    private String oldName;
     @JsonProperty("name")
     @Getter
     @Setter

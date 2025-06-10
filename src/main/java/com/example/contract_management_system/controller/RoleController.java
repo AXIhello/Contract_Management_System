@@ -22,6 +22,16 @@ public class RoleController {
     @GetMapping("/list")
     public List<Role> getAllRoles() {
         return roleService.getAllRoles();}
+
+    @GetMapping("/{name}")
+    public Result<Role> getRoleByName(@PathVariable("name") String name) {
+        Role role = roleService.getByName(name);  // 你需要确保 roleService 有这个方法
+        if (role != null) {
+            return Result.success(role);
+        } else {
+            return Result.error("未找到该角色");
+        }
+    }
     @PreAuthorize("hasAuthority('add_role')")
     @PostMapping("/add")
     public Result<String> addRole(@RequestBody RoleRequest roleRequest) {
@@ -58,15 +68,32 @@ public class RoleController {
         RoleRequest roleRequest = roleService.getRoleDetailByName(name);
         return roleRequest != null ? Result.success(roleRequest) : Result.error("角色不存在");
     }
-    // 修改角色（根据 name 更新）
+
+    //更新用户
     @PreAuthorize("hasAuthority('edit_role')")
     @PostMapping("/update")
     public Result<String> updateRole(@RequestBody RoleRequest roleRequest) {
-        if (roleRequest.getName() == null || roleRequest.getName().trim().isEmpty()) {
+        String newName = roleRequest.getName();
+        String oldName = roleRequest.getOldName();
+
+        if (newName == null || newName.trim().isEmpty()) {
             return Result.error("角色名称不能为空");
         }
 
-        boolean updated = roleService.updateRoleByName(roleRequest);
-        return updated ? Result.success("修改成功") : Result.error("修改失败或角色不存在");
+        // 名称没变，直接更新
+        if (newName.equals(oldName)) {
+            boolean updated = roleService.updateRoleByName(roleRequest);
+            return updated ? Result.success("修改成功") : Result.error("修改失败或角色不存在");
+        } else {
+            // 名称变了，先删除旧的，再插入新的
+            boolean deleted = roleService.deleteByName(oldName);
+            if (!deleted) {
+                return Result.error("原角色不存在，无法重命名");
+            }
+
+            boolean added = roleService.addRole(newName, roleRequest.getDesc(), roleRequest.getPerms());
+            return added ? Result.success("重命名并保存成功") : Result.error("保存新角色失败");
+        }
     }
+
 }
