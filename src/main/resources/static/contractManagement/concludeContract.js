@@ -105,10 +105,10 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 提交结项
-    document.getElementById("concludeForm").addEventListener("submit", (e) => {
+    document.getElementById("signContractForm").addEventListener("submit", (e) => {
         e.preventDefault();
 
-        const comments = document.getElementById("concludeComments").value.trim();
+        const comments = document.getElementById("signInfo").value.trim();
 
         if (comments === "") {
             alert("请填写结项说明");
