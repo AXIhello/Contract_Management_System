@@ -141,7 +141,7 @@ async function submitCountersign() {
         const data = await res.json();
         if (!res.ok) {
             if (data.code === 403) {
-                throw new Error("权限不足，无法提交会签");
+                throw new Error("权限不足，无法会签合同");
             } else if (data.code === 401) {
                 throw new Error("未登录或登录已过期，请重新登录");
             } else {

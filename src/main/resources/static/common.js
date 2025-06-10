@@ -7,17 +7,6 @@ async function goToDashboard() {
 
         const data = await response.json();
 
-        if (!response.ok) {
-            // 权限不足或未登录等
-            if (data.code === 403) {
-                throw new Error("权限不足，无法起草合同");
-            } else if (data.code === 401) {
-                throw new Error("未登录或登录已过期，请重新登录");
-            } else {
-                throw new Error(data.msg || "请求失败");
-            }
-        }
-
         fetch(`/right/isAdmin/${data.userId}`)
             .then(res => res.json())
             .then(isAdmin => {

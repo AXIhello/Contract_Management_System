@@ -22,7 +22,7 @@ window.onload = async function () {
 
         if (!response.ok) {
             if (result.code === 403) {
-                throw new Error("权限不足，无法起草合同");
+                throw new Error("权限不足，无法查询合同");
             } else if (result.code === 401) {
                 throw new Error("未登录或登录已过期，请重新登录");
             } else {
@@ -301,7 +301,7 @@ function handleFormSubmit(form, contractId) {
 
             if (!res.ok) {
                 if (result.code === 403) {
-                    throw new Error("权限不足，无法提交合同");
+                    throw new Error("权限不足，无法定稿合同");
                 } else if (result.code === 401) {
                     throw new Error("未登录或登录已过期，请重新登录");
                 } else {

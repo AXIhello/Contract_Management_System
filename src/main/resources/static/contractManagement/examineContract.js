@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 获取合同审批信息
-    fetch(`/api/contract/approvalInfo/${contractId}`, {
+    fetch("/api/contract/approvalInfo/${contractId}", {
         method: 'GET',
         credentials: 'include',
     })

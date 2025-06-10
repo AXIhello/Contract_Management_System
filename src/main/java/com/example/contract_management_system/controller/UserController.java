@@ -59,25 +59,46 @@ public class UserController {
         }
     }
 
+    @PreAuthorize("hasAuthority('add_user')")
+    @PostMapping("/add")
+    public Result<String> add(@RequestParam String username,
+                                   @RequestParam String password,
+                                   @RequestParam String confirmPassword) {
+        User user = new User();
+        user.setUsername(username);
+        user.setPassword(password);
+
+
+        boolean success = userService.register(user, confirmPassword);
+        if (success) {
+            return Result.success("添加成功");
+        } else {
+            return Result.error("用户名已存在！");
+        }
+    }
+
     @PostMapping("/login")
-    public Result<String> login(@RequestParam String username,
-                                @RequestParam String password,
-                                HttpSession session) {
+    public Result<Map<String, Object>> login(@RequestParam String username,
+                                             @RequestParam String password,
+                                             HttpSession session) {
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(username, password);
         try {
             Authentication authentication = authenticationManager.authenticate(authToken);
-            // 登录成功，将认证信息存入Security上下文和session
             SecurityContextHolder.getContext().setAuthentication(authentication);
             session.setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
 
-            // 查询数据库，返回完整用户信息
             QueryWrapper<User> query = new QueryWrapper<>();
             query.eq("username", username);
-
             User user = userMapper.selectOne(query);
 
-            return Result.success(user.getUsername() + user.getUserId() +"登录成功");
+            // 创建返回的数据Map
+            Map<String, Object> data = new HashMap<>();
+            data.put("userId", user.getUserId());
+            data.put("username", user.getUsername());
+            data.put("message", "登录成功");
+
+            return Result.success(data);
         } catch (AuthenticationException e) {
             return Result.error("用户名或密码错误");
         }

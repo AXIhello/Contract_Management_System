@@ -112,7 +112,7 @@ public class ContractController {
                                 break;
                             }
 
-                            boolean logSuccess = logService.addLog(userId, 1, "ConTractAttachment", file.getOriginalFilename());
+                            boolean logSuccess = logService.addLog(userId, 1, "ConTractAttachment", contract.getName()+ " " + file.getOriginalFilename());
                             if (!logSuccess) {
                                 response.put("success", false);
                                 response.put("message", "合同起草成功，但日志记录失败");
@@ -225,7 +225,6 @@ public class ContractController {
     }
 
     @PreAuthorize("hasAuthority('finalize_contract')")
-
     @PostMapping("/finalize/{contractNum}")
     public Result<String> finalizeContract(
             @PathVariable Integer contractNum,
@@ -260,14 +259,12 @@ public class ContractController {
     }
 
 
-    @PreAuthorize("hasAuthority('approve_contract')")
     @GetMapping("/approvalInfo/{id}")
     public Map<String, Object> getApprovalInfo(@PathVariable Integer id) {
         // 获取合同审批相关信息
         return contractProcessService.getContractApprovalInfo(id);
     }
 
-    @PreAuthorize("hasAuthority('sign_contract')")
     @GetMapping("/concludeInfo/{id}")
     public Map<String, Object> getConcludeInfoInfo(@PathVariable Integer id) {
         // 合同签订

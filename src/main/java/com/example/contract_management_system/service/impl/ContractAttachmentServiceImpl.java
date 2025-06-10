@@ -3,7 +3,8 @@ package com.example.contract_management_system.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.mapper.ContractAttachmentMapper;
-import com.example.contract_management_system.pojo.ContractAttachment;
+import com.example.contract_management_system.mapper.ContractMapper;
+import com.example.contract_management_system.pojo.*;
 import com.example.contract_management_system.service.ContractAttachmentService;
 import com.example.contract_management_system.service.LogService;
 import com.example.contract_management_system.service.UserService;
@@ -30,6 +31,7 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
     private static final Logger logger = LoggerFactory.getLogger(ContractAttachmentServiceImpl.class);
 
     private final ContractAttachmentMapper contractAttachmentMapper;
+    private final ContractMapper contractMapper;
 
     @Value("${file.upload.path}")
     private String uploadPath;
@@ -37,8 +39,9 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
     private final LogService logService;
     private final UserService userService;
 
-    public ContractAttachmentServiceImpl(ContractAttachmentMapper contractAttachmentMapper, LogService logService, UserService userService) {
+    public ContractAttachmentServiceImpl(ContractAttachmentMapper contractAttachmentMapper, ContractMapper contractMapper, LogService logService, UserService userService) {
         this.contractAttachmentMapper = contractAttachmentMapper;
+        this.contractMapper = contractMapper;
         this.logService = logService;
         this.userService = userService;
     }
@@ -100,11 +103,13 @@ public class ContractAttachmentServiceImpl extends ServiceImpl<ContractAttachmen
             attachment.setType(fileType);
             attachment.setUploadTime(new Date());
 
+            Contract contract = contractMapper.selectById(conNum);
+
             boolean saved = saveAttachment(attachment);
             if (saved) {
                 logger.info("附件信息保存到数据库成功");
                 Integer userId = userService.getCurrentUserId();
-                logService.addLog(userId, 1, "ContractAttachment", originalFileName);
+                logService.addLog(userId, 1, "ContractAttachment", contract.getName()+ " " + originalFileName);
             } else {
                 logger.error("附件信息保存到数据库失败");
                 destFile.delete();
