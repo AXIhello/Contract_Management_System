@@ -37,11 +37,11 @@ public class ContractStateServiceImpl extends ServiceImpl<ContractStateMapper, C
         Integer userId = userService.getCurrentUserId();
         // 如果状态记录不存在，则插入新记录
         if (getContractState(conNum) == null) {
-            logService.addLog(userId, 1, "ContractState", contract.getName());
+            logService.addLog(userId, 1, "ContractState","ContractName: " + contract.getName());
             return save(contractState);
         }
 
-        logService.addLog(userId, 3, "ContractState", contract.getName());
+        logService.addLog(userId, 3, "ContractState","ContractName: " + contract.getName());
         // 如果状态记录存在，则更新状态
         return updateById(contractState);
     }

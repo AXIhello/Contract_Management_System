@@ -48,7 +48,7 @@ public class UserServiceImpl implements UserService {
 
         boolean success = userMapper.insert(user) > 0;
         if (success) {
-            logService.addLog(user.getUserId(), 1, "User", user.getUsername());}
+            logService.addLog(user.getUserId(), 1, "User","UserName: " + user.getUsername());}
         return success;
     }
 
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean deleteUserById(int userId){
         User user = getById(userId);
-        logService.addLog(userId, 2, "User", user.getUsername());
+        logService.addLog(userId, 2, "User","UserName: " + user.getUsername());
         return userMapper.deleteById(userId) > 0;
     }
 
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean updateById(User user){
-        logService.addLog(user.getUserId(), 3, "User", user.getUsername());
+        logService.addLog(user.getUserId(), 3, "User","UserName: " + user.getUsername());
         return userMapper.updateById(user) > 0;
     }
 

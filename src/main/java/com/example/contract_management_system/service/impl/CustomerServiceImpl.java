@@ -29,7 +29,7 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
     @Override
     public boolean addCustomer(Customer customer){
         Integer userId = userService.getCurrentUserId();
-        logService.addLog(userId, 1, "Customer", customer.getName());
+        logService.addLog(userId, 1, "Customer","CustomerName: " +  customer.getName());
         return customerMapper.insert(customer) > 0;
     }
 
@@ -52,14 +52,14 @@ public class CustomerServiceImpl extends ServiceImpl<CustomerMapper, Customer> i
     public boolean deleteCustomerById(Integer num){
         Customer customer = customerMapper.selectById(num);
         Integer userId = userService.getCurrentUserId();
-        logService.addLog(userId, 2, "Customer", customer.getName());
+        logService.addLog(userId, 2, "Customer","CustomerName: " +  customer.getName());
         return customerMapper.deleteById(num)>0;
     }
 
     @Override
     public boolean updateCustomer(Customer customer){
         Integer userId = userService.getCurrentUserId();
-        logService.addLog(userId, 3, "Customer", customer.getName());
+        logService.addLog(userId, 3, "Customer","CustomerName: " + customer.getName());
         return customerMapper.updateById(customer)>0;
     }
 }

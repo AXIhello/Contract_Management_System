@@ -112,7 +112,7 @@ public class ContractController {
                                 break;
                             }
 
-                            boolean logSuccess = logService.addLog(userId, 1, "ConTractAttachment", contract.getName()+ " " + file.getOriginalFilename());
+                            boolean logSuccess = logService.addLog(userId, 1, "ConTractAttachment", "ContractName: " + contract.getName()+ ", AttachName: " + file.getOriginalFilename());
                             if (!logSuccess) {
                                 response.put("success", false);
                                 response.put("message", "合同起草成功，但日志记录失败");
@@ -132,7 +132,7 @@ public class ContractController {
                     response.put("contractId", contract.getNum());
                 }
 
-                boolean logSuccess = logService.addLog(userId, 1, "ConTract", contractName);
+                boolean logSuccess = logService.addLog(userId, 1, "ConTract","ContractName: " + contractName);
                 if (!logSuccess) {
                     response.put("success", false);
                     response.put("message", "合同起草成功，但日志记录失败");

@@ -210,7 +210,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
             logger.info("合同定稿状态保存结果: {}", stateSaved);
 
             Contract contract = contractMapper.selectById(contractNum);
-            logService.addLog(userId, 3,"Contract", contract.getName());
+            logService.addLog(userId, 3,"Contract", "ContarctName: " + contract.getName());
 
             return stateSaved;
         }
