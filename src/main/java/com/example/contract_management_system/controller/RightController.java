@@ -44,8 +44,8 @@ public class RightController {
         return result;
     }
 
-    @PreAuthorize("hasAuthority('query_user')")
     // 获取用户的用户名和角色
+    @PreAuthorize("hasAuthority('query_user')")
     @GetMapping("/userinfo/{userId}")
     public Map<String, Object> getUserInfo(@PathVariable("userId") int userId) {
         Map<String, Object> result = new HashMap<>();
@@ -62,6 +62,23 @@ public class RightController {
         result.put("roleNames", roleNames != null ? roleNames : Collections.emptyList());
         return result;
     }
+
+    @GetMapping("/isAdmin/{userId}")
+    public boolean isAdmin(@PathVariable("userId") int userId) {
+        boolean result = false;
+        User user = userService.getById(userId);
+        if (user == null) return result;
+
+        List<String> roleNames = rightService.selectRoleNameByUserId(userId);
+        for (String roleName : roleNames) {
+            if (roleName.equals("管理员")) {
+                result = true;
+                break;
+            }
+        }
+        return result;
+    }
+
     @PreAuthorize("hasAuthority('assign_perm')")
     // 分配角色给用户
     @PostMapping("/assign")

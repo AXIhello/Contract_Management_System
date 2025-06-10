@@ -82,23 +82,26 @@ function viewContract(id) {
 }
 
 
-// 页面加载时获取数据
 fetch('/api/contract/approvalConclude')
-    .then(res => {
-        return res.json().then(data => {
-            if (!res.ok) {
-                if (data.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
-                } else if (data.code === 401) {
-                    throw new Error("未登录或登录已过期，请重新登录");
-                } else {
-                    throw new Error(data.msg || "请求失败");
-                }
+    .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+            if (data.code === 403) {
+                alert("权限不足，无法起草合同");
+                window.location.href = '/dashboard-user.html';
+                return null;  // 停止后续执行
+            } else if (data.code === 401) {
+                alert("未登录或登录已过期，请重新登录");
+                window.location.href = "/login.html";  // 跳登录页
+                return null;
+            } else {
+                throw new Error(data.msg || "请求失败");
             }
-            return data;
-        });
+        }
+        return data;
     })
     .then(data => {
+        if (!data) return;  // 如果之前跳转了就停止
         contracts = data;
         renderTable(contracts);
     })
@@ -106,6 +109,7 @@ fetch('/api/contract/approvalConclude')
         console.error('获取待签订合同列表失败:', err);
         alert(err.message || '系统异常，获取数据失败！');
     });
+
 
 
 

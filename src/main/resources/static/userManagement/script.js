@@ -42,15 +42,26 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.log(data);
 
                 if (data.success) {
-                    alert("登录成功，欢迎 " + username);
-                    if (username === "admin") {
-                        window.location.href = "/dashboard-admin.html";
-                    } else {
-                        window.location.href = "/dashboard-user.html";
-                    }
+                    alert("登录成功，欢迎 " + data.username);
+                    // 调用后台接口判断是否管理员
+                    fetch(`/right/isAdmin/${data.userId}`)
+                        .then(res => res.json())
+                        .then(isAdmin => {
+                            if (isAdmin) {
+                                window.location.href = "/dashboard-admin.html";
+                            } else {
+                                window.location.href = "/dashboard-user.html";
+                            }
+                        })
+                        .catch(err => {
+                            console.error("权限判断失败", err);
+                            // 权限判断失败也跳转普通页面或者给提示
+                            window.location.href = "/dashboard-user.html";
+                        });
                 } else {
                     error.textContent = data.msg;
                 }
+
             } catch (err) {
                 error.textContent = err.message || "网络错误，请稍后再试";
                 console.error(err);
