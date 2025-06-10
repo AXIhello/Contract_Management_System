@@ -14,6 +14,6 @@ public interface ContractMapper extends BaseMapper<Contract> {
 //    int updateContractState(@Param("contractId") Integer contractId, @Param("state") Integer state);
 
     @Select("SELECT name FROM contract WHERE num = #{num}")
-    String findContractNameById(@Param("id") int id);
+    String findContractNameById(int num);
 }
 

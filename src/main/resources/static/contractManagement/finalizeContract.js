@@ -311,7 +311,7 @@ function handleFormSubmit(form, contractId) {
 
             if (res.ok && result.code === 200) {
                 alert("提交成功");
-                window.location.href = "/contract/list"; // 或其他跳转
+                window.location.href = "/queryAndStatistics/toBeFinalizedContractList.html";
             } else {
                 alert("提交失败：" + result.msg);
             }

@@ -233,9 +233,9 @@ function cancelAssign() {
 // 动态设置合同标题
 function updateContractTitle(contractName) {
     const titleElem = document.getElementById('contractTitle');
-    if(!titleElem)
+    if(titleElem)
         titleElem.textContent = `流程配置：${contractName}`;
-    else titleElem.textContent = `未知合同`;
+    else titleElem.textContent = `未知合同||updateError`;
 }
 
 // 绑定按钮事件
@@ -290,12 +290,12 @@ window.addEventListener('DOMContentLoaded', () => {
             return data;
         })
         .then(data => {
-            updateContractTitle(data.name || '未知合同');
+            updateContractTitle(data.name || '未知合同||dataNull');
         })
         .catch(err => {
             console.error('获取合同名失败:', err);
             alert(err.message || '获取合同名失败');
-            updateContractTitle('未知合同');
+            updateContractTitle('未知合同||catchError');
         });
 
 
