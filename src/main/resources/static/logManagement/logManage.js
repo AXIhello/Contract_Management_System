@@ -6,18 +6,18 @@ const pageSize = 10;
 // 初始化模拟数据（实际应从后端获取）
 window.onload = function () {
     // 示例数据
-    allLogs = Array.from({ length: 53 }, (_, i) => ({
-        userName: "用户" + ((i % 5) + 1),
-        content: `执行了操作 ${i + 1}`,
-        time: new Date(Date.now() - i * 3600000).toISOString().slice(0, 19).replace('T', ' ')
-    }));
+    // allLogs = Array.from({ length: 53 }, (_, i) => ({
+    //     userName: "用户" + ((i % 5) + 1),
+    //     content: `执行了操作 ${i + 1}`,
+    //     time: new Date(Date.now() - i * 3600000).toISOString().slice(0, 19).replace('T', ' ')
+    // }));
 
     filteredLogs = [...allLogs];
     renderTable();
 };
 
 function loadLogs() {
-    fetch('/api/log/all')
+    fetch('/api/log/list')
         .then(res => res.json().then(data => {
             if (!res.ok) {
                 if (data.code === 403) {
@@ -54,7 +54,7 @@ function renderTable() {
     pageData.forEach(log => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${log.userName}</td>
+            <td>${log.userId}</td>
             <td>${log.content}</td>
             <td>${log.time}</td>
         `;
@@ -66,12 +66,12 @@ function renderTable() {
 }
 
 function searchLogs() {
-    const userInput = document.getElementById('userName').value.trim().toLowerCase();
+    const userInput = document.getElementById('userId').value.trim();
     const startTime = document.getElementById('startTime').value;
     const endTime = document.getElementById('endTime').value;
 
     filteredLogs = allLogs.filter(log => {
-        const matchesUser = !userInput || log.userName.toLowerCase().includes(userInput);
+        const matchesUser = !userInput || log.userId.includes(userInput);
         const matchesStart = !startTime || log.time >= startTime.replace("T", " ");
         const matchesEnd = !endTime || log.time <= endTime.replace("T", " ");
         return matchesUser && matchesStart && matchesEnd;
@@ -82,7 +82,7 @@ function searchLogs() {
 }
 
 function resetSearch() {
-    document.getElementById('userName').value = '';
+    document.getElementById('userId').value = 0;
     document.getElementById('startTime').value = '';
     document.getElementById('endTime').value = '';
 
@@ -118,9 +118,9 @@ function exportLogs() {
     }
 
     const csvRows = [
-        "操作人,操作内容,操作时间",
+        "操作人ID,操作内容,操作时间",
         ...filteredLogs.map(log =>
-            `"${log.userName}","${log.content}","${log.time}"`
+            `"${log.userId}","${log.content}","${log.time}"`
         )
     ];
 

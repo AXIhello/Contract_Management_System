@@ -1,5 +1,6 @@
 package com.example.contract_management_system.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.contract_management_system.mapper.LogMapper;
 import com.example.contract_management_system.pojo.Log;
@@ -7,6 +8,7 @@ import com.example.contract_management_system.service.LogService;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogService {
@@ -45,4 +47,11 @@ public class LogServiceImpl extends ServiceImpl<LogMapper, Log> implements LogSe
     public boolean addLog(int userId, int type, String object, String name) {
         return addLog(userId, type, object, name, new Date(new java.util.Date().getTime()));
     }
+
+    @Override
+    public List<Log> getAllLogs() {
+        return logMapper.selectList(null);
+    }
+
+
 }
