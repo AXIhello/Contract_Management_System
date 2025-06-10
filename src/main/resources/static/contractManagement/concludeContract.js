@@ -333,13 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("concludeForm").addEventListener("submit", (e) => {
         e.preventDefault();
 
-        const result = document.querySelector('input[name="concludeResult"]:checked');
         const comments = document.getElementById("concludeComments").value.trim();
-
-        if (!result) {
-            alert("请选择结项结果（成功或失败）");
-            return;
-        }
 
         if (comments === "") {
             alert("请填写结项说明");
@@ -348,11 +342,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const payload = {
             contractId,
-            concludeResult: result.value,
             concludeOpinion: comments,
         };
 
-        fetch("/api/contract/submitSign", {
+        fetch(`/api/contract/submitSign`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
