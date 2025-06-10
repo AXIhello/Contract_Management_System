@@ -234,7 +234,7 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
     public List<Map<String, Object>> getPendingExamineContracts(Integer userId) {
         try {
             // 获取当前用户待审批的合同列表
-            List<Integer> contractIds = contractStateMapper.selectContractsByState(2);
+            List<Integer> contractIds = contractProcessMapper.getPendingExamineContracts(userId);
             List<Map<String, Object>> contracts = new ArrayList<>();
 
             

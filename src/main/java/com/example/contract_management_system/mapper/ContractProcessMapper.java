@@ -25,6 +25,10 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "WHERE user_id  = #{userId} AND type = 1 AND state = 0")
     List<Integer> getPendingCountersignContracts(@Param("userId") Integer userId);
 
+    @Select("SELECT conNum FROM contract_process " +
+            "WHERE user_id  = #{userId} AND type = 2 AND state = 0")
+    List<Integer> getPendingExamineContracts(@Param("userId") Integer userId);
+
     @Select("SELECT * FROM contract_process " +
             "WHERE conNum = #{conNum} AND user_id = #{userId} AND type = #{type}")
     ContractProcess getContractProcess(@Param("conNum") Integer conNum,
@@ -55,26 +59,6 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
             "FROM contract_process " +
             "WHERE conNum = #{conNum} AND type = 3 AND (state = 0 OR state = 2)")
     boolean checkAllConclude(@Param("conNum") Integer conNum);
-
-
-
-    @Select("SELECT cp.conNum " +
-            "FROM contract_process cp " +
-            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
-            "WHERE cp.user_id = #{userId} " +
-            "AND cp.type = 2 " +
-            "AND cp.state = 0 " +
-            "AND cs.type = 3")
-    List<Integer> getPendingExamineContracts(@Param("userId") Integer userId);
-
-    @Select("SELECT cp.conNum " +
-            "FROM contract_process cp " +
-            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
-            "WHERE cp.user_id = #{userId} " +
-            "AND cp.type = 3 " +
-            "AND cp.state = 0 " +
-            "AND cs.type = 4")
-    List<Integer> getPendingConcludeContracts(@Param("userId") Integer userId);
 
     @Select("SELECT content " +
             "FROM contract_process " +
