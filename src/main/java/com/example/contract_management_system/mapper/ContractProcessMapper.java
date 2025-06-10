@@ -21,13 +21,32 @@ public interface ContractProcessMapper extends BaseMapper<ContractProcess> {
                               @Param("content") String content,
                               @Param("time") Timestamp time );
 
-    @Select("SELECT conNum FROM contract_process " +
-            "WHERE user_id  = #{userId} AND type = 1 AND state = 0")
+    @Select("SELECT cp.conNum " +
+            "FROM contract_process cp " +
+            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
+            "WHERE cp.user_id = #{userId} " +
+            "AND cp.type = 1 " +
+            "AND cp.state = 0 " +
+            "AND cs.type = 1")
     List<Integer> getPendingCountersignContracts(@Param("userId") Integer userId);
 
-    @Select("SELECT conNum FROM contract_process " +
-            "WHERE user_id  = #{userId} AND type = 2 AND state = 0")
+    @Select("SELECT cp.conNum " +
+            "FROM contract_process cp " +
+            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
+            "WHERE cp.user_id = #{userId} " +
+            "AND cp.type = 2 " +
+            "AND cp.state = 0 " +
+            "AND cs.type = 3")
     List<Integer> getPendingExamineContracts(@Param("userId") Integer userId);
+
+    @Select("SELECT cp.conNum " +
+            "FROM contract_process cp " +
+            "JOIN contract_state cs ON cp.conNum = cs.conNum " +
+            "WHERE cp.user_id = #{userId} " +
+            "AND cp.type = 3 " +
+            "AND cp.state = 0 " +
+            "AND cs.type = 4")
+    List<Integer> getPendingConcludeContracts(@Param("userId") Integer userId);
 
     @Select("SELECT * FROM contract_process " +
             "WHERE conNum = #{conNum} AND user_id = #{userId} AND type = #{type}")
