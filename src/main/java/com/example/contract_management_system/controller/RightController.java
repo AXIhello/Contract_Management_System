@@ -14,10 +14,12 @@ public class RightController {
 
     private final UserService userService;
     private final RightService rightService;
+    private final RoleService roleService;
 
-    public RightController(UserService userService, RightService rightService) {
+    public RightController(UserService userService, RightService rightService, RoleService roleService) {
         this.userService = userService;
         this.rightService = rightService;
+        this.roleService = roleService;
     }
 
     // 控制器
@@ -42,6 +44,55 @@ public class RightController {
         }
 
         return result;
+    }
+
+    // 获取有对应权限的user
+    @GetMapping("/list/countersign")
+    public List<User> listUsers_countersign() {
+        List<String> roleNames = roleService.selectRoleNamesWithRight("countersign_contract");
+
+        // 使用 HashSet 来去重
+
+        Set<User> userSet = new HashSet<>();
+
+        for (String roleName : roleNames) {
+            List<User> usersWithRole = rightService.selectUserWithRole(roleName);
+            userSet.addAll(usersWithRole); // 将当前角色下的用户添加到 Set 中
+        }
+        // 返回去重后的用户列表
+        return new ArrayList<>(userSet);
+    }
+
+    @GetMapping("/list/approve")
+    public List<User> listUsers_approve() {
+        List<String> roleNames = roleService.selectRoleNamesWithRight("approve_contract");
+
+        // 使用 HashSet 来去重
+
+        Set<User> userSet = new HashSet<>();
+
+        for (String roleName : roleNames) {
+            List<User> usersWithRole = rightService.selectUserWithRole(roleName);
+            userSet.addAll(usersWithRole); // 将当前角色下的用户添加到 Set 中
+        }
+        // 返回去重后的用户列表
+        return new ArrayList<>(userSet);
+    }
+
+    @GetMapping("/list/sign")
+    public List<User> listUsers_sign() {
+        List<String> roleNames = roleService.selectRoleNamesWithRight("sign_contract");
+
+        // 使用 HashSet 来去重
+
+        Set<User> userSet = new HashSet<>();
+
+        for (String roleName : roleNames) {
+            List<User> usersWithRole = rightService.selectUserWithRole(roleName);
+            userSet.addAll(usersWithRole); // 将当前角色下的用户添加到 Set 中
+        }
+        // 返回去重后的用户列表
+        return new ArrayList<>(userSet);
     }
 
     // 获取用户的用户名和角色
@@ -79,8 +130,8 @@ public class RightController {
         return result;
     }
 
-    @PreAuthorize("hasAuthority('assign_perm')")
     // 分配角色给用户
+    @PreAuthorize("hasAuthority('assign_perm')")
     @PostMapping("/assign")
     public Result<String> assignRoles(@RequestBody Map<String, Object> payload) {
         int userId = Integer.parseInt(payload.get("userId").toString());

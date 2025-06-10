@@ -90,5 +90,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         return roleMapper.updateByName(existing) > 0;
     }
 
+    @Override
+    public List<String> selectRoleNamesWithRight(String rightName) {
+        return roleMapper.selectRoleNamesWithRight(rightName);
+    }
+
 
 }

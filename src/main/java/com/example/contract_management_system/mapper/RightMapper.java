@@ -15,4 +15,7 @@ public interface RightMapper extends BaseMapper<Right> {
 
     @Insert("INSERT INTO `right` (user_id, roleName) " + "VALUES (#{userId}, #{roleName})")
     void assignRights(int userId, String roleName);
+
+    @Select("SELECT user_id FROM `right` WHERE roleName = #{roleName}")
+    List<Integer> selectUserWithRole(String roleName);
 }

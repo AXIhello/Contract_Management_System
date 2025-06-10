@@ -104,13 +104,13 @@ class MultiSelect {
 let signerSelect, approveSelect, signListSelect;
 
 // 动态拉人员列表，初始化 MultiSelect
-function initMultiSelects(userList) {
-    signListSelect = new MultiSelect(document.getElementById('signListSelect'), userList);
-    approveSelect = new MultiSelect(document.getElementById('approveSelect'), userList);
-    signerSelect = new MultiSelect(document.getElementById('signerSelect'), userList)
+function initMultiSelects(countersignUsers, approveUsers, signUsers) {
+    signListSelect = new MultiSelect(document.getElementById('signListSelect'), signUsers);
+    approveSelect = new MultiSelect(document.getElementById('approveSelect'), approveUsers);
+    signerSelect = new MultiSelect(document.getElementById('signerSelect'), countersignUsers);
 }
 
-//提交分配
+// 提交分配
 async function submitAssign() {
     const contractId = new URLSearchParams(window.location.search).get('id');
     const id = parseInt(contractId);
@@ -202,22 +202,6 @@ async function submitAssign() {
     }
 }
 
-
-async function assignToBackend(request) {
-    const response = await fetch('/api/contract/assign', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request)
-    });
-
-    if (!response.ok) {
-        throw new Error(await response.text());
-    }
-    return response.json();
-}
-
 // 取消分配，返回上一页或刷新
 function cancelAssign() {
     if (confirm('确定取消吗？')) {
@@ -244,35 +228,50 @@ document.getElementById('btnBack').addEventListener('click', cancelAssign);
 
 // 页面启动时，调用接口获取人员列表和合同名
 window.addEventListener('DOMContentLoaded', () => {
-    // 返回User对象数组
-    fetch('/api/user/list')
-        .then(async res => {
-            const data = await res.json();
-            if (!res.ok) {
-                if (data.code === 403) {
-                    throw new Error("权限不足，无法访问人员列表");
-                } else if (data.code === 401) {
-                    throw new Error("未登录或登录已过期，请重新登录");
-                } else {
-                    throw new Error(data.msg || "请求失败");
-                }
-            }
+    // 获取会签人员列表
+    fetch('/api/right/list/countersign')
+        .then(res => res.json())
+        .then(data => {
+            if (!data) throw new Error("获取会签人员失败");
             return data;
         })
-        .then(data => {
-            initMultiSelects(data);
+        .then(countersignUsers => {
+            // 获取审批人员列表
+            fetch('/api/right/list/approve')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data) throw new Error("获取审批人员失败");
+                    return data;
+                })
+                .then(approveUsers => {
+                    // 获取签订人员列表
+                    fetch('/api/right/list/sign')
+                        .then(res => res.json())
+                        .then(data => {
+                            if (!data) throw new Error("获取签订人员失败");
+                            return data;
+                        })
+                        .then(signUsers => {
+                            // 初始化 MultiSelect 组件
+                            initMultiSelects(countersignUsers, approveUsers, signUsers);
+                        })
+                        .catch(err => {
+                            console.error(err);
+                            alert(err.message || "获取签订人员失败");
+                            initMultiSelects([], [], []);
+                        });
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert(err.message || "获取审批人员失败");
+                    initMultiSelects([], [], []);
+                });
         })
         .catch(err => {
-            console.error('获取人员列表失败:', err);
-            alert(err.message || '获取人员失败');
-            // 失败时使用默认假数据
-            initMultiSelects([
-                { userId: 1, username: '张三' },
-                { userId: 2, username: '李四' },
-                { userId: 3, username: '王五' }
-            ]);
+            console.error(err);
+            alert(err.message || "获取会签人员失败");
+            initMultiSelects([], [], []);
         });
-
 
     const conId = new URLSearchParams(window.location.search).get('id') || 'C001';
     fetch(`/api/contract/name?id=${conId}`)
@@ -297,9 +296,6 @@ window.addEventListener('DOMContentLoaded', () => {
             alert(err.message || '获取合同名失败');
             updateContractTitle('未知合同||catchError');
         });
-
-
-
 });
 
 document.addEventListener('DOMContentLoaded', function () {

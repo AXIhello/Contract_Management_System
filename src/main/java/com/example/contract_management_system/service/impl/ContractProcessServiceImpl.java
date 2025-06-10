@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -227,8 +226,6 @@ public class ContractProcessServiceImpl extends ServiceImpl<ContractProcessMappe
         }
         return result;
     }
-
-
 
     @Override
     public List<Map<String, Object>> getPendingExamineContracts(Integer userId) {

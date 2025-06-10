@@ -7,6 +7,8 @@ import com.example.contract_management_system.service.LogService;
 import com.example.contract_management_system.service.RightService;
 import org.springframework.stereotype.Service;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,5 +37,15 @@ public class RightServiceImpl implements RightService {
             logService.addLog(userId, 1, "Right","UserName: " + user.getUsername() + "RoleName: " + roleName);
             rightMapper.assignRights(userId,roleName);
         }
+    }
+
+    @Override
+    public List<User> selectUserWithRole(String roleName){
+        List<Integer> userIds = rightMapper.selectUserWithRole(roleName);
+        List<User> users = new ArrayList<>();
+        for(Integer userId : userIds) {
+            users.add(userMapper.selectById(userId));
+        }
+        return users;
     }
 }

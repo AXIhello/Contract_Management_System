@@ -18,4 +18,7 @@ public interface RoleMapper extends BaseMapper<Role> {
     @Update("UPDATE role SET description = #{description}, functions = #{functions} WHERE name = #{name}")
     int updateByName(Role role);
 
+    @Select("SELECT name FROM role WHERE functions LIKE CONCAT('%', #{rightName}, '%')")
+    List<String> selectRoleNamesWithRight(String rightName);
+
 }
