@@ -163,6 +163,44 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     });
 
+    function setFieldsReadonly() {
+        const fields = ["contractName", "approverName", "clientName", "beginTime", "endTime"];
+        fields.forEach(id => {
+            const field = document.getElementById(id);
+            if (field) {
+                field.readOnly = true;
+                field.disabled = true;
+                field.style.backgroundColor = '#f8f9fa';
+                field.title = '此字段不可修改';
+            }
+        });
+        addReadonlyLabels();
+    }
+
+    function addReadonlyLabels() {
+        const labels = [
+            { id: "contractName", label: "合同名称" },
+            { id: "clientName", label: "客户名称" },
+            { id: "approverName", label: "客户名称" },
+            { id: "beginTime", label: "开始时间" },
+            { id: "endTime", label: "结束时间" }
+        ];
+        labels.forEach(({ id, label }) => {
+            const el = document.getElementById(id);
+            if (el) {
+                const labelEl = document.querySelector(`label[for="${id}"]`);
+                if (labelEl && !labelEl.querySelector('.readonly-indicator')) {
+                    const span = document.createElement('span');
+                    span.textContent = ' (不可修改)';
+                    span.className = 'readonly-indicator';
+                    span.style.color = '#6c757d';
+                    span.style.fontSize = '0.85em';
+                    labelEl.appendChild(span);
+                }
+            }
+        });
+    }
+
     // 重置按钮
     document.getElementById("resetBtn").addEventListener("click", () => {
         // 复位审批结果（单选按钮）
