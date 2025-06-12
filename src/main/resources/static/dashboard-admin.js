@@ -177,6 +177,7 @@ window.addEventListener("DOMContentLoaded", function () {
     fetch("/api/contract-process/pending")
         .then(res => res.json())
         .then(data => {
+            console.log('data', data);
             const typeMap = {
                 0: "定稿",
                 1: "会签",
