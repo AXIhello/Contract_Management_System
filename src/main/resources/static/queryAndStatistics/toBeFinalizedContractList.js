@@ -73,23 +73,75 @@ function updatePageInfo() {
     document.getElementById("pageInfo").innerText = `共 ${totalPages} 页 ${draftContracts.length} 条`;
 }
 
-// 搜索合同
+// // 搜索合同
+// function searchDraftContracts() {
+//     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+//
+//     // 模拟过滤
+//     const filtered = draftContracts.filter(c =>
+//         c.id.toLowerCase().includes(keyword) ||
+//         c.name.toLowerCase().includes(keyword) ||
+//         c.drafter.toLowerCase().includes(keyword) ||
+//         c.draftDate.includes(keyword)
+//     );
+//
+//     // 重置页码和数据
+//     currentPage = 1;
+//     draftContracts = filtered;
+//     renderDraftContractsTable();
+//     updatePageInfo();
+// }
+function safeLower(val) {
+    if (!val) return "";
+
+    if (val instanceof Date) {
+        // Date 对象格式化为 yyyy-mm-dd
+        return val.toISOString().slice(0, 10).toLowerCase();
+    }
+
+    const str = val.toString().toLowerCase();
+
+    // 匹配可能是字符串形式的日期（例如 "2025/6/13"、"2025-6-13" 等），尝试转为 yyyy-mm-dd
+    const dateMatch = str.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (dateMatch) {
+        const [, year, month, day] = dateMatch;
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    return str;
+}
+
+
 function searchDraftContracts() {
-    const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
+    const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
-    // 模拟过滤
+    if (!query) {
+        renderDraftContractsTable();
+        updatePageInfo();
+        return;
+    }
+
     const filtered = draftContracts.filter(c =>
-        c.id.toLowerCase().includes(keyword) ||
-        c.name.toLowerCase().includes(keyword) ||
-        c.drafter.toLowerCase().includes(keyword) ||
-        c.draftDate.includes(keyword)
+        safeLower(c.id).includes(query) ||
+        safeLower(c.name).includes(query) ||
+        safeLower(c.drafter).includes(query) ||
+        safeLower(c.draftDate).includes(query)
     );
+    console.log(draftContracts.map(c => c.draftDate));
 
-    // 重置页码和数据
+
     currentPage = 1;
-    draftContracts = filtered;
+    renderFilteredContracts(filtered);
+}
+
+
+function renderFilteredContracts(filteredContracts) {
+    // 临时替换原始数据来渲染
+    const oldContracts = draftContracts;
+    draftContracts = filteredContracts;
     renderDraftContractsTable();
     updatePageInfo();
+    draftContracts = oldContracts; // 恢复原始数据
 }
 
 // 分页逻辑
