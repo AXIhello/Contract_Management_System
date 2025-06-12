@@ -31,6 +31,46 @@
         .back-button:hover {
             background-color: #5a6268;
         }
+        .operation-btn {
+            padding: 4px 8px;
+            margin: 0 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+        .operation-btn.edit {
+            background-color: #17a2b8;
+        }
+        .operation-btn.edit:hover {
+            background-color: #138496;
+        }
+        .operation-btn.delete {
+            background-color: #dc3545;
+        }
+        .operation-btn.delete:hover {
+            background-color: #c82333;
+        }
+        .operation-btn {
+            padding: 4px 8px;
+            margin: 0 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+        .operation-btn.edit {
+            background-color: #17a2b8;
+        }
+        .operation-btn.edit:hover {
+            background-color: #138496;
+        }
+        .operation-btn.delete {
+            background-color: #dc3545;
+        }
+        .operation-btn.delete:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -58,6 +98,7 @@
             <th>开户行</th>
             <th>账号</th>
             <th>备注</th>
+            <th>操作</th> <!-- 新增“操作”，修改或者删除-->
         </tr>
         </thead>
         <tbody id="customerBody">
