@@ -26,14 +26,25 @@ function renderTable(data) {
         `共 ${Math.ceil(data.length / itemsPerPage)} 页 ${data.length} 条`;
 }
 
+function safeLower(val) {
+    // 如果是 Date 对象，转为 ISO 字符串并截取前 10 位（yyyy-mm-dd）
+    if (val instanceof Date) {
+        return val.toISOString().slice(0, 10).toLowerCase();
+    }
+    // 其余情况，null/undefined/数字/字符串都安全转为字符串
+    return (val ?? "").toString().toLowerCase();
+}
+
 function searchContracts() {
     const query = document.getElementById("searchInput").value.toLowerCase();
+
     const filtered = contracts.filter(c =>
-        c.id.toLowerCase().includes(query) ||
-        c.name.toLowerCase().includes(query) ||
-        c.drafter.toLowerCase().includes(query) ||
-        c.date.includes(query)
+        safeLower(c.num).includes(query) ||
+        safeLower(c.name).includes(query) ||
+        safeLower(c.userId).includes(query) ||
+        safeLower(c.beginTime).includes(query)
     );
+
     currentPage = 1;
     renderTable(filtered);
 }
@@ -69,9 +80,7 @@ function goToLastPage() {
 // 启动时请求后端接口获取数据
 fetch('/api/contract/getDraft')
     .then(async response => {
-        const data = await response.json();
-
-        return data;
+        return await response.json();
     })
     .then(data => {
         contracts = data;
