@@ -3,38 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <title>待分配合同</title>
-    <link rel="stylesheet" href="../style.css" />
     <style>
+        /* 基础样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f2f5;
             padding: 20px;
         }
+
+        /* 容器样式 */
         .container {
             background: #fff;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             max-width: 1000px;
-            margin: auto;
+            margin: 0 auto;
         }
-        h2 {
+
+        /* 标题和按钮区域 */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
             background-color: #007bff;
             color: white;
             padding: 10px 15px;
             border-radius: 4px;
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
         }
+
+        /* 通用按钮样式 */
+        button {
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+
+        /* 返回按钮 */
+        .back-button {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .back-button:hover {
+            background-color: #5a6268;
+        }
+
+        /* 搜索区域 */
         .search-bar {
             margin: 15px 0;
             display: flex;
             align-items: center;
         }
+
+        .search-bar label {
+            margin-right: 8px;
+            white-space: nowrap;
+            font-size: 14px;
+        }
+
         .search-bar input {
             padding: 8px;
             width: 300px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            font-size: 14px;
+            outline: none;
         }
+
+        .search-bar input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+        }
+
         .search-bar button {
             margin-left: 10px;
             padding: 8px 16px;
@@ -42,28 +102,50 @@
             color: white;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
         }
+
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+
+        /* 表格样式 */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
+            font-size: 14px;
         }
+
         table th, table td {
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
             padding: 10px;
             text-align: center;
         }
+
         table th {
             background-color: #007bff;
             color: white;
+            font-weight: 500;
+            text-align: center;
         }
+
+        table tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        table tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        /* 分页区域 */
         .pagination {
             margin-top: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 14px;
         }
+
         .pagination button {
             padding: 6px 12px;
             margin: 0 2px;
@@ -71,31 +153,30 @@
             color: white;
             border: none;
             border-radius: 4px;
-            cursor: pointer;
         }
+
+        .pagination button:hover {
+            background-color: #0056b3;
+        }
+
+        .pagination button:disabled {
+            background-color: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
         .pagination span {
             font-weight: bold;
-        }
-        .back-button {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-        .back-button:hover {
-            background-color: #5a6268;
+            color: #333;
         }
     </style>
 </head>
 <body>
-<!-- 返回主控台按钮 -->
-<div style="text-align: right; margin-bottom: 10px;">
-    <button onclick="goToDashboard()" class="back-button">返回主控台</button>
-</div>
 <div class="container">
-    <h2>待分配合同</h2>
+    <div class="header">
+        <h2>待分配合同</h2>
+        <button onclick="goToDashboard()" class="back-button">返回主控台</button>
+    </div>
 
     <div class="search-bar">
         <label for="searchInput">查找待分配合同：</label>
