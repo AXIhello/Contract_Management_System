@@ -31,6 +31,13 @@ function loadContracts() {
 
 // 显示合同列表
 function renderTable(data) {
+    const contractStatusMap = {
+        "1": "起草完成，待会签",
+        "2": "会签完成，待定稿",
+        "3": "定稿完成，待审批",
+        "4": "审批完成，待签订",
+        "5": "签订完成"
+    };
     const tbody = document.querySelector("#contractTable tbody");
     tbody.innerHTML = "";
 
@@ -45,7 +52,7 @@ function renderTable(data) {
                 <tr>
                     <td>${contract.num}</td>
                     <td>${contract.name}</td>
-                    <td>${contract.state}</td>
+                    <td>${contractStatusMap[contract.state] || '未知状态'}</td>
                     <td>
                         <a href="/contractManagement/finalizeContract.html?id=${contract.num}">修改</a>
                         <button onclick="deleteContract('${contract.num}')">删除</button>
@@ -65,12 +72,13 @@ function updatePageInfo(total) {
 
 // 模糊查询合同名称
 function searchContracts() {
+    console.log("合同数据结构：", contracts);
     const nameInput = document.getElementById('contractName').value.trim().toLowerCase();
     const statusInput = document.getElementById('contractStatus').value;
 
     const filtered = contracts.filter(contract => {
         const matchesName = !nameInput || contract.name.toLowerCase().includes(nameInput);
-        const matchesStatus = !statusInput || contract.status === statusInput;
+        const matchesStatus = !statusInput || contract.state === Number(statusInput);
         return matchesName && matchesStatus;
     });
 
