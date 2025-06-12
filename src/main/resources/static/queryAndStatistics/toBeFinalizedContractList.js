@@ -73,24 +73,6 @@ function updatePageInfo() {
     document.getElementById("pageInfo").innerText = `共 ${totalPages} 页 ${draftContracts.length} 条`;
 }
 
-// // 搜索合同
-// function searchDraftContracts() {
-//     const keyword = document.getElementById("searchInput").value.trim().toLowerCase();
-//
-//     // 模拟过滤
-//     const filtered = draftContracts.filter(c =>
-//         c.id.toLowerCase().includes(keyword) ||
-//         c.name.toLowerCase().includes(keyword) ||
-//         c.drafter.toLowerCase().includes(keyword) ||
-//         c.draftDate.includes(keyword)
-//     );
-//
-//     // 重置页码和数据
-//     currentPage = 1;
-//     draftContracts = filtered;
-//     renderDraftContractsTable();
-//     updatePageInfo();
-// }
 function safeLower(val) {
     if (!val) return "";
 

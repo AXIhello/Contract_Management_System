@@ -142,11 +142,16 @@ function renderNotificationList() {
     notifications.forEach((notif) => {
         const item = document.createElement("a");
         item.className = "dropdown-item";
-        item.href = "#";
-        item.innerHTML = `<i class="fas fa-info-circle me-2 text-${notif.type}"></i> ${notif.message} <br><small class="text-muted">${notif.time}</small>`;
+        item.href = notif.link || "#";  // 若有 link，点击跳转；否则无跳转
+        item.innerHTML = `
+            <i class="fas fa-info-circle me-2 text-${notif.type}"></i>
+            ${notif.message}
+            <br><small class="text-muted">${notif.time}</small>
+        `;
         list.appendChild(item);
     });
 }
+
 
 function updateBadge() {
     const badge = document.getElementById("notificationBadge");
@@ -163,13 +168,26 @@ document.getElementById("notificationIcon").addEventListener("click", function (
     box.style.display = box.style.display === "none" ? "block" : "none";
 });
 
-// 事件通知触发器（可由起草、审批等逻辑触发）
-function notifyEvent(type, userName, contractTitle) {
-    const msgMap = {
-        'draft': `合同《${contractTitle}》已起草，请 ${userName} 会签。`,
-        'examined': `合同《${contractTitle}》已审批，请 ${userName} 签订。`
-    };
-    addNotification(msgMap[type]);
-}
 
+// 页面加载完后拉取待处理流程，生成通知
+window.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/contract-process/pending")
+        .then(res => res.json())
+        .then(data => {
+            const typeMap = {
+                0: "定稿",
+                1: "会签",
+                2: "审批",
+                3: "签订"
+            };
 
+            const uniqueTypes = [...new Set(data.map(item => item.type))];
+            uniqueTypes.forEach(type => {
+                const message = `你有待${typeMap[type]}的合同，请尽快处理`;
+                addNotification(message, "info");  // 调用你已有的 addNotification
+            });
+        })
+        .catch(err => {
+            console.error("获取待处理合同流程失败", err);
+        });
+});
