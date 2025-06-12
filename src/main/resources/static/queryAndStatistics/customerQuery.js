@@ -69,7 +69,7 @@ function renderTable(customers) {
 
     if (!customers || customers.length === 0) {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="9">没有找到客户数据</td>`;
+        tr.innerHTML = `<td colspan="10">没有找到客户数据</td>`; // 列数改为10
         tbody.appendChild(tr);
         return;
     }
@@ -86,10 +86,40 @@ function renderTable(customers) {
             <td>${c.bank ?? ""}</td>
             <td>${c.account ?? ""}</td>
             <td>${c.note ?? ""}</td>
+            <td>
+                <button onclick="editCustomer(${c.id})">修改</button>
+                <button onclick="deleteCustomer(${c.id})">删除</button>
+            </td>
         `;
         tbody.appendChild(tr);
     });
 }
+
+function editCustomer(id) {
+    window.location.href = `/customerEdit.html?id=${id}`;
+}
+
+function deleteCustomer(id) {
+    if (!confirm("确定要删除该客户吗？")) return;
+
+    fetch(`/api/customer/delete/${id}`, {
+        method: "DELETE"
+    })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                alert("删除成功！");
+                searchCustomers(); // 重新加载数据
+            } else {
+                alert(data.msg || "删除失败！");
+            }
+        })
+        .catch(err => {
+            console.error("删除请求失败:", err);
+            alert("系统异常，删除失败！");
+        });
+}
+
 
 function updatePageInfo() {
     const info = document.getElementById("pageInfo");
