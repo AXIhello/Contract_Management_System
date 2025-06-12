@@ -198,6 +198,37 @@
             margin-top: 0.5rem;
             display: inline-block;
         }
+
+        .notification-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .notification-item.info {
+            border-left: 4px solid #0dcaf0;
+        }
+
+        .notification-item.success {
+            border-left: 4px solid #198754;
+        }
+
+        .notification-item.warning {
+            border-left: 4px solid #ffc107;
+        }
+
+        .notification-item i {
+            font-size: 1.2em;
+        }
+
+        #notificationBox {
+            max-height: 400px;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
@@ -372,7 +403,6 @@
         <!-- 动态通知插入这里 -->
     </div>
     <div class="dropdown-divider"></div>
-    <a class="dropdown-item text-center text-primary" href="#">查看全部通知</a>
 </div>
 
 
