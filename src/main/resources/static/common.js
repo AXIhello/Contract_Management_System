@@ -7,7 +7,7 @@ async function goToDashboard() {
 
         const data = await response.json();
 
-        fetch(`/api/right/isAdmin/${data.userId}`)
+        fetch(`/api/right/isAdmin`)
             .then(res => res.text())  // 注意：返回的是文本，需要转成布尔值
             .then(text => {
                 const isAdmin = text === "true";

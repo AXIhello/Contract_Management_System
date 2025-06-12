@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("登录成功，欢迎 " + username);
 
                     // 判断是否管理员
-                    fetch(`/api/right/isAdmin/${data.data.userId}`)
+                    fetch(`/api/right/isAdmin`)
                         .then(res => res.text())  // 注意：返回的是文本，需要转成布尔值
                         .then(text => {
                             const isAdmin = text === "true";
@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             console.error("权限判断失败", err);
                             window.location.href = "/dashboard-user.html";
                         });
+
                 } else {
                     error.textContent = data.msg;
                 }

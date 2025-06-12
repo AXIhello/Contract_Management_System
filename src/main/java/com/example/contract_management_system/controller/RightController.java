@@ -114,8 +114,9 @@ public class RightController {
         return result;
     }
 
-    @GetMapping("/isAdmin/{userId}")
-    public boolean isAdmin(@PathVariable("userId") int userId) {
+    @GetMapping("/isAdmin")
+    public boolean isAdmin() {
+        int userId = userService.getCurrentUserId();
         boolean result = false;
         User user = userService.getById(userId);
         if (user == null) return result;
