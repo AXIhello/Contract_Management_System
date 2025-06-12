@@ -47,6 +47,8 @@
         .approval-section {
             display: flex;
             gap: 1rem;
+            max-width: 800px;
+            margin: auto;
         }
         .approval-options {
             display: flex;
@@ -171,7 +173,7 @@
             <input type="date" id="endTime" name="endDate" readonly />
         </div>
 
-        <div class="form-group">
+        <div class="form-group" style="width: 100%;">
             <label for="contractContent">合同内容：</label>
             <textarea id="contractContent" name="contractContent" rows="7" readonly></textarea>
         </div>
@@ -184,23 +186,26 @@
             </ul>
         </div>
 
-        <div class="approval-section" style="align-items: flex-start;">
-            <div class="approval-options">
-                <label>
-                    <input type="radio" name="approvalResult" value="approved" required />
-                    ✅ 通过
-                </label>
-                <label>
-                    <input type="radio" name="approvalResult" value="rejected" />
-                    ❌ 拒绝
-                </label>
-            </div>
+        <div class="form-group">
+            <div class="approval-section">
+                <div class="approval-options">
+                    <label>
+                        <input type="radio" name="approvalResult" value="approved" required />
+                        ✅ 通过
+                    </label>
+                    <label>
+                        <input type="radio" name="approvalResult" value="rejected" />
+                        ❌ 拒绝
+                    </label>
+                </div>
 
-            <div style="flex-grow: 1;">
-                <label for="approvalComments" style="display: block; margin-bottom: 0.5rem;">审批意见：</label>
-                <textarea id="approvalComments" placeholder="请输入审批意见..." style="width: 100%;"></textarea>
+                <div style="flex-grow: 1;">
+                    <label for="approvalComments" style="display: block; margin-bottom: 0.5rem;">审批意见：</label>
+                    <textarea id="approvalComments" placeholder="请输入审批意见..." rows="4" style="width: 100%;"></textarea>
+                </div>
             </div>
         </div>
+
 
 
 
