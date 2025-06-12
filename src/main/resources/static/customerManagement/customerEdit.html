@@ -53,8 +53,8 @@
 <div class="container">
     <h2>修改客户信息</h2>
     <form id="editForm">
-        <label for="id">客户编号（只读）</label>
-        <input type="text" id="id" name="id" readonly>
+        <label for="num">客户编号（只读）</label>
+        <input type="text" id="num" name="num" readonly>
 
         <label for="name">客户名称</label>
         <input type="text" id="name" name="name" required>
@@ -90,7 +90,7 @@
 <script src="customerEdit.js"></script>
 <script>
     function goToQueryPage() {
-        window.location.href = "customerQuery.html";
+        window.location.href = "/queryAndStatistics/customerQuery.html";
     }
 </script>
 </body>

@@ -98,7 +98,7 @@ function renderTable(customers) {
 }
 
 function editCustomer(id) {
-    window.location.href = `../customerManagement/customerEdit.html`;
+    window.location.href = `../customerManagement/customerEdit.html?num=${id}`;
 }
 
 function deleteCustomer(id) {

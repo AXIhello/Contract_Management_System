@@ -58,11 +58,11 @@ public class CustomerController {
     @DeleteMapping("/delete/{id}")
     public Result<Void> deleteCustomer(@PathVariable("id") Integer id) {
         boolean success = customerService.deleteCustomerById(id);
-        return success ? Result.success() : Result.error("删除失败！");
+        return success ? Result.success() : Result.error("删除失败！客户有相关合同");
     }
 
 
-    @PreAuthorize("hasAuthority('update_client')")
+    @PreAuthorize("hasAuthority('edit_client')")
     @PutMapping("/update")
     public Result<Void> updateCustomer(@RequestBody Customer customer) {
         Integer userId = userService.getCurrentUserId();

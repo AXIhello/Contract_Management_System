@@ -114,10 +114,13 @@ async function logout(e) {
 
 const notifications = [];
 
-function addNotification(message, type = "info") {
-    const time = new Date().toLocaleTimeString();
-    const notif = { message, time, type };
-    notifications.unshift(notif);
+function addNotification(message, type, link = "#") {
+    notifications.push({
+        message,
+        type,
+        time: new Date().toLocaleString(),
+        link
+    });
 
     renderNotificationList();
     updateBadge();
@@ -183,9 +186,32 @@ window.addEventListener("DOMContentLoaded", function () {
 
             const uniqueTypes = [...new Set(data.map(item => item.type))];
             uniqueTypes.forEach(type => {
-                const message = `你有待${typeMap[type]}的合同，请尽快处理`;
-                addNotification(message, "info");  // 调用你已有的 addNotification
+                const contract = data.find(item => item.type === type);
+                if (contract) {
+                    const message = `你有待${typeMap[type]}的合同，请尽快处理`;
+                    let link;
+                    switch (type){
+                        case 0:{
+                            link = `/queryAndStatistics/toBeFinalizedContractList.html`
+                            break;
+                        }
+                        case 1:{
+                            link = `/queryAndStatistics/toBeCountersignedContractList.html`
+                            break;
+                        }
+                        case 2:{
+                            link = `/queryAndStatistics/toBeExaminedContractList.html`
+                            break;
+                        }
+                        case 3:{
+                            link = `/queryAndStatistics/toBeConcludedContractList.html`
+                            break;
+                        }
+                    }
+                    addNotification(message, "info", link);
+                }
             });
+
         })
         .catch(err => {
             console.error("获取待处理合同流程失败", err);

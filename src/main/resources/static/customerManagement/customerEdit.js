@@ -1,31 +1,32 @@
-// 解析 URL 参数获取客户 ID
-function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-}
+// // 解析 URL 参数获取客户 ID
+// function getQueryParam(param) {
+//     const urlParams = new URLSearchParams(window.location.search);
+//     return urlParams.get(param);
+// }
 
-const customerId = getQueryParam("num");
+const customerId =  new URLSearchParams(window.location.search).get("num");
 
 window.onload = () => {
-    if (!customerId) {
-        alert("未指定客户 ID");
-        window.location.href = "customerQuery.html";
-        return;
-    }
-    fetch(`/api/customer/query?id=${customerId}`)
+    // if (!customerId) {
+    //     alert("未指定客户 ID");
+    //     window.location.href = "customerQuery.html";
+    //     return;
+    // }
+    fetch(`/api/customer/query?customerId=${customerId}`)
         .then(res => res.json())
         .then(data => {
+            console.log(data.data);
             if (data.success && data.data) {
-                populateForm(data.data);
+                populateForm(data.data[0]);
             } else {
                 alert(data.msg || "获取客户信息失败！");
-                window.location.href = "customerQuery.html";
+                //window.location.href = "customerQuery.html";
             }
         })
         .catch(err => {
             console.error(err);
             alert("系统异常！");
-            window.location.href = "customerQuery.html";
+            //window.location.href = "customerQuery.html";
         });
 
     const form = document.getElementById("editForm");
@@ -54,7 +55,7 @@ window.onload = () => {
             .then(data => {
                 if (data.success) {
                     alert("客户信息更新成功！");
-                    window.location.href = "customerQuery.html";
+                    window.location.href = "/queryAndStatistics/customerQuery.html";
                 } else {
                     alert(data.msg || "更新失败！");
                 }
