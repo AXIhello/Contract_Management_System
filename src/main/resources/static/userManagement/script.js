@@ -78,12 +78,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            if (password.length > 6) {
-                const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
-                if (!strongPasswordRegex.test(password)) {
-                    error.textContent = "密码超过6位时，必须包含字母和数字";
-                    return;
-                }
+            const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d).{7,}$/;
+
+            if (!strongPasswordRegex.test(password)) {
+                error.textContent = "密码必须大于6位，且包含字母和数字";
+                return;
             }
 
 
