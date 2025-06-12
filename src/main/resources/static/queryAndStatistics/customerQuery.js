@@ -87,8 +87,8 @@ function renderTable(customers) {
             <td>${c.account ?? ""}</td>
             <td>${c.note ?? ""}</td>
             <td>
-                <button onclick="editCustomer(${c.id})">修改</button>
-                <button onclick="deleteCustomer(${c.id})">删除</button>
+                <button onclick="editCustomer(${c.num})">修改</button>
+                <button onclick="deleteCustomer(${c.num})">删除</button>
             </td>
         `;
         tbody.appendChild(tr);
@@ -96,7 +96,7 @@ function renderTable(customers) {
 }
 
 function editCustomer(id) {
-    window.location.href = `/customerEdit.html?id=${id}`;
+    window.location.href = `/queryAndStatistics/customerEdit.html?num=${num}`;
 }
 
 function deleteCustomer(id) {
