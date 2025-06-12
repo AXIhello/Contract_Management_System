@@ -28,6 +28,8 @@
         }
         .form-group {
             margin-bottom: 1.5rem;
+            width: 97%;
+
         }
         label {
             display: block;
@@ -71,6 +73,8 @@
             border-radius: 4px;
             font-size: 1rem;
             font-family: Arial, sans-serif;
+            width: 96%;
+
         }
         .buttons {
             margin-top: 1.5rem;
@@ -180,7 +184,7 @@
             </ul>
         </div>
 
-        <div class="approval-section">
+        <div class="approval-section" style="align-items: flex-start;">
             <div class="approval-options">
                 <label>
                     <input type="radio" name="approvalResult" value="approved" required />
@@ -192,10 +196,13 @@
                 </label>
             </div>
 
-            <label for="approvalComments">审批意见：</label>
-            <textarea id="approvalComments" placeholder="请输入审批意见..."></textarea>
-
+            <div style="flex-grow: 1;">
+                <label for="approvalComments" style="display: block; margin-bottom: 0.5rem;">审批意见：</label>
+                <textarea id="approvalComments" placeholder="请输入审批意见..." style="width: 100%;"></textarea>
+            </div>
         </div>
+
+
 
         <div class="buttons">
             <button type="submit">提交</button>
