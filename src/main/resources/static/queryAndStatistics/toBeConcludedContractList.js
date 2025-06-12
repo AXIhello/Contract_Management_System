@@ -38,14 +38,23 @@ function updatePageInfo(total) {
     document.getElementById('pageInfo').textContent = `共 ${pageCount} 页 ${total} 条`;
 }
 
-// 搜索
+function safeLower(val) {
+    // 如果是 Date 对象，转为 ISO 字符串并截取前 10 位（yyyy-mm-dd）
+    if (val instanceof Date) {
+        return val.toISOString().slice(0, 10).toLowerCase();
+    }
+    // 其余情况，null/undefined/数字/字符串都安全转为字符串
+    return (val ?? "").toString().toLowerCase();
+}
+
 function searchToBeSignedContracts() {
     const query = document.getElementById("searchInput").value.toLowerCase();
+
     const filtered = contracts.filter(c =>
-        c.id.toLowerCase().includes(query) ||
-        c.name.toLowerCase().includes(query) ||
-        c.clientName.toLowerCase().includes(query) ||
-        c.beginTime.includes(query)
+        safeLower(c.id || c.contractId).includes(query) ||
+        safeLower(c.name || c.contractName).includes(query) ||
+        safeLower(c.customer).includes(query) ||
+        safeLower(c.beginTime).includes(query)
     );
     currentPage = 1;
     renderTable(filtered);
