@@ -75,17 +75,6 @@ async function loadContractAttachments(contractId) {
             credentials: 'include'
         });
 
-        const data = await res.json();
-        if (!res.ok) {
-            if (data.code === 403) {
-                throw new Error("权限不足，无法提交会签");
-            } else if (data.code === 401) {
-                throw new Error("未登录或登录已过期，请重新登录");
-            } else {
-                throw new Error(data.msg || "提交失败");
-            }
-        }
-
         window.existingAttachments = data.map(item => ({
             id: item.id,
             name: item.fileName || item.name,
