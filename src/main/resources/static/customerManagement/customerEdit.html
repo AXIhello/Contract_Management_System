@@ -2,78 +2,96 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8" />
-    <title>客户查询</title>
+    <title>修改客户信息</title>
     <style>
         body { font-family: Arial, sans-serif; background-color: #f0f2f5; padding: 20px; }
-        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 1000px; margin: auto; }
+        .container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); max-width: 800px; margin: auto; }
         h2 { background-color: #007bff; color: white; padding: 10px 15px; border-radius: 4px; }
-        .search-bar { margin: 15px 0; display: flex; align-items: center; gap: 10px; }
-        .search-bar input { padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px; }
-        .search-bar button { padding: 8px 16px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .search-bar button:hover { background-color: #0056b3; }
-        .add-btn { margin-left: auto; background-color: #28a745; }
-        .add-btn:hover { background-color: #218838; }
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        table th, table td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        table th { background-color: #007bff; color: white; }
-        .pagination { margin-top: 15px; display: flex; justify-content: space-between; align-items: center; }
-        .pagination button { padding: 6px 12px; margin: 0 2px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .pagination button:hover { background-color: #0056b3; }
-        .pagination span { font-weight: bold; }
-        .back-button {
-            background-color: #6c757d;
-            color: white;
+        form { margin-top: 20px; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .form-actions {
+            margin-top: 25px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
             border: none;
             border-radius: 4px;
-            padding: 8px 16px;
+            color: white;
             cursor: pointer;
         }
-        .back-button:hover {
+        .btn.save {
+            background-color: #28a745;
+        }
+        .btn.save:hover {
+            background-color: #218838;
+        }
+        .btn.cancel {
+            background-color: #6c757d;
+        }
+        .btn.cancel:hover {
             background-color: #5a6268;
         }
     </style>
 </head>
 <body>
 
-
-<div class="container">
-    <h2>客户查询</h2>
-    <div class="search-bar">
-        <label for="searchInput">查询客户：</label>
-        <input type="text" id="searchInput" placeholder="请输入客户名称" />
-        <button onclick="searchCustomers()">查询</button>
-    </div>
-
-    <table id="customerTable">
-        <thead>
-        <tr>
-            <th>编号</th>
-            <th>名称</th>
-            <th>地址</th>
-            <th>电话</th>
-            <th>传真</th>
-            <th>邮编</th>
-            <th>开户行</th>
-            <th>账号</th>
-            <th>备注</th>
-        </tr>
-        </thead>
-        <tbody id="customerBody">
-        <!-- 动态数据插入 -->
-        </tbody>
-    </table>
-
-    <div class="pagination">
-        <div>
-            <button onclick="goToPage(1)">first</button>
-            <button onclick="prevPage()">&lt; pre</button>
-            <button onclick="nextPage()">next &gt;</button>
-            <button onclick="goToLastPage()">last</button>
-        </div>
-        <span id="pageInfo">共 0 页 0 条</span>
-    </div>
+<div style="text-align: right; margin-bottom: 10px;">
+    <button onclick="goToQueryPage()" class="btn cancel">返回客户查询</button>
 </div>
 
-<script src="../customerManagement/customerEdit.js"></script>
+<div class="container">
+    <h2>修改客户信息</h2>
+    <form id="editForm">
+        <label for="id">客户编号（只读）</label>
+        <input type="text" id="id" name="id" readonly>
+
+        <label for="name">客户名称</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="address">地址</label>
+        <input type="text" id="address" name="address">
+
+        <label for="tel">电话</label>
+        <input type="text" id="tel" name="tel">
+
+        <label for="fax">传真</label>
+        <input type="text" id="fax" name="fax">
+
+        <label for="code">邮编</label>
+        <input type="text" id="code" name="code">
+
+        <label for="bank">开户行</label>
+        <input type="text" id="bank" name="bank">
+
+        <label for="account">银行账号</label>
+        <input type="text" id="account" name="account">
+
+        <label for="note">备注</label>
+        <textarea id="note" name="note" rows="3"></textarea>
+
+        <div class="form-actions">
+            <button type="submit" class="btn save">保存修改</button>
+            <button type="button" onclick="goToQueryPage()" class="btn cancel">取消</button>
+        </div>
+    </form>
+</div>
+
+<script src="customerEdit.js"></script>
+<script>
+    function goToQueryPage() {
+        window.location.href = "customerQuery.html";
+    }
+</script>
 </body>
 </html>
