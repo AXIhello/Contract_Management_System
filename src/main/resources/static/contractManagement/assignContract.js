@@ -16,7 +16,7 @@ function renderTable(data) {
             <td>${contract.num}</td>
             <td>${contract.name}</td>
             <td>${contract.userId}</td>
-            <td>${contract.beginTime}</td>
+            <td>${contract.beginTime?.slice(0, 10)}</td>
             <td><a href="/contractManagement/assign.html?id=${contract.num}">分配</a></td>
         </tr>`;
         body.insertAdjacentHTML("beforeend", row);
