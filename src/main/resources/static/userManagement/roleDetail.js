@@ -48,13 +48,13 @@ async function fetchRoleByName(roleName) {
 
             // 填入到页面元素中
             document.getElementById('roleName').value = role.name;
-            document.getElementById('roleDescription').textContent = role.description || "无描述";
+            document.getElementById('roleDesc').textContent = role.description || "无描述";
         } else {
             alert("获取角色失败: " + result.msg);
         }
     } catch (error) {
         console.error("请求失败:", error);
-        alert("系统异常，无法获取角色信息");
+        alert(error.message||"系统异常，无法获取角色信息");
     }
 }
 

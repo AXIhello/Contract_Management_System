@@ -2,9 +2,7 @@ package com.example.contract_management_system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.contract_management_system.pojo.Right;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -18,4 +16,7 @@ public interface RightMapper extends BaseMapper<Right> {
 
     @Select("SELECT user_id FROM `right` WHERE roleName = #{roleName}")
     List<Integer> selectUserWithRole(String roleName);
+
+    @Delete("DELETE FROM `right` WHERE user_id = #{userId}")
+    void deleteRolesById(int userId);
 }

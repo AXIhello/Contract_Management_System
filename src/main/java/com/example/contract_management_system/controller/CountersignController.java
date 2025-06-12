@@ -53,7 +53,6 @@ public class CountersignController {
         return contractProcessService.getPendingCountersignContracts(currentUserId);
     }
 
-    @PreAuthorize("hasAuthority('countersign_contract')")
     @GetMapping("/contract/{id}")
     public Map<String, Object> getContractInfo(@PathVariable Integer id) {
         Contract contract = contractProcessService.getContractById(id);

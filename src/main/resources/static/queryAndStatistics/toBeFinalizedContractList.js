@@ -7,20 +7,11 @@ window.onload = function () {
     loadDraftContracts();
 };
 
-// 模拟从后端获取待定稿合同数据
+// 从后端获取待定稿合同数据
 function loadDraftContracts() {
     fetch("/api/contract/getToBeFinishedContracts")
         .then(response => {
             return response.json().then(data => {
-                if (!response.ok) {
-                    if (data.code === 403) {
-                        throw new Error("权限不足，无法起草合同");
-                    } else if (data.code === 401) {
-                        throw new Error("未登录或登录已过期，请重新登录");
-                    } else {
-                        throw new Error(data.msg || "请求失败");
-                    }
-                }
                 return data;
             });
         })

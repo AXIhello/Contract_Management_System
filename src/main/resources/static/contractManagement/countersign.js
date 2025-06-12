@@ -75,6 +75,8 @@ async function loadContractAttachments(contractId) {
             credentials: 'include'
         });
 
+        const data = await res.json();
+
         window.existingAttachments = data.map(item => ({
             id: item.id,
             name: item.fileName || item.name,
@@ -146,7 +148,8 @@ async function submitCountersign() {
         }
     } catch (err) {
         console.error('提交会签失败:', err);
-        alert('提交会签失败，请稍后重试');
+        const textContent = err.message
+        alert(textContent);
     }
 }
 

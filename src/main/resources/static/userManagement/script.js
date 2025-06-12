@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     alert("登录成功，欢迎 " + username);
 
                     // 判断是否管理员
-                    fetch(`/api/right/isAdmin/${data.data.userId}`)
+                    fetch(`/api/right/isAdmin`)
                         .then(res => res.text())  // 注意：返回的是文本，需要转成布尔值
                         .then(text => {
                             const isAdmin = text === "true";
@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
                             console.error("权限判断失败", err);
                             window.location.href = "/dashboard-user.html";
                         });
+
                 } else {
                     error.textContent = data.msg;
                 }
@@ -76,6 +77,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 error.textContent = "两次输入的密码不一致";
                 return;
             }
+
+            if (password.length > 6) {
+                const strongPasswordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]+$/;
+                if (!strongPasswordRegex.test(password)) {
+                    error.textContent = "密码超过6位时，必须包含字母和数字";
+                    return;
+                }
+            }
+
 
             try {
                 const res = await fetch(`/api/user/register`, {
