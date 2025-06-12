@@ -169,6 +169,8 @@ window.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await fetch(`/api/countersign/contract/${contractId}`);
 
+            const data = await res.json();
+
             if (!res.ok) {
                 // 权限不足或未登录等
                 if (data.code === 403) {
@@ -180,7 +182,6 @@ window.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            const data = await res.json();
 
             document.getElementById('contractName').textContent = data.name ;
             document.getElementById('contractNum').textContent = data.contractNum ;
