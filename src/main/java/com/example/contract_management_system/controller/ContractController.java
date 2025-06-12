@@ -154,6 +154,7 @@ public class ContractController {
         return response;
     }
 
+    @PreAuthorize("hasAuthority('query_contract')")
     @GetMapping("/list")
     public List<ContractDTO> getContracts() {
         // 查询所有合同
