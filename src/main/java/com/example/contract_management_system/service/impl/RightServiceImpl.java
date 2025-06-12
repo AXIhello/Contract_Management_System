@@ -53,8 +53,6 @@ public class RightServiceImpl implements RightService {
 
     @Override
     public void removeAllRolesFromUser(int userId) {
-        QueryWrapper<Right> query = new QueryWrapper<>();
-        query.eq("user_id", userId);
-        rightMapper.delete(query);
+        rightMapper.deleteRolesById(userId);
     }
 }

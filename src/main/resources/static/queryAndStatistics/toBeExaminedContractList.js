@@ -35,7 +35,7 @@ function renderTable(data) {
 // 更新页码显示
 function updatePageInfo(total) {
     const pageCount = Math.ceil(total / pageSize) || 1;
-    document.getElementById('pageInfo').textContent = `共 ${pageCount} 页 ${total} 条`;
+    document.getElementById('approvalPageInfo').textContent = `共 ${pageCount} 页 ${total} 条`;
 }
 
 // 搜索

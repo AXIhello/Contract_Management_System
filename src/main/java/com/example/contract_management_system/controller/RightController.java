@@ -146,6 +146,7 @@ public class RightController {
         } catch (Exception e) {
             return Result.error("用户权限分配失败");
         }
+
     }
 
 }

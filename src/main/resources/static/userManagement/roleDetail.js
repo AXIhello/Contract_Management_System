@@ -48,7 +48,7 @@ async function fetchRoleByName(roleName) {
 
             // 填入到页面元素中
             document.getElementById('roleName').value = role.name;
-            document.getElementById('roleDescription').textContent = role.description || "无描述";
+            document.getElementById('roleDesc').textContent = role.description || "无描述";
         } else {
             alert("获取角色失败: " + result.msg);
         }
