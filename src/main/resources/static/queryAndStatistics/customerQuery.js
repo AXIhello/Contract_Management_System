@@ -2,43 +2,65 @@ let currentPage = 1;
 const pageSize = 10;
 let totalRecords = 0;
 let totalPages = 0;
+let allCustomers = []; // 保存所有客户数据
 
-function searchCustomers(page = 1) {
-    currentPage = page;
+function searchCustomers() {
+    currentPage = 1;
     const name = document.getElementById("searchInput").value.trim();
 
-    // 设置按钮等输入状态为加载中（如果有实现）
     setInputsLoading(true);
 
-    // 这里构造分页和查询参数
-    const url = `/api/customer/query?name=${encodeURIComponent(name)}&page=${page}&pageSize=${pageSize}`;
+    const url = `/api/customer/query?name=${encodeURIComponent(name)}`;
 
     fetch(url)
-        .then(res => res.json())
+        .then(res => res.json().then(data => {
+            if (!res.ok) {
+                if (data.code === 403) {
+                    throw new Error("权限不足，无法访问用户信息");
+                } else if (data.code === 401) {
+                    throw new Error("未登录或登录过期，请重新登录");
+                } else {
+                    throw new Error(data.msg || "请求失败");
+                }
+            }
+            return data;
+        }))
         .then(data => {
+
             if (data.success) {
-                renderTable(data.data || []);
-                totalRecords = data.total || 0;
+                allCustomers = data.data || [];
+                totalRecords = allCustomers.length;
                 totalPages = Math.ceil(totalRecords / pageSize);
+                renderTable(getPageData(currentPage));
                 updatePageInfo();
             } else {
                 console.error("查询失败:", data.message);
-                renderTable([]);
+                alert(data.msg || '系统异常，获取数据失败！');
+                allCustomers = [];
                 totalRecords = 0;
                 totalPages = 0;
+                renderTable([]);
                 updatePageInfo();
             }
         })
         .catch(err => {
             console.error("请求错误:", err);
-            renderTable([]);
+            alert(err.message || '系统异常，获取用户数据失败！');
+            allCustomers = [];
             totalRecords = 0;
             totalPages = 0;
+            renderTable([]);
             updatePageInfo();
         })
         .finally(() => {
             setInputsLoading(false);
         });
+}
+
+function getPageData(page) {
+    const start = (page - 1) * pageSize;
+    const end = start + pageSize;
+    return allCustomers.slice(start, end);
 }
 
 function renderTable(customers) {
@@ -55,16 +77,16 @@ function renderTable(customers) {
     customers.forEach(c => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-      <td>${c.num ?? ""}</td>
-      <td>${c.name ?? ""}</td>
-      <td>${c.address ?? ""}</td>
-      <td>${c.tel ?? ""}</td>
-      <td>${c.fax ?? ""}</td>
-      <td>${c.code ?? ""}</td>
-      <td>${c.bank ?? ""}</td>
-      <td>${c.account ?? ""}</td>
-      <td>${c.note ?? ""}</td>
-    `;
+            <td>${c.num ?? ""}</td>
+            <td>${c.name ?? ""}</td>
+            <td>${c.address ?? ""}</td>
+            <td>${c.tel ?? ""}</td>
+            <td>${c.fax ?? ""}</td>
+            <td>${c.code ?? ""}</td>
+            <td>${c.bank ?? ""}</td>
+            <td>${c.account ?? ""}</td>
+            <td>${c.note ?? ""}</td>
+        `;
         tbody.appendChild(tr);
     });
 }
@@ -78,26 +100,34 @@ function goToPage(page) {
     if (page < 1) page = 1;
     if (page > totalPages) page = totalPages;
     if (page === currentPage) return;
-    searchCustomers(page);
+    currentPage = page;
+    renderTable(getPageData(currentPage));
+    updatePageInfo();
 }
 
 function prevPage() {
     if (currentPage > 1) {
-        searchCustomers(currentPage - 1);
+        currentPage--;
+        renderTable(getPageData(currentPage));
+        updatePageInfo();
     }
 }
 
 function nextPage() {
     if (currentPage < totalPages) {
-        searchCustomers(currentPage + 1);
+        currentPage++;
+        renderTable(getPageData(currentPage));
+        updatePageInfo();
     }
 }
 
 function goToLastPage() {
-    searchCustomers(totalPages);
+    currentPage = totalPages;
+    renderTable(getPageData(currentPage));
+    updatePageInfo();
 }
 
-// 伪函数，加载状态的按钮禁用等
+// 加载状态切换（禁用输入框与按钮）
 function setInputsLoading(loading) {
     const input = document.getElementById("searchInput");
     const btns = document.querySelectorAll(".search-bar button");
@@ -105,12 +135,12 @@ function setInputsLoading(loading) {
     btns.forEach(btn => (btn.disabled = loading));
 }
 
-// 初始化页面，自动加载第一页
+// 页面加载默认查询
 window.onload = () => {
-    searchCustomers(1);
+    searchCustomers();
 };
 
-// 返回主控台按钮实现
+// 返回主控台（可选按钮）
 function goToDashboard() {
-    window.location.href = "/dashboard.html"; // 根据实际调整
+    window.location.href = "/dashboard.html";
 }
