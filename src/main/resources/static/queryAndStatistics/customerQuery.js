@@ -3,6 +3,8 @@ const pageSize = 10;
 let totalRecords = 0;
 let totalPages = 0;
 let allCustomers = []; // 保存所有客户数据
+let num;
+
 
 function searchCustomers() {
     currentPage = 1;
@@ -96,7 +98,7 @@ function renderTable(customers) {
 }
 
 function editCustomer(id) {
-    window.location.href = `/queryAndStatistics/customerEdit.html?num=${num}`;
+    window.location.href = `../customerManagement/customerEdit.html`;
 }
 
 function deleteCustomer(id) {

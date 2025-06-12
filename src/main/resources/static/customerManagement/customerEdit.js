@@ -4,7 +4,7 @@ function getQueryParam(param) {
     return urlParams.get(param);
 }
 
-const customerId = getQueryParam("id");
+const customerId = getQueryParam("num");
 
 window.onload = () => {
     if (!customerId) {
@@ -32,7 +32,7 @@ window.onload = () => {
     form.addEventListener("submit", (e) => {
         e.preventDefault();
         const customer = {
-            id: customerId,
+            num: customerId,
             name: document.getElementById("name").value.trim(),
             address: document.getElementById("address").value.trim(),
             tel: document.getElementById("tel").value.trim(),
@@ -67,7 +67,7 @@ window.onload = () => {
 };
 
 function populateForm(c) {
-    document.getElementById("id").value = c.id;
+    document.getElementById("num").value = c.num;
     document.getElementById("name").value = c.name ?? "";
     document.getElementById("address").value = c.address ?? "";
     document.getElementById("tel").value = c.tel ?? "";
