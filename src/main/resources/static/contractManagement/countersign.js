@@ -75,17 +75,6 @@ async function loadContractAttachments(contractId) {
             credentials: 'include'
         });
 
-        const data = await res.json();
-        if (!res.ok) {
-            if (data.code === 403) {
-                throw new Error("权限不足，无法提交会签");
-            } else if (data.code === 401) {
-                throw new Error("未登录或登录已过期，请重新登录");
-            } else {
-                throw new Error(data.msg || "提交失败");
-            }
-        }
-
         window.existingAttachments = data.map(item => ({
             id: item.id,
             name: item.fileName || item.name,
@@ -169,18 +158,12 @@ window.addEventListener('DOMContentLoaded', async () => {
         try {
             const res = await fetch(`/api/countersign/contract/${contractId}`);
 
+            const data = await res.json();
+
             if (!res.ok) {
-                // 权限不足或未登录等
-                if (data.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
-                } else if (data.code === 401) {
-                    throw new Error("未登录或登录已过期，请重新登录");
-                } else {
-                    throw new Error(data.msg || "请求失败");
-                }
+                throw new Error(data.msg || "请求失败");
             }
 
-            const data = await res.json();
 
             document.getElementById('contractName').textContent = data.name ;
             document.getElementById('contractNum').textContent = data.contractNum ;
@@ -202,7 +185,6 @@ window.addEventListener('DOMContentLoaded', async () => {
 
             const contentElement = document.getElementById('contractContent');
             contentElement.innerHTML = data.content || '合同内容为空';
-
 
 
         } catch (err) {
