@@ -30,6 +30,15 @@ function loadDraftContracts() {
 
 // 渲染表格
 function renderDraftContractsTable() {
+    function formatDateToYMD(date) {
+        if (!date) return "";
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
     const tbody = document.getElementById("draftContractBody");
     tbody.innerHTML = "";
 
@@ -51,7 +60,7 @@ function renderDraftContractsTable() {
             <td>${contract.id}</td>
             <td>${contract.name}</td>
             <td>${contract.drafter}</td>
-            <td>${contract.draftDate}</td>
+            <td>${formatDateToYMD(contract.draftDate)}</td>
             <td><button onclick="viewContract('${contract.id}')">查看</button></td>
         `;
         tbody.appendChild(row);

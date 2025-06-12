@@ -236,6 +236,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
 
         // 当前用户id
         Integer userId = userService.getCurrentUserId();
+        //当前用户名称
 
         // 再从合同表查：合同编号在contractNums内，且user_id = 当前用户id
         QueryWrapper<Contract> contractQuery = new QueryWrapper<>();
@@ -248,7 +249,7 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         return contracts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
-        //TODO:显示附件列表，提供下载功能
+
     }
 
     @Override
@@ -261,7 +262,8 @@ public class ContractServiceImpl extends ServiceImpl<ContractMapper, Contract> i
         ContractPendingDTO dto = new ContractPendingDTO();
         dto.setId(contract.getNum());
         dto.setName(contract.getName());
-        dto.setDrafter(contract.getUserId().toString());//目前只获取用户ID
+        dto.setDrafter(userService.getUsernameById(contract.getUserId())
+        +"("+contract.getUserId().toString()+")");//目前获取用户名称
         dto.setDraftDate(contract.getBeginTime().toString());
         // 其他字段映射
         return dto;

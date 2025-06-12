@@ -20,7 +20,7 @@ function renderTable(data) {
                 <td>${c.id || c.contractId}</td>
                 <td>${c.name || c.contractName}</td>
                 <td>${c.customer}</td>
-                <td>${c.beginTime}</td>
+                <td>${c.beginTime?.slice(0, 10)}</td>
                 <td>
                     <button onclick="viewContract('${c.id || c.contractId}')">查看</button>
                 </td>
