@@ -54,7 +54,7 @@ async function fetchRoleByName(roleName) {
         }
     } catch (error) {
         console.error("请求失败:", error);
-        alert("系统异常，无法获取角色信息");
+        alert(error.message||"系统异常，无法获取角色信息");
     }
 }
 

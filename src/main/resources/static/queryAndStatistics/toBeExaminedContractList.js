@@ -74,15 +74,6 @@ function goToLastPage() {
 fetch('/api/contract/approvalPending')
     .then(res => {
         return res.json().then(data => {
-            if (!res.ok) {
-                if (data.code === 403) {
-                    throw new Error("权限不足，无法起草合同");
-                } else if (data.code === 401) {
-                    throw new Error("未登录或登录已过期，请重新登录");
-                } else {
-                    throw new Error(data.msg || "请求失败");
-                }
-            }
             return data;
         });
     })
