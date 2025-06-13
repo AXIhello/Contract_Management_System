@@ -2,6 +2,8 @@ package com.example.contract_management_system.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.example.contract_management_system.mapper.RightMapper;
+import com.example.contract_management_system.mapper.RoleMapper;
 import com.example.contract_management_system.mapper.UserMapper;
 import com.example.contract_management_system.pojo.User;
 import com.example.contract_management_system.service.UserService;
@@ -30,11 +32,13 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
 
     private final UserMapper userMapper;
+    private final RightMapper rightMapper;
 
-    public UserController(UserService userService, AuthenticationManager authenticationManager, UserMapper userMapper) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, UserMapper userMapper,RightMapper rightMapper) {
         this.userService = userService;
         this.authenticationManager = authenticationManager;
         this.userMapper = userMapper;
+        this.rightMapper = rightMapper;
     }
 
     @GetMapping("/list")
@@ -135,14 +139,28 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("用户不存在");
         }
 
-        // 单独查 role name，不加在 User 类里
-        //String roleName = roleMapper.selectById(Role.getRole_id()).getName();
+        //获取角色名
+        List<String> roleNames = rightMapper.selectRoleNameByUserId(userId);
+
+        String roleName = "未知角色"; // 默认值
+
+        // **适配逻辑：从列表中安全地提取唯一的角色名称**
+        if (roleNames != null && !roleNames.isEmpty()) {
+            roleName = roleNames.get(0);
+
+            // ⚠️ 建议：如果按业务逻辑“应该”只有一个，但实际可能出现多个，
+            // 可以添加一个日志或异常处理，以防数据不一致。
+            // if (roleNames.size() > 1) {
+            //     System.err.println("警告：用户 " + userId + " 存在多个角色，将使用第一个：" + roleName);
+            //     // 或者抛出业务异常：throw new RuntimeException("用户拥有多个角色，数据异常");
+            // }
+        }
 
         // 返回需要的信息
         Map<String, Object> result = new HashMap<>();
         result.put("userId", user.getUserId());
         result.put("username", user.getUsername());
-        //result.put("roleName", roleName);
+        result.put("role", roleName);
 
         return ResponseEntity.ok(result);
     }

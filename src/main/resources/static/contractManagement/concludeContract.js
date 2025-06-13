@@ -35,8 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
             if (data.examineComments) {
                 commentsUl.innerHTML = `<li>${data.examineComments}</li>`;
             }
-//
-            setFieldsReadonly();
         })
         .catch((error) => {
             console.error("获取结项信息失败:", error);
